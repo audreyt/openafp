@@ -17,7 +17,11 @@ main = do
     bh      <- openBinIO_ fh
     mapref	<- newIORef []
     scflref <- newIORef []
-    runReaderT (stateMain bh cs) opts{ currentMap = mapref, scflStack = scflref } { maps = fms }
+    sidref  <- newIORef 1
+    runReaderT (stateMain bh cs) opts
+        { currentMap = mapref
+        , scflStack = scflref
+        , scflID = sidref } { maps = fms }
     hClose fh
 
 stateMain :: BinHandle -> [AFP_] -> ReaderT Opts IO ()
@@ -86,10 +90,31 @@ strChunks (x:xs) = [x] : strChunks xs
 
 mungePage :: [AFP_] -> OptsIO [AFP_]
 mungePage page = do
-    page ==> [ _PTX === (`filterChunks`
-        [ _PTX_TRN === trnHandler
-        , _PTX_SCFL === scflHandler
-        ]) ]
+    page ==>
+        [ _MCF ... mcfHandler
+        , _PTX === (`filterChunks`
+            [ _PTX_TRN === trnHandler
+            , _PTX_SCFL === scflHandler
+            ])
+        ]
+
+-- | Record font Id to Name mappings in MCF's RLI and FQN chunks.
+mcfHandler :: MCF -> OptsIO ()
+mcfHandler r = do
+    readChunks r ..>
+        [ _MCF_T ... \mcf -> do
+            fnt <- asks font
+            let cs = readChunks mcf
+            ids   <- sequence [ t_rli `applyToChunk` c | c <- cs, c ~~ _T_RLI ]
+            fonts <- sequence [ t_fqn `applyToChunk` c | c <- cs, c ~~ _T_FQN ]
+            let alist = map fromA8 fonts `zip` ids
+            case lookup fnt alist of
+                Just sid -> do
+                    verbose $$ ("Found font ID for " ++ fnt ++ ": " ++ (show sid))
+                    scflID $= id $ sid
+                    return ()
+                Nothing -> return ()
+        ]
 
 scflHandler :: PTX_SCFL -> WriterOptsIO ()
 scflHandler r = do
@@ -101,6 +126,7 @@ trnHandler r = do
     trnOld  <- fromNStr $ ptx_trn r
     fm		<- readVar currentMap
     scfls   <- readVar scflStack
+    sid     <- readVar scflID
     case fm of
         ((trn, rv):rest) | trn == trnOld -> do
             -- verbose $$ map (chr . fromEnum) trn
@@ -109,8 +135,8 @@ trnHandler r = do
                 []      -> do
                     let rst = (ptx_trn_Type r `mod` 2)
                         typ = (ptx_scfl_Type _PTX_SCFL)
-                    push _PTX_SCFL{ ptx_scfl = 1, ptx_scfl_Type = typ + rst }
-                    push _PTX_SCFL{ ptx_scfl = 1, ptx_scfl_Type = typ + (1-rst) }
+                    push _PTX_SCFL{ ptx_scfl = sid, ptx_scfl_Type = typ + rst }
+                    push _PTX_SCFL{ ptx_scfl = sid, ptx_scfl_Type = typ + (1-rst) }
                 (s:ss)  -> mapM_ push $ reverse (s{ ptx_scfl = 1 }:ss)
             unless (null rv) $ do
                 trn' <- toNStr rv
@@ -141,6 +167,7 @@ data Opts = Opts
     , verbose           :: Bool
     , showHelp          :: IO ()
     , scflStack         :: IORef [PTX_SCFL]
+    , scflID            :: IORef N1
     } deriving (Typeable)
 
 defaultOpts = Opts
@@ -153,6 +180,7 @@ defaultOpts = Opts
     , verbose           = True
     , showHelp          = return ()
     , scflStack         = undefined
+    , scflID            = undefined
     }
 
 options :: [OptDescr (Opts -> Opts)]
