@@ -24,7 +24,6 @@ stateMain bh = do
     mapM_ ((liftIO . put bh =<<) . pageHandler)
         . splitRecords _PGD
 
-pageHandler :: [AFP_] -> OptsIO [AFP_]
 pageHandler page = do
     ptxList <- sequence [ ptx_Chunks `applyToChunk` c | c <- page, c ~~ _PTX ]
     trnList <- sequence [ ptx_trn `applyToChunk` c | c <- concat ptxList, c ~~ _PTX_TRN ]
@@ -36,24 +35,53 @@ pageHandler page = do
         Nothing -> return page
         Just fm -> do
             verbose $$ "Matched..."
-            currentMap $= id $ fm
+            currentMap $= mungeMap $ fm
             maps $= delete fm $ fms
             mungePage page
 
+mungeMap :: Map -> Map
+mungeMap = concatMap mungePair
+
+mungePair :: ([N1], [N1]) -> Map
+mungePair (key, val) = splitChunks key `zip` (val:repeat [])
+
+pretty :: [[N1]] -> [String]
+pretty = map foo
+    where
+    foo = map (chr . fromEnum)
 matchMap :: [[N1]] -> Map -> Bool
-matchMap strList fm = (length matched == length fm)
+matchMap strList fm
+    -- | trace (unlines $ pretty matched) True
+    -- | trace (show (length matched, length keys)) True
+    = (length matched >= length keys)
     where
     matched = filter matchOne strList
+    keys = concatMap splitChunks keysList
+    keysList = map fst fm
     matchOne str
-        | str `elem` map fst fm
+        | str `elem` keys
         = True
         | length str < 2
         = False
         | last str == 0x40
         , last (init str) == 0xA1
-        = matchOne $ init (init str)
+        = matchOne (init (init str))
         | otherwise
+--        , trace (map (chr . fromEnum) str) True
         = False
+
+splitChunks = foldr joinChunks [] . strChunks
+
+joinChunks :: [N1] -> [[N1]] -> [[N1]]
+joinChunks xs [] = [xs]
+joinChunks [x] ((y:ys):rest)        | y <= 0x80 = (x:y:ys):rest
+joinChunks [x1,x2] ((y:ys):rest)    | y >= 0x80 = (x1:x2:y:ys):rest
+joinChunks xs rest = xs:rest
+
+strChunks :: [N1] -> [[N1]]
+strChunks [] = []
+strChunks (hi:lo:xs) | hi >= 0x80 = ([hi, lo] : strChunks xs)
+strChunks (x:xs) = [x] : strChunks xs
 
 mungePage :: [AFP_] -> OptsIO [AFP_]
 mungePage page = do
@@ -63,12 +91,17 @@ trnHandler :: PTX_TRN -> WriterOptsIO ()
 trnHandler r = do
     trn     <- fromNStr $ ptx_trn r
     fm		<- readVar currentMap
-    let rv = (lookup trn fm :: Maybe [N1])
-    trn'    <- toNStr $ maybe trn id rv
---	when (isJust rv) $ do
---		currentMap $= delete (trn, fromJust rv) $ fm
-    push r { ptx_trn = trn' }
-
+    case fm of
+        ((trn, rv):rest) -> do
+            verbose $$ map (chr . fromEnum) trn
+            currentMap $= id $ rest
+            unless (null rv) $ do
+                verbose $$ ("==> " ++ (map (chr . fromEnum) rv))
+                trn' <- toNStr rv
+                push _PTX_SCFL { ptx_scfl = 1 } -- XXX font
+                push r { ptx_trn = trn' }
+        _ -> push r
+        
 usage :: String -> IO a
 usage = showUsage options showInfo
     where
@@ -111,7 +144,7 @@ options =
 
 run :: IO ()
 -- run = withArgs (split " " "-v -m SC27.add -i SC27.AFP -o output.afp") main
-run = runWith "-v -m x.add -i x.afp -o y.afp"
+run = runWith "-v -m test.add -i foo.afp -o bar.afp"
 
 runWith str = withArgs (split " " str) main
 
@@ -123,9 +156,17 @@ makeMaps str = entries
     pair (a:b:[]) = [(ordList a, ordList b)]
     pair (a:b:[]:rest) = (ordList a, ordList b) : pair rest
     pair x = error $ unwords x
-    groups = split "\n\n--\n--\n\n" str
+    groups = split "\n\n--\n--\n\n" $ ignoreFont str
     ordList = map (toEnum . ord)
 
+gun = run
+
+ignoreFont str
+    | take 5 str == "Font:"
+    = unlines $ tail $ lines str
+    | otherwise
+    = str
+    where
 getOpts :: IO Opts
 getOpts = do
     args <- getArgs
