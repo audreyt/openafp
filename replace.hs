@@ -38,7 +38,7 @@ pageHandler page = do
             verbose $$ "Matched..."
             currentMap $= id $ fm
             maps $= delete fm $ fms
-            mungePage fm page
+            mungePage page
 
 matchMap :: [[N1]] -> Map -> Bool
 matchMap strList fm = (length matched == length fm)
@@ -63,10 +63,10 @@ trnHandler :: PTX_TRN -> WriterOptsIO ()
 trnHandler r = do
     trn     <- fromNStr $ ptx_trn r
     fm		<- readVar currentMap
-    let rv = lookup trn fm
+    let rv = (lookup trn fm :: Maybe [N1])
     trn'    <- toNStr $ maybe trn id rv
-	when (isJust rv) $ do
-		currentMap $= delete (trn, fromJust rv) $ fm
+--	when (isJust rv) $ do
+--		currentMap $= delete (trn, fromJust rv) $ fm
     push r { ptx_trn = trn' }
 
 usage :: String -> IO a
