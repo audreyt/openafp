@@ -3,7 +3,7 @@
 module Main where
 import OpenAFP.Prelude
 
-type Map = FiniteMap [N1] [N1]
+type Map = [([N1], [N1])]
 type Maps = IORef [Map]
 type OptsIO a = StateIO Opts a
 type WriterOptsIO a = WriterStateIO Opts a
@@ -15,7 +15,8 @@ main = do
     cs      <- readInputAFP opts
     fh      <- openOutputAFP opts
     bh      <- openBinIO_ fh
-    runReaderT (stateMain bh cs) opts { maps = fms }
+    mapref	<- newIORef []
+    runReaderT (stateMain bh cs) opts{ currentMap = mapref } { maps = fms }
     hClose fh
 
 stateMain :: BinHandle -> [AFP_] -> ReaderT Opts IO ()
@@ -35,15 +36,16 @@ pageHandler page = do
         Nothing -> return page
         Just fm -> do
             verbose $$ "Matched..."
+            currentMap $= id $ fm
             maps $= delete fm $ fms
             mungePage fm page
 
 matchMap :: [[N1]] -> Map -> Bool
-matchMap strList fm = (length matched == sizeFM fm)
+matchMap strList fm = (length matched == length fm)
     where
     matched = filter matchOne strList
     matchOne str
-        | str `elemFM` fm
+        | str `elem` map fst fm
         = True
         | length str < 2
         = False
@@ -53,14 +55,18 @@ matchMap strList fm = (length matched == sizeFM fm)
         | otherwise
         = False
 
-mungePage :: Map -> [AFP_] -> OptsIO [AFP_]
-mungePage fm page = do
-    page ==> [ _PTX === (`filterChunks` [ _PTX_TRN === trnHandler fm ]) ]
+mungePage :: [AFP_] -> OptsIO [AFP_]
+mungePage page = do
+    page ==> [ _PTX === (`filterChunks` [ _PTX_TRN === trnHandler ]) ]
 
-trnHandler :: Map -> PTX_TRN -> WriterOptsIO ()
-trnHandler fm r = do
+trnHandler :: PTX_TRN -> WriterOptsIO ()
+trnHandler r = do
     trn     <- fromNStr $ ptx_trn r
-    trn'    <- toNStr $ lookupWithDefaultFM fm trn trn
+    fm		<- readVar currentMap
+    let rv = lookup trn fm
+    trn'    <- toNStr $ maybe trn id rv
+	when (isJust rv) $ do
+		currentMap $= delete (trn, fromJust rv) $ fm
     push r { ptx_trn = trn' }
 
 usage :: String -> IO a
@@ -72,6 +78,7 @@ usage = showUsage options showInfo
 data Opts = Opts
     { readMaps          :: IO Maps
     , maps              :: Maps
+    , currentMap		:: IORef Map
     , readInputAFP      :: IO [AFP_]
     , openOutputAFP     :: IO Handle
     , verbose           :: Bool
@@ -80,6 +87,7 @@ data Opts = Opts
 
 defaultOpts = Opts
     { readMaps          = requiredOpt usage "map"
+   	, currentMap		= undefined
     , maps              = requiredOpt usage "map"
     , readInputAFP      = requiredOpt usage "input"
     , openOutputAFP     = requiredOpt usage "output"
@@ -103,12 +111,14 @@ options =
 
 run :: IO ()
 -- run = withArgs (split " " "-v -m SC27.add -i SC27.AFP -o output.afp") main
-run = withArgs (split " " "-v -m x.add -i x.afp -o y.afp") main
+run = runWith "-v -m x.add -i x.afp -o y.afp"
+
+runWith str = withArgs (split " " str) main
 
 makeMaps :: String -> [Map]
 makeMaps str = entries
     where
-    entries = map (listToFM . pair . lines) groups
+    entries = map (pair . lines) groups
     pair [] = []
     pair (a:b:[]) = [(ordList a, ordList b)]
     pair (a:b:[]:rest) = (ordList a, ordList b) : pair rest
