@@ -1,0 +1,257 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--Rendered using the Haskell Html Library v0.2-->
+<HTML
+><HEAD
+  ><TITLE
+    >OpenAFP.Prelude</TITLE
+    ><LINK HREF = "haddock.css" REL = "stylesheet" TYPE = "text/css"
+    ></HEAD
+  ><BODY
+  ><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+    ><TR
+      ><TD CLASS = "topbar"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD
+	      ><IMG SRC = "haskell_icon.gif" WIDTH = "16" HEIGHT = "16" ALT = " "
+		></TD
+	      ><TD CLASS = "title"
+	      >OpenAFP</TD
+	      ><TD CLASS = "topbut"
+	      ><A HREF = "index.html"
+		>Contents</A
+		></TD
+	      ><TD CLASS = "topbut"
+	      ><A HREF = "doc-index.html"
+		>Index</A
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "modulebar"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD
+	      ><FONT SIZE = "6"
+		>OpenAFP.Prelude</FONT
+		></TD
+	      ><TD ALIGN = "right"
+	      ><TABLE CLASS = "narrow" CELLSPACING = "0" CELLPADDING = "0"
+		><TR
+		  ><TD CLASS = "infohead"
+		    >Portability</TD
+		    ><TD CLASS = "infoval"
+		    >  non-portable (GHC-only)</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "infohead"
+		    >Stability</TD
+		    ><TD CLASS = "infoval"
+		    >  experimental</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "infohead"
+		    >Maintainer</TD
+		    ><TD CLASS = "infoval"
+		    >  autrijus@autrijus.org</TD
+		    ></TR
+		  ></TABLE
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "section1"
+	>Description</TD
+	></TR
+      ><TR
+      ><TD CLASS = "doc"
+	>This module re-exports all Records, Types, Internals and Prelude modules,
+and provides some toplevel convenience functions.
+</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "section1"
+	>Synopsis</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "body"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD CLASS = "decl"
+	      >module <A HREF = "OpenAFP.Types.html"
+		>OpenAFP.Types</A
+		></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      >module <A HREF = "OpenAFP.Records.html"
+		>OpenAFP.Records</A
+		></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      >module <A HREF = "OpenAFP.Internals.html"
+		>OpenAFP.Internals</A
+		></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      >module <A HREF = "OpenAFP.Prelude.Utils.html"
+		>OpenAFP.Prelude.Utils</A
+		></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      >module <A HREF = "OpenAFP.Prelude.Instances.html"
+		>OpenAFP.Prelude.Instances</A
+		></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AreadAFP"
+		>readAFP</A
+		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
+		>MonadIO</A
+		> m =&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AFilePath"
+		>FilePath</A
+		> -&gt; m [<A HREF = "OpenAFP.Records.html#t%3AAFP_"
+		>AFP_</A
+		>]</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AwriteAFP"
+		>writeAFP</A
+		> :: <A HREF = "OpenAFP.Internals.Binary.html#t%3ABinary"
+		>Binary</A
+		> a =&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AFilePath"
+		>FilePath</A
+		> -&gt; [a] -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AIO"
+		>IO</A
+		> ()</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AfilterAFP"
+		>filterAFP</A
+		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AFilePath"
+		>FilePath</A
+		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AFilePath"
+		>FilePath</A
+		> -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		>ChunkType</A
+		>, <A HREF = "OpenAFP.Records.html#t%3AAFP_"
+		>AFP_</A
+		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AIO"
+		>IO</A
+		> [<A HREF = "OpenAFP.Records.html#t%3AAFP_"
+		>AFP_</A
+		>])] -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AIO"
+		>IO</A
+		> ()</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AreadArgs"
+		>readArgs</A
+		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
+		>MonadIO</A
+		> m =&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AInt"
+		>Int</A
+		> -&gt; m [<A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Base.html#t%3AString"
+		>String</A
+		>]</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3Aafp_Chunks"
+		>afp_Chunks</A
+		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AFilePath"
+		>FilePath</A
+		> -&gt; [<A HREF = "OpenAFP.Records.html#t%3AAFP_"
+		>AFP_</A
+		>]</TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "botbar"
+	>Produced by <A HREF = "http://www.haskell.org/haddock/"
+	  >Haddock</A
+	  > version HADDOCK_VERSION</TD
+	></TR
+      ></TABLE
+    ></BODY
+  ></HTML
+>

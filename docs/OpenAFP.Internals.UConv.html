@@ -1,0 +1,266 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--Rendered using the Haskell Html Library v0.2-->
+<HTML
+><HEAD
+  ><TITLE
+    >OpenAFP.Internals.UConv</TITLE
+    ><LINK HREF = "haddock.css" REL = "stylesheet" TYPE = "text/css"
+    ></HEAD
+  ><BODY
+  ><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+    ><TR
+      ><TD CLASS = "topbar"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD
+	      ><IMG SRC = "haskell_icon.gif" WIDTH = "16" HEIGHT = "16" ALT = " "
+		></TD
+	      ><TD CLASS = "title"
+	      >OpenAFP</TD
+	      ><TD CLASS = "topbut"
+	      ><A HREF = "index.html"
+		>Contents</A
+		></TD
+	      ><TD CLASS = "topbut"
+	      ><A HREF = "doc-index.html"
+		>Index</A
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "modulebar"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD
+	      ><FONT SIZE = "6"
+		>OpenAFP.Internals.UConv</FONT
+		></TD
+	      ><TD ALIGN = "right"
+	      ><TABLE CLASS = "narrow" CELLSPACING = "0" CELLPADDING = "0"
+		><TR
+		  ><TD CLASS = "infohead"
+		    >Portability</TD
+		    ><TD CLASS = "infoval"
+		    >  non-portable (FFI extensions, UNIX98)</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "infohead"
+		    >Stability</TD
+		    ><TD CLASS = "infoval"
+		    >  experimental</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "infohead"
+		    >Maintainer</TD
+		    ><TD CLASS = "infoval"
+		    >  autrijus@autrijus.org</TD
+		    ></TR
+		  ></TABLE
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "section1"
+	>Description</TD
+	></TR
+      ><TR
+      ><TD CLASS = "doc"
+	>This module provides an interface to IBM ICU's uconv functionality
+</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "section1"
+	>Synopsis</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "body"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3Auconv"
+		>uconv</A
+		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AString"
+		>String</A
+		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AString"
+		>String</A
+		> -&gt; [<A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Word.html#t%3AWord8"
+		>Word8</A
+		>] -&gt; [<A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Word.html#t%3AWord8"
+		>Word8</A
+		>]</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3Aucnv_convert"
+		>ucnv_convert</A
+		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.C.String.html#t%3ACString"
+		>CString</A
+		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.C.String.html#t%3ACString"
+		>CString</A
+		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.Ptr.html#t%3APtr"
+		>Ptr</A
+		> <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.C.Types.html#t%3ACChar"
+		>CChar</A
+		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Int.html#t%3AInt32"
+		>Int32</A
+		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.Ptr.html#t%3APtr"
+		>Ptr</A
+		> <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.C.Types.html#t%3ACChar"
+		>CChar</A
+		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Int.html#t%3AInt32"
+		>Int32</A
+		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.Ptr.html#t%3APtr"
+		>Ptr</A
+		> <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Word.html#t%3AWord8"
+		>Word8</A
+		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AIO"
+		>IO</A
+		> <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Int.html#t%3AInt32"
+		>Int32</A
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "section1"
+	>Documentation</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><A NAME = "v%3Auconv"
+	  ></A
+	  ><B
+	  >uconv</B
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "body"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD CLASS = "decl"
+	      >:: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AString"
+		>String</A
+		></TD
+	      ><TD CLASS = "rdoc"
+	      >The encoding to convert from</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      >-&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AString"
+		>String</A
+		></TD
+	      ><TD CLASS = "rdoc"
+	      >The encoding to convert to</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      >-&gt; [<A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Word.html#t%3AWord8"
+		>Word8</A
+		>]</TD
+	      ><TD CLASS = "rdoc"
+	      >The byte sequence to convert</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      >-&gt; [<A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Word.html#t%3AWord8"
+		>Word8</A
+		>]</TD
+	      ><TD CLASS = "rdoc"
+	      >The byte sequence converted</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "ndoc" COLSPAN = "2"
+	      >Convert a sequence of bytes from one encoding to another.</TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><A NAME = "v%3Aucnv_convert"
+	  ></A
+	  ><B
+	  >ucnv_convert</B
+	  > :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.C.String.html#t%3ACString"
+	  >CString</A
+	  > -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.C.String.html#t%3ACString"
+	  >CString</A
+	  > -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.Ptr.html#t%3APtr"
+	  >Ptr</A
+	  > <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.C.Types.html#t%3ACChar"
+	  >CChar</A
+	  > -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Int.html#t%3AInt32"
+	  >Int32</A
+	  > -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.Ptr.html#t%3APtr"
+	  >Ptr</A
+	  > <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.C.Types.html#t%3ACChar"
+	  >CChar</A
+	  > -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Int.html#t%3AInt32"
+	  >Int32</A
+	  > -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.Ptr.html#t%3APtr"
+	  >Ptr</A
+	  > <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Word.html#t%3AWord8"
+	  >Word8</A
+	  > -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AIO"
+	  >IO</A
+	  > <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Int.html#t%3AInt32"
+	  >Int32</A
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "botbar"
+	>Produced by <A HREF = "http://www.haskell.org/haddock/"
+	  >Haddock</A
+	  > version HADDOCK_VERSION</TD
+	></TR
+      ></TABLE
+    ></BODY
+  ></HTML
+>

@@ -1,0 +1,276 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--Rendered using the Haskell Html Library v0.2-->
+<HTML
+><HEAD
+  ><TITLE
+    >OpenAFP.Prelude.Utils</TITLE
+    ><LINK HREF = "haddock.css" REL = "stylesheet" TYPE = "text/css"
+    ></HEAD
+  ><BODY
+  ><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+    ><TR
+      ><TD CLASS = "topbar"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD
+	      ><IMG SRC = "haskell_icon.gif" WIDTH = "16" HEIGHT = "16" ALT = " "
+		></TD
+	      ><TD CLASS = "title"
+	      >OpenAFP</TD
+	      ><TD CLASS = "topbut"
+	      ><A HREF = "index.html"
+		>Contents</A
+		></TD
+	      ><TD CLASS = "topbut"
+	      ><A HREF = "doc-index.html"
+		>Index</A
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "modulebar"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD
+	      ><FONT SIZE = "6"
+		>OpenAFP.Prelude.Utils</FONT
+		></TD
+	      ><TD ALIGN = "right"
+	      ><TABLE CLASS = "narrow" CELLSPACING = "0" CELLPADDING = "0"
+		><TR
+		  ><TD CLASS = "infohead"
+		    >Portability</TD
+		    ><TD CLASS = "infoval"
+		    >  non-portable (GHC-only)</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "infohead"
+		    >Stability</TD
+		    ><TD CLASS = "infoval"
+		    >  experimental</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "infohead"
+		    >Maintainer</TD
+		    ><TD CLASS = "infoval"
+		    >  autrijus@autrijus.org</TD
+		    ></TR
+		  ></TABLE
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "section1"
+	>Description</TD
+	></TR
+      ><TR
+      ><TD CLASS = "doc"
+	>This module provides various AFP manipulation utilities.
+</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "section1"
+	>Synopsis</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "body"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AapplyToChunk"
+		>applyToChunk</A
+		> :: (<A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+		>Rec</A
+		> a, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
+		>Chunk</A
+		> c, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
+		>MonadIO</A
+		> m) =&gt; (a -&gt; b) -&gt; c -&gt; m b</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AsplitRecords"
+		>splitRecords</A
+		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
+		>Chunk</A
+		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
+		>Typeable</A
+		> t) =&gt; t -&gt; [a] -&gt; [[a]]</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AfindRecord"
+		>findRecord</A
+		> :: (a -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3ABool"
+		>Bool</A
+		>) -&gt; [<A HREF = "OpenAFP.Types.Record.html#t%3ARecord"
+		>Record</A
+		> a] -&gt; a</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AmatchRecord"
+		>matchRecord</A
+		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3ARecData"
+		>RecData</A
+		> a b, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AEq"
+		>Eq</A
+		> c) =&gt; c -&gt; (b -&gt; c) -&gt; a -&gt; b</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AtoAsc"
+		>toAsc</A
+		> :: (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
+		>MonadIO</A
+		> m, <A HREF = "OpenAFP.Internals.Binary.html#t%3ABinary"
+		>Binary</A
+		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.Storable.html#t%3AStorable"
+		>Storable</A
+		> a) =&gt; a -&gt; m <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Base.html#t%3AString"
+		>String</A
+		></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3Atrim"
+		>trim</A
+		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Base.html#t%3AString"
+		>String</A
+		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Base.html#t%3AString"
+		>String</A
+		></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AcatBuf"
+		>catBuf</A
+		> :: (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
+		>MonadIO</A
+		> m, <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
+		>Buf</A
+		> a) =&gt; a -&gt; a -&gt; m a</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AsubBuf"
+		>subBuf</A
+		> :: (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
+		>MonadIO</A
+		> m, <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
+		>Buf</A
+		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AIntegral"
+		>Integral</A
+		> b, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AIntegral"
+		>Integral</A
+		> c) =&gt; a -&gt; b -&gt; c -&gt; m a</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AsubBufs"
+		>subBufs</A
+		> :: (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
+		>MonadIO</A
+		> m, <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
+		>Buf</A
+		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AIntegral"
+		>Integral</A
+		> b, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AIntegral"
+		>Integral</A
+		> c) =&gt; [a] -&gt; b -&gt; c -&gt; m a</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AshowBitmap"
+		>showBitmap</A
+		> :: (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
+		>MonadIO</A
+		> m, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AIntegral"
+		>Integral</A
+		> i, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AShow"
+		>Show</A
+		> a) =&gt; [a] -&gt; i -&gt; m ()</TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "botbar"
+	>Produced by <A HREF = "http://www.haskell.org/haddock/"
+	  >Haddock</A
+	  > version HADDOCK_VERSION</TD
+	></TR
+      ></TABLE
+    ></BODY
+  ></HTML
+>

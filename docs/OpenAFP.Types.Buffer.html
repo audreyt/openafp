@@ -1,0 +1,623 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--Rendered using the Haskell Html Library v0.2-->
+<HTML
+><HEAD
+  ><TITLE
+    >OpenAFP.Types.Buffer</TITLE
+    ><LINK HREF = "haddock.css" REL = "stylesheet" TYPE = "text/css"
+    ></HEAD
+  ><BODY
+  ><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+    ><TR
+      ><TD CLASS = "topbar"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD
+	      ><IMG SRC = "haskell_icon.gif" WIDTH = "16" HEIGHT = "16" ALT = " "
+		></TD
+	      ><TD CLASS = "title"
+	      >OpenAFP</TD
+	      ><TD CLASS = "topbut"
+	      ><A HREF = "index.html"
+		>Contents</A
+		></TD
+	      ><TD CLASS = "topbut"
+	      ><A HREF = "doc-index.html"
+		>Index</A
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "modulebar"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD
+	      ><FONT SIZE = "6"
+		>OpenAFP.Types.Buffer</FONT
+		></TD
+	      ><TD ALIGN = "right"
+	      ><TABLE CLASS = "narrow" CELLSPACING = "0" CELLPADDING = "0"
+		><TR
+		  ><TD CLASS = "infohead"
+		    >Portability</TD
+		    ><TD CLASS = "infoval"
+		    >  non-portable (GHC-only)</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "infohead"
+		    >Stability</TD
+		    ><TD CLASS = "infoval"
+		    >  experimental</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "infohead"
+		    >Maintainer</TD
+		    ><TD CLASS = "infoval"
+		    >  autrijus@autrijus.org</TD
+		    ></TR
+		  ></TABLE
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "section1"
+	>Description</TD
+	></TR
+      ><TR
+      ><TD CLASS = "doc"
+	>This module handles sized binary buffers.
+</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "section1"
+	>Synopsis</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "body"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD CLASS = "decl"
+	      ><SPAN CLASS = "keyword"
+		>class</SPAN
+		> (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AShow"
+		>Show</A
+		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
+		>Typeable</A
+		> a) =&gt; <A HREF = "#t%3ABuf"
+		>Buf</A
+		> a  <SPAN CLASS = "keyword"
+		>where</SPAN
+		></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "body"
+	      ><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+		><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "#v%3AbufFromPStrLen"
+		      >bufFromPStrLen</A
+		      > :: <A HREF = "OpenAFP.Internals.Binary.html#t%3APStringLen"
+		      >PStringLen</A
+		      > -&gt; a</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "#v%3AbufToPStrLen"
+		      >bufToPStrLen</A
+		      > :: a -&gt; <A HREF = "OpenAFP.Internals.Binary.html#t%3APStringLen"
+		      >PStringLen</A
+		      ></TD
+		    ></TR
+		  ></TABLE
+		></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><SPAN CLASS = "keyword"
+		>newtype</SPAN
+		> <A HREF = "#t%3ABuffer0"
+		>Buffer0</A
+		>  = <A HREF = "#v%3ABuf0"
+		>Buf0</A
+		> <A HREF = "OpenAFP.Internals.Binary.html#t%3APStringLen"
+		>PStringLen</A
+		></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><SPAN CLASS = "keyword"
+		>newtype</SPAN
+		> <A HREF = "#t%3ABuffer1"
+		>Buffer1</A
+		>  = <A HREF = "#v%3ABuf1"
+		>Buf1</A
+		> <A HREF = "OpenAFP.Internals.Binary.html#t%3APStringLen"
+		>PStringLen</A
+		></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><SPAN CLASS = "keyword"
+		>newtype</SPAN
+		> <A HREF = "#t%3ABuffer2"
+		>Buffer2</A
+		>  = <A HREF = "#v%3ABuf2"
+		>Buf2</A
+		> <A HREF = "OpenAFP.Internals.Binary.html#t%3APStringLen"
+		>PStringLen</A
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "section1"
+	>Documentation</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><SPAN CLASS = "keyword"
+	  >class</SPAN
+	  > (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AShow"
+	  >Show</A
+	  > a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
+	  >Typeable</A
+	  > a) =&gt; <A NAME = "t%3ABuf"
+	  ></A
+	  ><B
+	  >Buf</B
+	  > a  <SPAN CLASS = "keyword"
+	  >where</SPAN
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "body"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD CLASS = "ndoc"
+	      >The Buf class represents buffers, with the leading bytes
+representing its length.</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "section4"
+	      >Methods</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "body"
+	      ><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+		><TR
+		  ><TD CLASS = "decl"
+		    ><A NAME = "v%3AbufFromPStrLen"
+		      ></A
+		      ><B
+		      >bufFromPStrLen</B
+		      > :: <A HREF = "OpenAFP.Internals.Binary.html#t%3APStringLen"
+		      >PStringLen</A
+		      > -&gt; a</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "s8"
+		    ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A NAME = "v%3AbufToPStrLen"
+		      ></A
+		      ><B
+		      >bufToPStrLen</B
+		      > :: a -&gt; <A HREF = "OpenAFP.Internals.Binary.html#t%3APStringLen"
+		      >PStringLen</A
+		      ></TD
+		    ></TR
+		  ></TABLE
+		></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "section4"
+	      >Instances</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "body"
+	      ><TABLE CLASS = "vanilla" CELLSPACING = "1" CELLPADDING = "0"
+		><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
+		      >Buf</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer0"
+		      >Buffer0</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
+		      >Buf</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer1"
+		      >Buffer1</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
+		      >Buf</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer2"
+		      >Buffer2</A
+		      ></TD
+		    ></TR
+		  ></TABLE
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><SPAN CLASS = "keyword"
+	  >newtype</SPAN
+	  > <A NAME = "t%3ABuffer0"
+	  ></A
+	  ><B
+	  >Buffer0</B
+	  > </TD
+	></TR
+      ><TR
+      ><TD CLASS = "body"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD CLASS = "ndoc"
+	      >Buffer0, being a simple PStringLen, is of unlimited length.</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "section4"
+	      >Constructors</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "body"
+	      ><TABLE CLASS = "vanilla" CELLSPACING = "1" CELLPADDING = "0"
+		><TR
+		  ><TD CLASS = "decl"
+		    ><A NAME = "v%3ABuf0"
+		      ></A
+		      ><B
+		      >Buf0</B
+		      > <A HREF = "OpenAFP.Internals.Binary.html#t%3APStringLen"
+		      >PStringLen</A
+		      ></TD
+		    ><TD CLASS = "rdoc"
+		    ></TD
+		    ></TR
+		  ></TABLE
+		></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "section4"
+	      >Instances</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "body"
+	      ><TABLE CLASS = "vanilla" CELLSPACING = "1" CELLPADDING = "0"
+		><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
+		      >Buf</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer0"
+		      >Buffer0</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "OpenAFP.Internals.Binary.html#t%3ABinary"
+		      >Binary</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer0"
+		      >Buffer0</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AShow"
+		      >Show</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer0"
+		      >Buffer0</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
+		      >Typeable</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer0"
+		      >Buffer0</A
+		      ></TD
+		    ></TR
+		  ></TABLE
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><SPAN CLASS = "keyword"
+	  >newtype</SPAN
+	  > <A NAME = "t%3ABuffer1"
+	  ></A
+	  ><B
+	  >Buffer1</B
+	  > </TD
+	></TR
+      ><TR
+      ><TD CLASS = "body"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD CLASS = "ndoc"
+	      >Buffer1 uses one byte as length, hence is at most 254 bytes long.</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "section4"
+	      >Constructors</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "body"
+	      ><TABLE CLASS = "vanilla" CELLSPACING = "1" CELLPADDING = "0"
+		><TR
+		  ><TD CLASS = "decl"
+		    ><A NAME = "v%3ABuf1"
+		      ></A
+		      ><B
+		      >Buf1</B
+		      > <A HREF = "OpenAFP.Internals.Binary.html#t%3APStringLen"
+		      >PStringLen</A
+		      ></TD
+		    ><TD CLASS = "rdoc"
+		    ></TD
+		    ></TR
+		  ></TABLE
+		></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "section4"
+	      >Instances</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "body"
+	      ><TABLE CLASS = "vanilla" CELLSPACING = "1" CELLPADDING = "0"
+		><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		      >ChunkBuf</A
+		      > <A HREF = "OpenAFP.Records.AFP.PTX.html#t%3APTX_"
+		      >PTX_</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer1"
+		      >Buffer1</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		      >ChunkBuf</A
+		      > <A HREF = "OpenAFP.Types.html#t%3AT_"
+		      >T_</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer1"
+		      >Buffer1</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
+		      >Buf</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer1"
+		      >Buffer1</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "OpenAFP.Internals.Binary.html#t%3ABinary"
+		      >Binary</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer1"
+		      >Buffer1</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AShow"
+		      >Show</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer1"
+		      >Buffer1</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
+		      >Typeable</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer1"
+		      >Buffer1</A
+		      ></TD
+		    ></TR
+		  ></TABLE
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><SPAN CLASS = "keyword"
+	  >newtype</SPAN
+	  > <A NAME = "t%3ABuffer2"
+	  ></A
+	  ><B
+	  >Buffer2</B
+	  > </TD
+	></TR
+      ><TR
+      ><TD CLASS = "body"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD CLASS = "ndoc"
+	      >Buffer2 uses two bytes; it can store up to 65535 bytes.</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "section4"
+	      >Constructors</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "body"
+	      ><TABLE CLASS = "vanilla" CELLSPACING = "1" CELLPADDING = "0"
+		><TR
+		  ><TD CLASS = "decl"
+		    ><A NAME = "v%3ABuf2"
+		      ></A
+		      ><B
+		      >Buf2</B
+		      > <A HREF = "OpenAFP.Internals.Binary.html#t%3APStringLen"
+		      >PStringLen</A
+		      ></TD
+		    ><TD CLASS = "rdoc"
+		    ></TD
+		    ></TR
+		  ></TABLE
+		></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "section4"
+	      >Instances</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "body"
+	      ><TABLE CLASS = "vanilla" CELLSPACING = "1" CELLPADDING = "0"
+		><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		      >ChunkBuf</A
+		      > <A HREF = "OpenAFP.Records.AFP.MCF.html#t%3AMCF_"
+		      >MCF_</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer2"
+		      >Buffer2</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		      >ChunkBuf</A
+		      > <A HREF = "OpenAFP.Records.html#t%3AAFP_"
+		      >AFP_</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer2"
+		      >Buffer2</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
+		      >Buf</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer2"
+		      >Buffer2</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "OpenAFP.Internals.Binary.html#t%3ABinary"
+		      >Binary</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer2"
+		      >Buffer2</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AShow"
+		      >Show</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer2"
+		      >Buffer2</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
+		      >Typeable</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer2"
+		      >Buffer2</A
+		      ></TD
+		    ></TR
+		  ></TABLE
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "botbar"
+	>Produced by <A HREF = "http://www.haskell.org/haddock/"
+	  >Haddock</A
+	  > version HADDOCK_VERSION</TD
+	></TR
+      ></TABLE
+    ></BODY
+  ></HTML
+>
