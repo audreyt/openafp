@@ -25,7 +25,7 @@ module OpenAFP.Records (
     Unknown(..), _Unknown,
 
     lookupAFP, lookupMCF, lookupPTX, lookupT,
-) where
+) where 
 import OpenAFP.Types
 import OpenAFP.Internals
 import OpenAFP.Records.AFP

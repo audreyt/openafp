@@ -59,7 +59,7 @@ getOpts = do
 	| otherwise	    = init xs ++ ["-i", last xs]
 
 run :: IO ()
-run = withArgs (split " " "-e 937,500 -i ln-1.afp -o x.html") main
+run = withArgs (split " " "-e big5 -i test.afp -o x.html") main
 
 main :: IO ()
 main = do

@@ -29,7 +29,7 @@ class (Show a, Typeable a) => Rec a where
     recSizeOf :: a -> Int
     recSizeOf = error "recSizeOf not defined"
     recView :: a -> IO ViewRecord
-    recView = error "recView not defined"
+    recView x = error ("recView not defined for " ++ show x)
     recType :: a -> Int
     recType = error "recType not defined"
 
@@ -45,7 +45,8 @@ func x y = sizeOf y
 -}
 func x y = 0
 
-instance (Rec a) => Rec (Record a)
+instance (Rec a) => Rec (Record a) where
+    recView (Record a) = recView a
 
 instance (Rec a) => Binary (Record a) where
     get bh = do
