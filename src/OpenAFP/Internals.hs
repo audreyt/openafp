@@ -48,6 +48,7 @@ module OpenAFP.Internals (
     module System.Environment,
     module System.Exit,
     module System.IO.Unsafe,
+    module System.IO.Error,
     module System.Directory,
     module Text.Regex,
     module GHC.IOBase,
@@ -92,6 +93,7 @@ import System.Environment
 import System.Exit
 import System.Mem.Weak
 import System.IO.Unsafe
+import System.IO.Error
 import System.Directory
 import Text.Regex
 import GHC.IOBase (IOArray, newIOArray, readIOArray, writeIOArray)

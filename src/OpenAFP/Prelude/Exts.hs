@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts -funbox-strict-fields #-}
+{-# OPTIONS -fglasgow-exts -funbox-strict-fields -cpp #-}
 
 -----------------------------------------------------------------------------
 -- |
@@ -33,8 +33,10 @@ type RE = String
 (=~) :: String -> String -> Bool
 s =~ p = isJust $ matchRegex (mkRegexWithOpts p False True) s
 
+#if __GLASGOW_HASKELL__ <= 602
 splitRegex :: RE -> String -> [String]
 splitRegex regexpr src = fst $ splitRegexWithMatches regexpr src
+#endif
 
 splitRegexWithMatches :: RE -> String -> ([String], [String])
 splitRegexWithMatches regexpr src = splitRegex' src

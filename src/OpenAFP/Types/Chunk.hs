@@ -64,7 +64,7 @@ toAStr str = liftIO $ do
 fromNStr :: NStr -> IOm [N1]
 fromNStr nstr = liftIO $ do
     let (pstr, len) = bufToPStrLen nstr
-    withForeignPtr (castForeignPtr pstr) $ \cstr ->
+    withForeignPtr (castForeignPtr pstr) $ \cstr -> do
         peekArray len cstr
 
 toNStr :: [N1] -> IOm NStr

@@ -16,7 +16,8 @@ main = do
     fh      <- openOutputAFP opts
     bh      <- openBinIO_ fh
     mapref	<- newIORef []
-    runReaderT (stateMain bh cs) opts{ currentMap = mapref } { maps = fms }
+    scflref <- newIORef []
+    runReaderT (stateMain bh cs) opts{ currentMap = mapref, scflStack = scflref } { maps = fms }
     hClose fh
 
 stateMain :: BinHandle -> [AFP_] -> ReaderT Opts IO ()
@@ -85,23 +86,45 @@ strChunks (x:xs) = [x] : strChunks xs
 
 mungePage :: [AFP_] -> OptsIO [AFP_]
 mungePage page = do
-    page ==> [ _PTX === (`filterChunks` [ _PTX_TRN === trnHandler ]) ]
+    page ==> [ _PTX === (`filterChunks`
+        [ _PTX_TRN === trnHandler
+        , _PTX_SCFL === scflHandler
+        ]) ]
+
+scflHandler :: PTX_SCFL -> WriterOptsIO ()
+scflHandler r = do
+    scfls <- readVar scflStack
+    scflStack $= id $ (r:scfls)
 
 trnHandler :: PTX_TRN -> WriterOptsIO ()
 trnHandler r = do
-    trn     <- fromNStr $ ptx_trn r
+    trnOld  <- fromNStr $ ptx_trn r
     fm		<- readVar currentMap
+    scfls   <- readVar scflStack
     case fm of
-        ((trn, rv):rest) -> do
-            verbose $$ map (chr . fromEnum) trn
+        ((trn, rv):rest) | trn == trnOld -> do
+            -- verbose $$ map (chr . fromEnum) trn
             currentMap $= id $ rest
+            case scfls of
+                []      -> do
+                    let rst = (ptx_trn_Type r `mod` 2)
+                        typ = (ptx_scfl_Type _PTX_SCFL)
+                    push _PTX_SCFL{ ptx_scfl = 1, ptx_scfl_Type = typ + rst }
+                    push _PTX_SCFL{ ptx_scfl = 1, ptx_scfl_Type = typ + (1-rst) }
+                (s:ss)  -> mapM_ push $ reverse (s{ ptx_scfl = 1 }:ss)
             unless (null rv) $ do
-                verbose $$ ("==> " ++ (map (chr . fromEnum) rv))
                 trn' <- toNStr rv
-                push _PTX_SCFL { ptx_scfl = 1 } -- XXX font
+                verbose $$ ("From:[" ++ map (chr . fromEnum) trnOld ++ "]")
+                verbose $$ ("To:  [" ++ map (chr . fromEnum) rv ++ "]")
                 push r { ptx_trn = trn' }
-        _ -> push r
-        
+                return ()
+        _ -> do
+            mapM_ push $ reverse scfls
+            push r
+    scflStack $= id $ []
+
+foo nstr = snd $ bufToPStrLen nstr
+
 usage :: String -> IO a
 usage = showUsage options showInfo
     where
@@ -114,8 +137,10 @@ data Opts = Opts
     , currentMap		:: IORef Map
     , readInputAFP      :: IO [AFP_]
     , openOutputAFP     :: IO Handle
+    , font              :: String
     , verbose           :: Bool
     , showHelp          :: IO ()
+    , scflStack         :: IORef [PTX_SCFL]
     } deriving (Typeable)
 
 defaultOpts = Opts
@@ -124,8 +149,10 @@ defaultOpts = Opts
     , maps              = requiredOpt usage "map"
     , readInputAFP      = requiredOpt usage "input"
     , openOutputAFP     = requiredOpt usage "output"
+    , font              = requiredOpt usage "font"
     , verbose           = True
     , showHelp          = return ()
+    , scflStack         = undefined
     }
 
 options :: [OptDescr (Opts -> Opts)]
@@ -136,6 +163,8 @@ options =
         (\s o -> o { readInputAFP   = readAFP s })
     , reqArg "o" ["output"]         "FILE"          "Output AFP file"
         (\s o -> o { openOutputAFP  = openBinaryFile s WriteMode })
+    , reqArg "f" ["font"]           "NAME"          "Font name"
+        (\s o -> o { font = s })
     , noArg  "v" ["verbose"]                        "Print progress information"
         (\o   -> o { verbose        = True })
     , noArg  "h" ["help"]                           "Show help"
@@ -144,29 +173,28 @@ options =
 
 run :: IO ()
 -- run = withArgs (split " " "-v -m SC27.add -i SC27.AFP -o output.afp") main
-run = runWith "-v -m test.add -i foo.afp -o bar.afp"
+run = runWith "-v -m 1-map.txt -i 1-in.afp -o 1-out.afp -f X0FDB000"
 
 runWith str = withArgs (split " " str) main
 
 makeMaps :: String -> [Map]
 makeMaps str = entries
     where
+    entries :: [Map]
     entries = map (pair . lines) groups
     pair [] = []
-    pair (a:b:[]) = [(ordList a, ordList b)]
-    pair (a:b:[]:rest) = (ordList a, ordList b) : pair rest
-    pair x = error $ unwords x
-    groups = split "\n\n--\n--\n\n" $ ignoreFont str
-    ordList = map (toEnum . ord)
+    pair (a:b:[]) = [(ordList a, checkDBCS $ ordList b)]
+    pair (a:b:[]:rest) = (ordList a, checkDBCS $ ordList b) : pair rest
+    pair x = error $ "Bad pair: " ++ (show x)
+    groups = split "\n\n--\n--\n\n" str
+    ordList :: (Enum a, Enum b) => [a] -> [b]
+    ordList = map (toEnum . fromEnum)
+    checkDBCS [] = []
+    checkDBCS (x:y:xs) | x > 0x7F = (x:y:checkDBCS xs)
+    checkDBCS x = error $ "Not DBCS: " ++ ordList x
 
 gun = run
 
-ignoreFont str
-    | take 5 str == "Font:"
-    = unlines $ tail $ lines str
-    | otherwise
-    = str
-    where
 getOpts :: IO Opts
 getOpts = do
     args <- getArgs

@@ -1,45 +1,45 @@
 udc4skl ::
-	ghc -H128m --make -o udc4skl -O udc4skl.hs
+	ghc -isrc -H128m --make -static -o udc4skl -O udc4skl.hs
 
 replace ::
-	ghc -H128m --make -o replace -O replace.hs
+	ghc -isrc -H128m --make -static -o replace replace.hs
 
 afpdump ::
-	ghc -H128m --make -o afpdump -O afpdump.hs -I/usr/local/include -L/usr/local/lib -licuuc
+	ghc -isrc -H128m --make -static -o afpdump -O afpdump.hs -I/usr/local/include -I/usr/local/include/icu -L/usr/local/lib -L/usr/local/lib/icu/ -licuuc
 
 fast ::
-	ghc -O0 --make -o udc4skl udc4skl.hs
+	ghc -isrc -O0 --make -o udc4skl udc4skl.hs
 
 profiled ::
-	ghc -O -prof -auto-all --make udc4skl.hs
+	ghc -isrc -O -prof -auto-all --make udc4skl.hs
 
 test ::
 	echo "1..1" && \
-	ghc -O --make udc4skl.hs && \
+	ghc -O -isrc --make udc4skl.hs && \
 	time ./a.out t/taishin3.afp t/output.afp && \
 	afpdump.pl output.afp > x.html && \
 	diff output.afp taishin3.afp && \
 	echo "ok 1"
 
 tags ::
-	find OpenAFP -name '*.hs' | xargs hasktags -c *.hs
+	find src/OpenAFP -name '*.hs' | xargs hasktags -c *.hs
 
 instance ::
-	perl OpenAFP/Prelude/instances.pl
+	perl src/OpenAFP/Prelude/instances.pl
 
 instances ::
-	perl OpenAFP/Prelude/instances.pl
+	perl src/OpenAFP/Prelude/instances.pl
 
 dist ::
 	tar czf afp.tar.gz _darcs Makefile *.*hs OpenAFP/*.*hs OpenAFP/*/*.*hs OpenAFP/*/*.pl OpenAFP/*/*/*hs
 
 clean ::
-	rm -f *.hi *.o OpenAFP/*.hi OpenAFP/*.o OpenAFP/*/*.hi OpenAFP/*/*.o OpenAFP/*/*/*.hi OpenAFP/*/*/*.o
+	rm -f *.hi *.o src/OpenAFP/*.hi src/OpenAFP/*.o src/OpenAFP/*/*.hi src/OpenAFP/*/*.o src/OpenAFP/*/*/*.hi src/OpenAFP/*/*/*.o
 
 docs ::
 	rm -rf docs
 	mkdir docs
-	cp -Rf OpenAFP docs/OpenAFP
+	cp -Rf src/OpenAFP docs/OpenAFP
 	cp Main.hs docs/Main.hs
 	perl -pi -e 's/IArray UArray/UArray/g' docs/OpenAFP/Internals/Binary.hs
 	chdir docs && find . -name '*.*hs' | \
