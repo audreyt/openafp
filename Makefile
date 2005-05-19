@@ -1,8 +1,11 @@
+validate ::
+	ghc -isrc -H128m --make -static -o validate -O validate.hs
+
 udc4skl ::
 	ghc -isrc -H128m --make -static -o udc4skl -O udc4skl.hs
 
 replace ::
-	ghc -isrc -H128m --make -static -o replace replace.hs
+	ghc -isrc -H128m --make -static -o replace -O replace.hs
 
 afpdump ::
 	ghc -isrc -H128m --make -static -o afpdump -O afpdump.hs -I/usr/local/include -I/usr/local/include/icu -L/usr/local/lib -L/usr/local/lib/icu/ -licuuc
