@@ -46,7 +46,7 @@ viewData ds = do
 
 viewNumber n = return $ ViewNumber (typeOf n, fromEnum n)
 
-viewString a = return $ ViewString (typeOf a, [ toAsc n | n <- [ 0..((sizeOf a)-1) ] ])
+viewString a = return $ ViewString (typeOf a, reverse [ toAsc n | n <- [ 0..((sizeOf a)-1) ] ])
     where toAsc n = ebc2asc ! fromIntegral ((a `shiftR` (8 * n)) .&. 0xFF)
 
 viewNStr nstr = do
