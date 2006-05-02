@@ -3,10 +3,10 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  OpenAFP.Internals.Binary
--- Copyright   :  (c) Autrijus Tang 2004
+-- Copyright   :  (c) Audrey Tang 2004, 2006
 -- License     :  BSD-style
 -- 
--- Maintainer  :  autrijus@autrijus.org
+-- Maintainer  :  audreyt@audreyt.org
 -- Stability   :  experimental
 -- Portability :  non-portable (GHC-only)
 --
@@ -44,34 +44,22 @@ module OpenAFP.Internals.Binary (
   ) where
 
 import Data.Array.Unboxed
-import Data.FiniteMap
-import Data.HashTable as HashTable
 import Data.Bits
 import Data.Int
 import Data.Word
-import Data.IORef
 import Data.Typeable
-import Data.Char                ( ord, chr )
 import Control.Monad            ( when )
 import System.IO as IO
-import System.IO.Unsafe         ( unsafeInterleaveIO )
 import System.IO.Error          ( mkIOError, eofErrorType )
-import GHC.Real                 ( Ratio(..) )
 import GHC.Exts
-import GHC.IOBase               ( IO(..) )
 import GHC.Word                 ( Word8(..) )
-import GHC.Weak
-import System.IO                ( openBinaryFile )
 import Foreign.Storable
 import Data.Char
 import Foreign.Ptr
 import Numeric                  (showHex)
 
-import System.IO.Unsafe
 import System.Mem.Weak
-import Foreign.C.String
 import Foreign.C.Types
-import Foreign.Marshal.Alloc
 import Foreign.Marshal.Utils
 import Foreign.ForeignPtr
 

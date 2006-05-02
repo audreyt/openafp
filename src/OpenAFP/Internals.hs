@@ -3,10 +3,10 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  OpenAFP.Internals
--- Copyright   :  (c) Autrijus Tang 2004
+-- Copyright   :  (c) Audrey Tang 2004, 2006
 -- License     :  BSD-style
 -- 
--- Maintainer  :  autrijus@autrijus.org
+-- Maintainer  :  audreyt@audreyt.org
 -- Stability   :  experimental
 -- Portability :  non-portable (GHC-only)
 --
@@ -25,7 +25,6 @@ module OpenAFP.Internals (
     module Data.Array.Unboxed,
     module Data.Bits,
     module Data.Char,
-    module Data.FiniteMap,
     module Data.List,
     module Data.HashTable,
     module Data.Word,
@@ -68,7 +67,6 @@ import qualified Control.Monad.RWS (get, put)
 import Data.Array.Unboxed
 import Data.Bits
 import Data.Char
-import Data.FiniteMap
 import Data.List
 import Data.HashTable hiding (lookup, insert, delete, new)
 import qualified Data.HashTable (lookup, insert, delete, new)

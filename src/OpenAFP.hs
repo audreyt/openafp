@@ -2,11 +2,11 @@
 
 -----------------------------------------------------------------------------
 -- |
--- Module      :  OpenAFP.Prelude
--- Copyright   :  (c) Autrijus Tang 2004
+-- Module      :  OpenAFP
+-- Copyright   :  (c) Audrey Tang 2004, 2006
 -- License     :  BSD-style
 -- 
--- Maintainer  :  autrijus@autrijus.org
+-- Maintainer  :  audreyt@audreyt.org
 -- Stability   :  experimental
 -- Portability :  non-portable (GHC-only)
 --
@@ -15,7 +15,7 @@
 --
 -----------------------------------------------------------------------------
 
-module OpenAFP.Prelude (
+module OpenAFP (
     module OpenAFP.Types,
     module OpenAFP.Records,
     module OpenAFP.Internals,
@@ -23,6 +23,7 @@ module OpenAFP.Prelude (
     module OpenAFP.Prelude.Utils,
     module OpenAFP.Prelude.Lookups,
     module OpenAFP.Prelude.Instances,
+    module OpenAFP.Internals.UConv,
 
     readAFP, writeAFP, filterAFP,
     readArgs, afp_Chunks,
@@ -30,6 +31,7 @@ module OpenAFP.Prelude (
 import OpenAFP.Types
 import OpenAFP.Records
 import OpenAFP.Internals
+import OpenAFP.Internals.UConv
 import OpenAFP.Prelude.Utils
 import OpenAFP.Prelude.Lookups
 import OpenAFP.Prelude.Instances

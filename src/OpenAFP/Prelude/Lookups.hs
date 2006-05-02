@@ -5,212 +5,212 @@ import OpenAFP.Types
 import OpenAFP.Records
 import OpenAFP.Internals
 import OpenAFP.Prelude.Instances
+import qualified Data.Map as Map
 
 descLookup :: ChunkType -> String
-descLookup = lookupWithDefaultFM descMap "(Unknown)" . show
+descLookup typ = Map.findWithDefault "(Unknown)" typ descMap
 
-descMap :: FiniteMap String String
-descMap = listToFM [
-    (show $ typeOf _MCF_T, "MCF Triplets"),
-    (show $ typeOf _CPI, "Code Page Index"),
-    (show $ typeOf _FNI, "Font Index"),
-    (show $ typeOf _CFI, "Coded Font Index"),
-    (show $ typeOf _MFC, "Medium Finishing Control"),
-    (show $ typeOf _TLE, "Tag Logical Element"),
-    (show $ typeOf _MCC, "Medium Copy Count"),
-    (show $ typeOf _FNM, "Font Patterns Map"),
-    (show $ typeOf _OBD, "Object Area Descriptor"),
-    (show $ typeOf _IID, "IM Image Input Descriptor (C)"),
-    (show $ typeOf _CPD, "Code Page Descriptor"),
-    (show $ typeOf _MDD, "Medium Descriptor"),
-    (show $ typeOf _FND, "Font Descriptor"),
-    (show $ typeOf _CDD, "Container Data Descriptor"),
-    (show $ typeOf _PTD1, "Presentation Text Descriptor Format-1 (C)"),
-    (show $ typeOf _PGD, "Page Descriptor"),
-    (show $ typeOf _GDD, "Graphics Data Descriptor"),
-    (show $ typeOf _FGD, "Form Environment Group Descriptor (O)"),
-    (show $ typeOf _DXD, "Data Map Transmission Subcase Descriptor"),
-    (show $ typeOf _LND, "Line Descriptor"),
-    (show $ typeOf _BDD, "Bar Code Data Descriptor"),
-    (show $ typeOf _IDD, "Image Data Descriptor"),
-    (show $ typeOf _IOC, "IM Image Output Control (C)"),
-    (show $ typeOf _CPC, "Code Page Control"),
-    (show $ typeOf _MMC, "Medium Modification Control"),
-    (show $ typeOf _FNC, "Font Control"),
-    (show $ typeOf _CFC, "Coded Font Control"),
-    (show $ typeOf _CTC, "Composed Text Control (O)"),
-    (show $ typeOf _PMC, "Page Modification Control"),
-    (show $ typeOf _BPS, "Begin Page Segment"),
-    (show $ typeOf _BCA, "Begin Color Attribute Table"),
-    (show $ typeOf _BII, "Begin IM Image (C)"),
-    (show $ typeOf _BCP, "Begin Code Page"),
-    (show $ typeOf _BFN, "Begin Font"),
-    (show $ typeOf _BCF, "Begin Coded Font"),
-    (show $ typeOf _BOC, "Begin Object Container"),
-    (show $ typeOf _BPT, "Begin Presentation Text Object"),
-    (show $ typeOf _BDI, "Begin Document Index"),
-    (show $ typeOf _BDT, "Begin Document"),
-    (show $ typeOf _BNG, "Begin Named Page Group"),
-    (show $ typeOf _BPG, "Begin Page"),
-    (show $ typeOf _BGR, "Begin Graphics Object"),
-    (show $ typeOf _BDG, "Begin Document Environment Group"),
-    (show $ typeOf _BFG, "Begin Form Environment Group (O)"),
-    (show $ typeOf _BRG, "Begin Resource Group"),
-    (show $ typeOf _BOG, "Begin Object Environment Group"),
-    (show $ typeOf _BAG, "Begin Active Environment Group"),
-    (show $ typeOf _BDM, "Begin Data Map"),
-    (show $ typeOf _BPM, "Begin Page Map"),
-    (show $ typeOf _BMM, "Begin Medium Map"),
-    (show $ typeOf _BFM, "Begin Form Map"),
-    (show $ typeOf _BR, "Begin Resource (R)"),
-    (show $ typeOf _BSG, "Begin Resource Environment Group"),
-    (show $ typeOf _BMO, "Begin Overlay"),
-    (show $ typeOf _BDX, "Begin Data Map Transmission Subcase"),
-    (show $ typeOf _BBC, "Begin Bar Code Object"),
-    (show $ typeOf _BIM, "Begin Image Object"),
-    (show $ typeOf _EPS, "End Page Segment"),
-    (show $ typeOf _ECA, "End Color Attribute Table"),
-    (show $ typeOf _EII, "End IM Image (C)"),
-    (show $ typeOf _ECP, "End Code Page"),
-    (show $ typeOf _EFN, "End Font"),
-    (show $ typeOf _ECF, "End Coded Font"),
-    (show $ typeOf _EOC, "End Object Container"),
-    (show $ typeOf _EPT, "End Presentation Text Object"),
-    (show $ typeOf _EDI, "End Document Index"),
-    (show $ typeOf _EDT, "End Document"),
-    (show $ typeOf _ENG, "End Named Page Group"),
-    (show $ typeOf _EPG, "End Page"),
-    (show $ typeOf _EGR, "End Graphics Object"),
-    (show $ typeOf _EDG, "End Document Environment Group"),
-    (show $ typeOf _EFG, "End Form Environment Group (O)"),
-    (show $ typeOf _ERG, "End Resource Group"),
-    (show $ typeOf _EOG, "End Object Environment Group"),
-    (show $ typeOf _EAG, "End Active Environment Group"),
-    (show $ typeOf _EDM, "End Data Map"),
-    (show $ typeOf _EPM, "End Page Map"),
-    (show $ typeOf _EMM, "End Medium Map"),
-    (show $ typeOf _EFM, "End Form Map"),
-    (show $ typeOf _ER, "End Resource (R)"),
-    (show $ typeOf _ESG, "End Resource Environment Group"),
-    (show $ typeOf _EMO, "End Overlay"),
-    (show $ typeOf _EDX, "End Data Map Transmission Subcase"),
-    (show $ typeOf _EBC, "End Bar Code Object"),
-    (show $ typeOf _EIM, "End Image Object"),
-    (show $ typeOf _LNC, "Line Descriptor Count"),
-    (show $ typeOf _MCA, "Map Color Attribute Table"),
-    (show $ typeOf _MMT, "Map Media Type"),
-    (show $ typeOf _FNN, "Font Names (Outline Fonts Only)"),
-    (show $ typeOf _MCF, "Map Coded Font"),
-    (show $ typeOf _MCD, "Map Container Data"),
-    (show $ typeOf _MPG, "Map Page"),
-    (show $ typeOf _MGO, "Map Graphics Object"),
-    (show $ typeOf _MDR, "Map Data Resource"),
-    (show $ typeOf _IMM, "Invoke Medium Map"),
-    (show $ typeOf _MPO, "Map Page Overlay"),
-    (show $ typeOf _MSU, "Map Suppression"),
-    (show $ typeOf _MBC, "Map Bar Code Object"),
-    (show $ typeOf _MIO, "Map Image Object"),
-    (show $ typeOf _OBP, "Object Area Position"),
-    (show $ typeOf _ICP, "IM Image Cell Position (C)"),
-    (show $ typeOf _FNP, "Font Position"),
-    (show $ typeOf _PGP1, "Page Position Format-1 (C)"),
-    (show $ typeOf _FNO, "Font Orientation"),
-    (show $ typeOf _IPS, "Include Page Segment"),
-    (show $ typeOf _IPG, "Include Page"),
-    (show $ typeOf _IOB, "Include Object"),
-    (show $ typeOf _IPO, "Include Page Overlay"),
-    (show $ typeOf _CAT, "Color Attribute Table"),
-    (show $ typeOf _MPS, "Map Page Segment"),
-    (show $ typeOf _MCF1, "Map Coded Font Format-1 (C)"),
-    (show $ typeOf _PTD, "Presentation Text Data Descriptor"),
-    (show $ typeOf _PGP, "Page Position"),
-    (show $ typeOf _MMO, "Map Medium Overlay"),
-    (show $ typeOf _PFC, "Presentation Fidelity Control"),
-    (show $ typeOf _IEL, "Index Element"),
-    (show $ typeOf _LLE, "Link Logical Element"),
-    (show $ typeOf _IRD, "IM Image Raster Data (C)"),
-    (show $ typeOf _FNG, "Font Patterns"),
-    (show $ typeOf _OCD, "Object Container Data"),
-    (show $ typeOf _PTX, "Presentation Text Data"),
-    (show $ typeOf _GAD, "Graphics Data"),
-    (show $ typeOf _BDA, "Bar Code Data"),
-    (show $ typeOf _NOP, "No Operation"),
-    (show $ typeOf _IPD, "Image Picture Data"),
-    (show $ typeOf _T_CGCSGI, "Coded Graphic Character Set Global ID"),
-    (show $ typeOf _T_FQN, "Fully Qualified Name"),
-    (show $ typeOf _T_MO, "Mapping Option"),
-    (show $ typeOf _T_OCL, "Object Classification"),
-    (show $ typeOf _T_MIS, "MO:DCA Interchange Set"),
-    (show $ typeOf _T_TO, "Text Orientation (R)"),
-    (show $ typeOf _T_FDS, "Font Descriptor Specification"),
-    (show $ typeOf _T_FCGCSGI, "Font Coded Graphic Character Set Global Identifier"),
-    (show $ typeOf _T_OFSS, "Object Function Set Specification"),
-    (show $ typeOf _T_ROT, "Resource Object Type (R)"),
-    (show $ typeOf _T_ERLI, "Extended Resource Local ID"),
-    (show $ typeOf _T_RLI, "Resource Local ID"),
-    (show $ typeOf _T_RSN, "Resource Section Number"),
-    (show $ typeOf _T_CR, "Character Rotation"),
-    (show $ typeOf _T_LDOPM, "Line Data Object Position Migration (R)"),
-    (show $ typeOf _T_OBO, "Object Byte Offset"),
-    (show $ typeOf _T_AV, "Attribute Value"),
-    (show $ typeOf _T_DP, "Descriptor Position"),
-    (show $ typeOf _T_MEC, "Media Eject Control"),
-    (show $ typeOf _T_POCP, "Page Overlay Conditional Processing"),
-    (show $ typeOf _T_RUA, "Resource Usage Attribute"),
-    (show $ typeOf _T_OAMU, "Object Area Measurement Units"),
-    (show $ typeOf _T_OAS, "Object Area Size"),
-    (show $ typeOf _T_AD, "Area Definition"),
-    (show $ typeOf _T_CS, "Color Specification"),
-    (show $ typeOf _T_ESI, "Encoding Scheme ID"),
-    (show $ typeOf _T_MMPN, "Medium Map Page Number"),
-    (show $ typeOf _T_OBE, "Object Byte Extent"),
-    (show $ typeOf _T_OSFO, "Object Structured Field Offset"),
-    (show $ typeOf _T_OSFE, "Object Structured Field Extent"),
-    (show $ typeOf _T_OO, "Object Offset"),
-    (show $ typeOf _T_FHSF, "Font Horizontal Scale Factor"),
-    (show $ typeOf _T_OCO, "Object Count"),
-    (show $ typeOf _T_LDTS, "Local Date and Time Stamp"),
-    (show $ typeOf _T_OCH, "Object Checksum (R)"),
-    (show $ typeOf _T_T1CRMT, "Type 1 - CRC Resource Management Triplet"),
-    (show $ typeOf _T_T2FRMT, "Type 2 - Font Resource Management Triplet"),
-    (show $ typeOf _T_OOI, "Object Origin Identifier (R)"),
-    (show $ typeOf _T_C, "Comment"),
-    (show $ typeOf _T_MOR, "Medium Orientation"),
-    (show $ typeOf _T_ROI, "Resource Object Include"),
-    (show $ typeOf _T_EF, "Extension Font"),
-    (show $ typeOf _T_PSRM, "Presentation Space Reset Mixing"),
-    (show $ typeOf _T_PSMR, "Presentation Space Mixing Rules"),
-    (show $ typeOf _T_UDTS, "Universal Date and Time Stamp"),
-    (show $ typeOf _T_II, "IMM Insertion (R)"),
-    (show $ typeOf _T_TS, "Toner Saver"),
-    (show $ typeOf _T_CF, "Color Fidelity"),
-    (show $ typeOf _T_FF, "Font Fidelity"),
-    (show $ typeOf _T_MA, "Metric Adjustment"),
-    (show $ typeOf _T_AQ, "Attribute Qualifier"),
-    (show $ typeOf _T_PPI, "Page Position Information"),
-    (show $ typeOf _T_PV, "Parameter Value"),
-    (show $ typeOf _T_PC, "Presentation Control"),
-    (show $ typeOf _T_FRMT, "Font Resolution and Metric Technology"),
-    (show $ typeOf _T_FO, "Finishing Operation"),
-    (show $ typeOf _T_MF, "Media Fidelity"),
-    (show $ typeOf _PTX_STC, "Set Text Color"),
-    (show $ typeOf _PTX_SIM, "Set Inline Margin"),
-    (show $ typeOf _PTX_SIA, "Set Intercharacter Adjustment"),
-    (show $ typeOf _PTX_SVI, "Set Variable-Space Character Increment"),
-    (show $ typeOf _PTX_AMI, "Absolute Move Inline"),
-    (show $ typeOf _PTX_RMI, "Relative Move Inline"),
-    (show $ typeOf _PTX_SBI, "Set Baseline Increment"),
-    (show $ typeOf _PTX_AMB, "Absolute Move Baseline"),
-    (show $ typeOf _PTX_RMB, "Relative Move Baseline"),
-    (show $ typeOf _PTX_BLN, "Begin Line Next"),
-    (show $ typeOf _PTX_DIR, "Draw I-Axis Rule"),
-    (show $ typeOf _PTX_DBR, "Draw B-Axis Rule"),
-    (show $ typeOf _PTX_RPS, "Repeat String"),
-    (show $ typeOf _PTX_SCFL, "Set Coded Font Local"),
-    (show $ typeOf _PTX_BSU, "Begin Suppression"),
-    (show $ typeOf _PTX_ESU, "Begin Suppression"),
-    (show $ typeOf _PTX_STO, "Set Text Orientation"),
-    (show $ typeOf _PTX_NOP, "No Operation"),
-    (show $ typeOf _PTX_TRN, "Transparent Data"),
-    ("", "(Unknown)")
+descMap :: Map.Map ChunkType String
+descMap = Map.fromList
+    [ (chunkTypeOf _MCF_T, "MCF Triplets")
+    , (chunkTypeOf _CPI, "Code Page Index")
+    , (chunkTypeOf _FNI, "Font Index")
+    , (chunkTypeOf _CFI, "Coded Font Index")
+    , (chunkTypeOf _MFC, "Medium Finishing Control")
+    , (chunkTypeOf _TLE, "Tag Logical Element")
+    , (chunkTypeOf _MCC, "Medium Copy Count")
+    , (chunkTypeOf _FNM, "Font Patterns Map")
+    , (chunkTypeOf _OBD, "Object Area Descriptor")
+    , (chunkTypeOf _IID, "IM Image Input Descriptor (C)")
+    , (chunkTypeOf _CPD, "Code Page Descriptor")
+    , (chunkTypeOf _MDD, "Medium Descriptor")
+    , (chunkTypeOf _FND, "Font Descriptor")
+    , (chunkTypeOf _CDD, "Container Data Descriptor")
+    , (chunkTypeOf _PTD1, "Presentation Text Descriptor Format-1 (C)")
+    , (chunkTypeOf _PGD, "Page Descriptor")
+    , (chunkTypeOf _GDD, "Graphics Data Descriptor")
+    , (chunkTypeOf _FGD, "Form Environment Group Descriptor (O)")
+    , (chunkTypeOf _DXD, "Data Map Transmission Subcase Descriptor")
+    , (chunkTypeOf _LND, "Line Descriptor")
+    , (chunkTypeOf _BDD, "Bar Code Data Descriptor")
+    , (chunkTypeOf _IDD, "Image Data Descriptor")
+    , (chunkTypeOf _IOC, "IM Image Output Control (C)")
+    , (chunkTypeOf _CPC, "Code Page Control")
+    , (chunkTypeOf _MMC, "Medium Modification Control")
+    , (chunkTypeOf _FNC, "Font Control")
+    , (chunkTypeOf _CFC, "Coded Font Control")
+    , (chunkTypeOf _CTC, "Composed Text Control (O)")
+    , (chunkTypeOf _PMC, "Page Modification Control")
+    , (chunkTypeOf _BPS, "Begin Page Segment")
+    , (chunkTypeOf _BCA, "Begin Color Attribute Table")
+    , (chunkTypeOf _BII, "Begin IM Image (C)")
+    , (chunkTypeOf _BCP, "Begin Code Page")
+    , (chunkTypeOf _BFN, "Begin Font")
+    , (chunkTypeOf _BCF, "Begin Coded Font")
+    , (chunkTypeOf _BOC, "Begin Object Container")
+    , (chunkTypeOf _BPT, "Begin Presentation Text Object")
+    , (chunkTypeOf _BDI, "Begin Document Index")
+    , (chunkTypeOf _BDT, "Begin Document")
+    , (chunkTypeOf _BNG, "Begin Named Page Group")
+    , (chunkTypeOf _BPG, "Begin Page")
+    , (chunkTypeOf _BGR, "Begin Graphics Object")
+    , (chunkTypeOf _BDG, "Begin Document Environment Group")
+    , (chunkTypeOf _BFG, "Begin Form Environment Group (O)")
+    , (chunkTypeOf _BRG, "Begin Resource Group")
+    , (chunkTypeOf _BOG, "Begin Object Environment Group")
+    , (chunkTypeOf _BAG, "Begin Active Environment Group")
+    , (chunkTypeOf _BDM, "Begin Data Map")
+    , (chunkTypeOf _BPM, "Begin Page Map")
+    , (chunkTypeOf _BMM, "Begin Medium Map")
+    , (chunkTypeOf _BFM, "Begin Form Map")
+    , (chunkTypeOf _BR, "Begin Resource (R)")
+    , (chunkTypeOf _BSG, "Begin Resource Environment Group")
+    , (chunkTypeOf _BMO, "Begin Overlay")
+    , (chunkTypeOf _BDX, "Begin Data Map Transmission Subcase")
+    , (chunkTypeOf _BBC, "Begin Bar Code Object")
+    , (chunkTypeOf _BIM, "Begin Image Object")
+    , (chunkTypeOf _EPS, "End Page Segment")
+    , (chunkTypeOf _ECA, "End Color Attribute Table")
+    , (chunkTypeOf _EII, "End IM Image (C)")
+    , (chunkTypeOf _ECP, "End Code Page")
+    , (chunkTypeOf _EFN, "End Font")
+    , (chunkTypeOf _ECF, "End Coded Font")
+    , (chunkTypeOf _EOC, "End Object Container")
+    , (chunkTypeOf _EPT, "End Presentation Text Object")
+    , (chunkTypeOf _EDI, "End Document Index")
+    , (chunkTypeOf _EDT, "End Document")
+    , (chunkTypeOf _ENG, "End Named Page Group")
+    , (chunkTypeOf _EPG, "End Page")
+    , (chunkTypeOf _EGR, "End Graphics Object")
+    , (chunkTypeOf _EDG, "End Document Environment Group")
+    , (chunkTypeOf _EFG, "End Form Environment Group (O)")
+    , (chunkTypeOf _ERG, "End Resource Group")
+    , (chunkTypeOf _EOG, "End Object Environment Group")
+    , (chunkTypeOf _EAG, "End Active Environment Group")
+    , (chunkTypeOf _EDM, "End Data Map")
+    , (chunkTypeOf _EPM, "End Page Map")
+    , (chunkTypeOf _EMM, "End Medium Map")
+    , (chunkTypeOf _EFM, "End Form Map")
+    , (chunkTypeOf _ER, "End Resource (R)")
+    , (chunkTypeOf _ESG, "End Resource Environment Group")
+    , (chunkTypeOf _EMO, "End Overlay")
+    , (chunkTypeOf _EDX, "End Data Map Transmission Subcase")
+    , (chunkTypeOf _EBC, "End Bar Code Object")
+    , (chunkTypeOf _EIM, "End Image Object")
+    , (chunkTypeOf _LNC, "Line Descriptor Count")
+    , (chunkTypeOf _MCA, "Map Color Attribute Table")
+    , (chunkTypeOf _MMT, "Map Media Type")
+    , (chunkTypeOf _FNN, "Font Names (Outline Fonts Only)")
+    , (chunkTypeOf _MCF, "Map Coded Font")
+    , (chunkTypeOf _MCD, "Map Container Data")
+    , (chunkTypeOf _MPG, "Map Page")
+    , (chunkTypeOf _MGO, "Map Graphics Object")
+    , (chunkTypeOf _MDR, "Map Data Resource")
+    , (chunkTypeOf _IMM, "Invoke Medium Map")
+    , (chunkTypeOf _MPO, "Map Page Overlay")
+    , (chunkTypeOf _MSU, "Map Suppression")
+    , (chunkTypeOf _MBC, "Map Bar Code Object")
+    , (chunkTypeOf _MIO, "Map Image Object")
+    , (chunkTypeOf _OBP, "Object Area Position")
+    , (chunkTypeOf _ICP, "IM Image Cell Position (C)")
+    , (chunkTypeOf _FNP, "Font Position")
+    , (chunkTypeOf _PGP1, "Page Position Format-1 (C)")
+    , (chunkTypeOf _FNO, "Font Orientation")
+    , (chunkTypeOf _IPS, "Include Page Segment")
+    , (chunkTypeOf _IPG, "Include Page")
+    , (chunkTypeOf _IOB, "Include Object")
+    , (chunkTypeOf _IPO, "Include Page Overlay")
+    , (chunkTypeOf _CAT, "Color Attribute Table")
+    , (chunkTypeOf _MPS, "Map Page Segment")
+    , (chunkTypeOf _MCF1, "Map Coded Font Format-1 (C)")
+    , (chunkTypeOf _PTD, "Presentation Text Data Descriptor")
+    , (chunkTypeOf _PGP, "Page Position")
+    , (chunkTypeOf _MMO, "Map Medium Overlay")
+    , (chunkTypeOf _PFC, "Presentation Fidelity Control")
+    , (chunkTypeOf _IEL, "Index Element")
+    , (chunkTypeOf _LLE, "Link Logical Element")
+    , (chunkTypeOf _IRD, "IM Image Raster Data (C)")
+    , (chunkTypeOf _FNG, "Font Patterns")
+    , (chunkTypeOf _OCD, "Object Container Data")
+    , (chunkTypeOf _PTX, "Presentation Text Data")
+    , (chunkTypeOf _GAD, "Graphics Data")
+    , (chunkTypeOf _BDA, "Bar Code Data")
+    , (chunkTypeOf _NOP, "No Operation")
+    , (chunkTypeOf _IPD, "Image Picture Data")
+    , (chunkTypeOf _T_CGCSGI, "Coded Graphic Character Set Global ID")
+    , (chunkTypeOf _T_FQN, "Fully Qualified Name")
+    , (chunkTypeOf _T_MO, "Mapping Option")
+    , (chunkTypeOf _T_OCL, "Object Classification")
+    , (chunkTypeOf _T_MIS, "MO:DCA Interchange Set")
+    , (chunkTypeOf _T_TO, "Text Orientation (R)")
+    , (chunkTypeOf _T_FDS, "Font Descriptor Specification")
+    , (chunkTypeOf _T_FCGCSGI, "Font Coded Graphic Character Set Global Identifier")
+    , (chunkTypeOf _T_OFSS, "Object Function Set Specification")
+    , (chunkTypeOf _T_ROT, "Resource Object Type (R)")
+    , (chunkTypeOf _T_ERLI, "Extended Resource Local ID")
+    , (chunkTypeOf _T_RLI, "Resource Local ID")
+    , (chunkTypeOf _T_RSN, "Resource Section Number")
+    , (chunkTypeOf _T_CR, "Character Rotation")
+    , (chunkTypeOf _T_LDOPM, "Line Data Object Position Migration (R)")
+    , (chunkTypeOf _T_OBO, "Object Byte Offset")
+    , (chunkTypeOf _T_AV, "Attribute Value")
+    , (chunkTypeOf _T_DP, "Descriptor Position")
+    , (chunkTypeOf _T_MEC, "Media Eject Control")
+    , (chunkTypeOf _T_POCP, "Page Overlay Conditional Processing")
+    , (chunkTypeOf _T_RUA, "Resource Usage Attribute")
+    , (chunkTypeOf _T_OAMU, "Object Area Measurement Units")
+    , (chunkTypeOf _T_OAS, "Object Area Size")
+    , (chunkTypeOf _T_AD, "Area Definition")
+    , (chunkTypeOf _T_CS, "Color Specification")
+    , (chunkTypeOf _T_ESI, "Encoding Scheme ID")
+    , (chunkTypeOf _T_MMPN, "Medium Map Page Number")
+    , (chunkTypeOf _T_OBE, "Object Byte Extent")
+    , (chunkTypeOf _T_OSFO, "Object Structured Field Offset")
+    , (chunkTypeOf _T_OSFE, "Object Structured Field Extent")
+    , (chunkTypeOf _T_OO, "Object Offset")
+    , (chunkTypeOf _T_FHSF, "Font Horizontal Scale Factor")
+    , (chunkTypeOf _T_OCO, "Object Count")
+    , (chunkTypeOf _T_LDTS, "Local Date and Time Stamp")
+    , (chunkTypeOf _T_OCH, "Object Checksum (R)")
+    , (chunkTypeOf _T_T1CRMT, "Type 1 - CRC Resource Management Triplet")
+    , (chunkTypeOf _T_T2FRMT, "Type 2 - Font Resource Management Triplet")
+    , (chunkTypeOf _T_OOI, "Object Origin Identifier (R)")
+    , (chunkTypeOf _T_C, "Comment")
+    , (chunkTypeOf _T_MOR, "Medium Orientation")
+    , (chunkTypeOf _T_ROI, "Resource Object Include")
+    , (chunkTypeOf _T_EF, "Extension Font")
+    , (chunkTypeOf _T_PSRM, "Presentation Space Reset Mixing")
+    , (chunkTypeOf _T_PSMR, "Presentation Space Mixing Rules")
+    , (chunkTypeOf _T_UDTS, "Universal Date and Time Stamp")
+    , (chunkTypeOf _T_II, "IMM Insertion (R)")
+    , (chunkTypeOf _T_TS, "Toner Saver")
+    , (chunkTypeOf _T_CF, "Color Fidelity")
+    , (chunkTypeOf _T_FF, "Font Fidelity")
+    , (chunkTypeOf _T_MA, "Metric Adjustment")
+    , (chunkTypeOf _T_AQ, "Attribute Qualifier")
+    , (chunkTypeOf _T_PPI, "Page Position Information")
+    , (chunkTypeOf _T_PV, "Parameter Value")
+    , (chunkTypeOf _T_PC, "Presentation Control")
+    , (chunkTypeOf _T_FRMT, "Font Resolution and Metric Technology")
+    , (chunkTypeOf _T_FO, "Finishing Operation")
+    , (chunkTypeOf _T_MF, "Media Fidelity")
+    , (chunkTypeOf _PTX_STC, "Set Text Color")
+    , (chunkTypeOf _PTX_SIM, "Set Inline Margin")
+    , (chunkTypeOf _PTX_SIA, "Set Intercharacter Adjustment")
+    , (chunkTypeOf _PTX_SVI, "Set Variable-Space Character Increment")
+    , (chunkTypeOf _PTX_AMI, "Absolute Move Inline")
+    , (chunkTypeOf _PTX_RMI, "Relative Move Inline")
+    , (chunkTypeOf _PTX_SBI, "Set Baseline Increment")
+    , (chunkTypeOf _PTX_AMB, "Absolute Move Baseline")
+    , (chunkTypeOf _PTX_RMB, "Relative Move Baseline")
+    , (chunkTypeOf _PTX_BLN, "Begin Line Next")
+    , (chunkTypeOf _PTX_DIR, "Draw I-Axis Rule")
+    , (chunkTypeOf _PTX_DBR, "Draw B-Axis Rule")
+    , (chunkTypeOf _PTX_RPS, "Repeat String")
+    , (chunkTypeOf _PTX_SCFL, "Set Coded Font Local")
+    , (chunkTypeOf _PTX_BSU, "Begin Suppression")
+    , (chunkTypeOf _PTX_ESU, "Begin Suppression")
+    , (chunkTypeOf _PTX_STO, "Set Text Orientation")
+    , (chunkTypeOf _PTX_NOP, "No Operation")
+    , (chunkTypeOf _PTX_TRN, "Transparent Data")
     ]

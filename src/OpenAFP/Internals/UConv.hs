@@ -4,10 +4,10 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  OpenAFP.Internals.UConv
--- Copyright   :  Autrijus Tang
+-- Copyright   :  Audrey Tang
 -- License     :  BSD-style
 --
--- Maintainer  :  autrijus@autrijus.org
+-- Maintainer  :  audreyt@audreyt.org
 -- Stability   :  experimental
 -- Portability :  non-portable (FFI extensions, UNIX98)
 --

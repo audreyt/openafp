@@ -1,5 +1,5 @@
 validate ::
-	ghc -isrc -H128m --make -static -o validate -O validate.hs
+	ghc -Wall -isrc -H128m --make -static -o validate -O validate.hs
 
 udc4skl ::
 	ghc -isrc -H128m --make -static -o udc4skl -O udc4skl.hs

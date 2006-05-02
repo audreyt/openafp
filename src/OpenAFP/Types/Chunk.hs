@@ -3,10 +3,10 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  OpenAFP.Types.Chunk
--- Copyright   :  (c) Autrijus Tang 2004
+-- Copyright   :  (c) Audrey Tang 2004, 2006
 -- License     :  BSD-style
 -- 
--- Maintainer  :  autrijus@autrijus.org
+-- Maintainer  :  audreyt@audreyt.org
 -- Stability   :  experimental
 -- Portability :  non-portable (GHC-only)
 --
@@ -18,6 +18,7 @@ module OpenAFP.Types.Chunk where
 import OpenAFP.Internals
 import OpenAFP.Types.Buffer
 import OpenAFP.Types.Record
+import GHC.Exts (unsafeCoerce#)
 
 infixl 4 ~~
 infixl 4 <~~
@@ -75,7 +76,17 @@ toNStr list = liftIO $ do
         pokeArray cstr list
         return $ bufFromPStrLen (castForeignPtr pstr, len)
 
-type ChunkType = TypeRep
+newtype ChunkType = MkChunkType TypeRep
+    deriving (Eq, Typeable)
+
+chunkTypeOf :: Typeable a => a -> ChunkType
+chunkTypeOf = MkChunkType . typeOf
+
+instance Ord ChunkType where
+    compare x y = coerce x `compare` coerce y
+        where
+        coerce :: a -> Int
+        coerce = unsafeCoerce#
 
 -- | The ChunkBuf class represents non-parsed chunks, constructed from a
 --   (ChunkType, Buffer) tuple.
@@ -162,7 +173,7 @@ instance (Rec a, Binary a) => Storable [a] where
     sizeOf r = recSizeOf r
     
 (~~) :: (ChunkBuf c n b, Typeable t) => c -> t -> Bool
-c ~~ t = (typeOf t == chunkType c)
+c ~~ t = (chunkTypeOf t == chunkType c)
 
 (<~~) :: (ChunkBuf c n b, Typeable t, Rec r) => t -> [c] -> IOm r
 t <~~ cs = do
@@ -184,9 +195,9 @@ cs ..> fs = chunksMapFiltersM_ cs fs
 (<..) :: (ChunkBuf c n b, MonadIO m) => [(ChunkType, c -> m [c])] -> [c] -> m ()
 (<..) = flip (..>)
 
-t === f = (typeOf t, processChunk t f)
--- t ==== f = (typeOf t, processChunk t (lift . f))
--- t ===== f = (typeOf t, processChunk t (lift . lift . f))
+t === f = (chunkTypeOf t, processChunk t f)
+-- t ==== f = (chunkTypeOf t, processChunk t (lift . f))
+-- t ===== f = (chunkTypeOf t, processChunk t (lift . lift . f))
 
 processChunk :: (MonadIO m, Rec r, ChunkBuf c n b) =>
     r -> (r -> ChunkWriter c m a) -> (c -> m [c])
@@ -198,9 +209,9 @@ processChunk _ f c = do
     -- collect the pushed stuff
     return cs
 
-t ... f = (typeOf t, inspectChunk t f)
-t .... f = (typeOf t, inspectChunk t (lift . f))
-t ..... f = (typeOf t, inspectChunk t (lift . lift . f))
+t ... f = (chunkTypeOf t, inspectChunk t f)
+t .... f = (chunkTypeOf t, inspectChunk t (lift . f))
+t ..... f = (chunkTypeOf t, inspectChunk t (lift . lift . f))
 
 inspectChunk :: (MonadIO m, Rec a, ChunkBuf c n b) => a -> (a -> m t) -> (c -> m [c])
 inspectChunk _ f c = do
