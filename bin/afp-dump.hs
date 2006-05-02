@@ -2,8 +2,7 @@
 
 module Main where
 import Text.Html
-import OpenAFP.Prelude hiding ((!))
-import OpenAFP.Internals.UConv
+import OpenAFP hiding ((!))
 
 -- The key here is inventing a ConcreteDataView for our data structure.
 -- See OpenAFP.Types.View for details.
@@ -116,11 +115,11 @@ recHtml (ViewRecord (t, fs))
     | otherwise
     = li << (typeHtml t +++ fieldsHtml fs)
 
-typeHtml :: ChunkType -> Html
+typeHtml :: RecordType -> Html
 typeHtml t = thediv << (typeStr +++ primHtml " &mdash; " +++ typeDesc)
     where
     typeStr = bold << last (split "." (show t))
-    typeDesc = stringToHtml $ descLookup t
+    typeDesc = stringToHtml $ descLookup (MkChunkType t)
 
 ptxHtml :: WithVars ([N1] -> [Html])
 ptxHtml nstr = [table << textHtml]

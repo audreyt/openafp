@@ -1,14 +1,21 @@
-validate ::
-	ghc -Wall -isrc -H128m --make -static -o validate -O validate.hs
+all :: dist/build/libHSOpenAFP-1.0.a afp-validate afp-udcfix afp-replace afp-dump
 
-udc4skl ::
-	ghc -isrc -H128m --make -static -o udc4skl -O udc4skl.hs
+afp-validate ::
+	ghc -H128m --make -static -o afp-validate -O bin/afp-validate.hs
 
-replace ::
-	ghc -isrc -H128m --make -static -o replace -O replace.hs
+afp-udcfix ::
+	ghc -H128m --make -static -o afp-udcfix -O bin/afp-udcfix.hs
 
-afpdump ::
-	ghc -isrc -H128m --make -static -o afpdump -O afpdump.hs -I/usr/local/include -I/usr/local/include/icu -L/usr/local/lib -L/usr/local/lib/icu/ -licuuc
+afp-replace ::
+	ghc -H128m --make -static -o afp-replace -O bin/afp-replace.hs
+
+afp-dump ::
+	ghc -H128m --make -static -o afp-dump -O bin/afp-dump.hs
+
+dist/build/libHSOpenAFP-1.0.a ::
+	runghc Setup.lhs configure --user
+	runghc Setup.lhs build
+	sudo runghc Setup.lhs install
 
 fast ::
 	ghc -isrc -O0 --make -o udc4skl udc4skl.hs

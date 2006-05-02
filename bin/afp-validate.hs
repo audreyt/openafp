@@ -1,7 +1,7 @@
 {-# OPTIONS -O -fglasgow-exts #-}
 
 module Main where
-import OpenAFP.Prelude
+import OpenAFP
 import System.Exit
 
 main :: IO ()

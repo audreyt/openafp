@@ -1,7 +1,7 @@
 {-# OPTIONS -O -fglasgow-exts #-}
 
 module Main where
-import OpenAFP.Prelude
+import OpenAFP
 
 type Map = [([N1], [N1])]
 type Maps = IORef [Map]

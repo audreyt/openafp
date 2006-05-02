@@ -1,7 +1,8 @@
 {-# OPTIONS -O -fglasgow-exts -funbox-strict-fields #-}
 
 module Main where
-import OpenAFP.Prelude
+import OpenAFP
+import qualified Data.Map as Map
 
 -- | Flags.
 type VarsIO a = StateIO Vars a
@@ -271,9 +272,9 @@ readIncrements font hi = do
     let cfi = hi `matchRecord` cfi_Section $ cfi_
     fni_    <- _FNI `readLibRecord` cfi_FontCharacterSetName $ cfi
     cpi_    <- _CPI `readLibRecord` cfi_CodePageName $ cfi
-    let gcgToIncr = listToFM . map (pair . fromRecord) $ readData fni_
+    let gcgToIncr = Map.fromList . map (pair . fromRecord) $ readData fni_
         pair r    = (fni_GCGID r, fni_CharacterIncrement r)
-        incr      = fromJust . lookupFM gcgToIncr . cpi_GCGID
+        incr      = fromJust . (`Map.lookup` gcgToIncr) . cpi_GCGID
     sequence_ [ _IncrCache %= (key r, incr r) | Record r <- readData cpi_ ]
     where
     key r = cacheKey font (hi, cpi_CodePoint r)
