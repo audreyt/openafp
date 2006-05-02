@@ -70,7 +70,65 @@
       ><TR
       ><TD CLASS = "body"
 	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
-	  ></TABLE
+	  ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3ArecOf"
+		>recOf</A
+		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		>ChunkBuf</A
+		> c n b, <A HREF = "OpenAFP.Internals.Binary.html#t%3ABinary"
+		>Binary</A
+		> (<A HREF = "OpenAFP.Types.Record.html#t%3ARecord"
+		>Record</A
+		> r)) =&gt; c -&gt; IO r</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3Aapply"
+		>apply</A
+		> :: MonadIO m =&gt; (t -&gt; IO a) -&gt; t -&gt; (a -&gt; m b) -&gt; m b</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AapplyAFP"
+		>applyAFP</A
+		> :: MonadIO m =&gt; <A HREF = "OpenAFP.Internals.Binary.html#t%3AN3"
+		>N3</A
+		> -&gt; <A HREF = "OpenAFP.Records.html#t%3AAFP_"
+		>AFP_</A
+		> -&gt; (<SPAN CLASS = "keyword"
+		>forall</SPAN
+		> a . <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+		>Rec</A
+		> a =&gt; a -&gt; m b) -&gt; m b</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AapplyMCF"
+		>applyMCF</A
+		> :: MonadIO m =&gt; <A HREF = "OpenAFP.Internals.Binary.html#t%3AN0"
+		>N0</A
+		> -&gt; <A HREF = "OpenAFP.Records.AFP.MCF.html#t%3AMCF_"
+		>MCF_</A
+		> -&gt; (<SPAN CLASS = "keyword"
+		>forall</SPAN
+		> a . <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+		>Rec</A
+		> a =&gt; a -&gt; m b) -&gt; m b</TD
+	      ></TR
+	    ></TABLE
 	  ></TD
 	></TR
       ><TR
@@ -85,7 +143,7 @@
       ><TD CLASS = "botbar"
 	>Produced by <A HREF = "http://www.haskell.org/haddock/"
 	  >Haddock</A
-	  > version HADDOCK_VERSION</TD
+	  > version ADDOCK_VERSION</TD
 	></TR
       ></TABLE
     ></BODY

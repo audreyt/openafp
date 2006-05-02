@@ -133,6 +133,36 @@
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "decl"
+	      ><SPAN CLASS = "keyword"
+		>type</SPAN
+		> <A HREF = "#t%3AChunkWriter"
+		>ChunkWriter</A
+		> c = WriterT (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkQueue"
+		>ChunkQueue</A
+		> c)</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><SPAN CLASS = "keyword"
+		>type</SPAN
+		> <A HREF = "#t%3AWriterStateIO"
+		>WriterStateIO</A
+		> v a = (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		>ChunkBuf</A
+		> c n b, MonadReader v m, MonadPlus m, MonadIO m, MonadError e m, Show e, Typeable e) =&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
+		>ChunkWriter</A
+		> c m a</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3A_NStr"
 		>_NStr</A
 		> :: <A HREF = "OpenAFP.Types.Chunk.html#t%3ANStr"
@@ -147,13 +177,11 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3AfromAStr"
 		>fromAStr</A
-		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m =&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AAStr"
+		> :: <A HREF = "OpenAFP.Types.Chunk.html#t%3AAStr"
 		>AStr</A
-		> -&gt; m <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Base.html#t%3AString"
-		>String</A
-		></TD
+		> -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+		>IOm</A
+		> String</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -163,11 +191,9 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3AtoAStr"
 		>toAStr</A
-		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m =&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Base.html#t%3AString"
-		>String</A
-		> -&gt; m <A HREF = "OpenAFP.Types.Chunk.html#t%3AAStr"
+		> :: String -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+		>IOm</A
+		> <A HREF = "OpenAFP.Types.Chunk.html#t%3AAStr"
 		>AStr</A
 		></TD
 	      ></TR
@@ -179,11 +205,11 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3AfromNStr"
 		>fromNStr</A
-		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m =&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3ANStr"
+		> :: <A HREF = "OpenAFP.Types.Chunk.html#t%3ANStr"
 		>NStr</A
-		> -&gt; m [<A HREF = "OpenAFP.Internals.Binary.html#t%3AN1"
+		> -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+		>IOm</A
+		> [<A HREF = "OpenAFP.Internals.Binary.html#t%3AN1"
 		>N1</A
 		>]</TD
 	      ></TR
@@ -195,11 +221,11 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3AtoNStr"
 		>toNStr</A
-		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m =&gt; [<A HREF = "OpenAFP.Internals.Binary.html#t%3AN1"
+		> :: [<A HREF = "OpenAFP.Internals.Binary.html#t%3AN1"
 		>N1</A
-		>] -&gt; m <A HREF = "OpenAFP.Types.Chunk.html#t%3ANStr"
+		>] -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+		>IOm</A
+		> <A HREF = "OpenAFP.Types.Chunk.html#t%3ANStr"
 		>NStr</A
 		></TD
 	      ></TR
@@ -210,11 +236,23 @@
 	    ><TR
 	    ><TD CLASS = "decl"
 	      ><SPAN CLASS = "keyword"
-		>type</SPAN
+		>newtype</SPAN
 		> <A HREF = "#t%3AChunkType"
 		>ChunkType</A
-		> = <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeRep"
-		>TypeRep</A
+		>  = <A HREF = "#v%3AMkChunkType"
+		>MkChunkType</A
+		> String</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AchunkTypeOf"
+		>chunkTypeOf</A
+		> :: Typeable a =&gt; a -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		>ChunkType</A
 		></TD
 	      ></TR
 	    ><TR
@@ -225,13 +263,11 @@
 	    ><TD CLASS = "decl"
 	      ><SPAN CLASS = "keyword"
 		>class</SPAN
-		> (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AShow"
-		>Show</A
-		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
-		>Typeable</A
-		> a) =&gt; <A HREF = "#t%3AChunk"
-		>Chunk</A
-		> a  <SPAN CLASS = "keyword"
+		> (Show c, Typeable c, <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
+		>Buf</A
+		> b, Num n, Enum n) =&gt; <A HREF = "#t%3AChunkBuf"
+		>ChunkBuf</A
+		> c n b | c -&gt; n, c -&gt; b <SPAN CLASS = "keyword"
 		>where</SPAN
 		></TD
 	      ></TR
@@ -240,9 +276,39 @@
 	      ><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
 		><TR
 		  ><TD CLASS = "decl"
+		    ><A HREF = "#v%3AchunkApply"
+		      >chunkApply</A
+		      > :: MonadIO m =&gt; n -&gt; c -&gt; (<SPAN CLASS = "keyword"
+		      >forall</SPAN
+		      > a . <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+		      >Rec</A
+		      > a =&gt; a -&gt; m x) -&gt; m x</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "#v%3AchunkCon"
+		      >chunkCon</A
+		      > :: (n, b) -&gt; c</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "#v%3AchunkDecon"
+		      >chunkDecon</A
+		      > :: c -&gt; (n, b)</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
 		    ><A HREF = "#v%3AchunkType"
 		      >chunkType</A
-		      > :: a -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		      > :: c -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		      >ChunkType</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "#v%3AchunkTypeLookup"
+		      >chunkTypeLookup</A
+		      > :: c -&gt; n -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 		      >ChunkType</A
 		      ></TD
 		    ></TR
@@ -250,7 +316,7 @@
 		  ><TD CLASS = "decl"
 		    ><A HREF = "#v%3AchunkToPStrLen"
 		      >chunkToPStrLen</A
-		      > :: a -&gt; <A HREF = "OpenAFP.Internals.Binary.html#t%3APStringLen"
+		      > :: c -&gt; <A HREF = "OpenAFP.Internals.Binary.html#t%3APStringLen"
 		      >PStringLen</A
 		      ></TD
 		    ></TR
@@ -258,41 +324,33 @@
 		  ><TD CLASS = "decl"
 		    ><A HREF = "#v%3AchunkMapFiltersM_"
 		      >chunkMapFiltersM_</A
-		      > :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		      >MonadIO</A
-		      > m =&gt; a -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		      > :: MonadIO m =&gt; c -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 		      >ChunkType</A
-		      >, a -&gt; m [a])] -&gt; m ()</TD
+		      >, c -&gt; m [c])] -&gt; m ()</TD
 		    ></TR
 		  ><TR
 		  ><TD CLASS = "decl"
 		    ><A HREF = "#v%3AchunkMapFiltersM"
 		      >chunkMapFiltersM</A
-		      > :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		      >MonadIO</A
-		      > m =&gt; a -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		      > :: MonadIO m =&gt; c -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 		      >ChunkType</A
-		      >, a -&gt; m [a])] -&gt; m [a]</TD
+		      >, c -&gt; m [c])] -&gt; m [c]</TD
 		    ></TR
 		  ><TR
 		  ><TD CLASS = "decl"
 		    ><A HREF = "#v%3AchunksMapFiltersM"
 		      >chunksMapFiltersM</A
-		      > :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		      >MonadIO</A
-		      > m =&gt; [a] -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		      > :: MonadIO m =&gt; [c] -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 		      >ChunkType</A
-		      >, a -&gt; m [a])] -&gt; m [a]</TD
+		      >, c -&gt; m [c])] -&gt; m [c]</TD
 		    ></TR
 		  ><TR
 		  ><TD CLASS = "decl"
 		    ><A HREF = "#v%3AchunksMapFiltersM_"
 		      >chunksMapFiltersM_</A
-		      > :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		      >MonadIO</A
-		      > m =&gt; [a] -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		      > :: MonadIO m =&gt; [c] -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 		      >ChunkType</A
-		      >, a -&gt; m [a])] -&gt; m ()</TD
+		      >, c -&gt; m [c])] -&gt; m ()</TD
 		    ></TR
 		  ><TR
 		  ><TD CLASS = "decl"
@@ -302,27 +360,19 @@
 		      >Binary</A
 		      > (<A HREF = "OpenAFP.Types.Record.html#t%3ARecord"
 		      >Record</A
-		      > b) =&gt; a -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AIO"
-		      >IO</A
-		      > (<A HREF = "OpenAFP.Types.Record.html#t%3ARecord"
+		      > r) =&gt; c -&gt; IO (<A HREF = "OpenAFP.Types.Record.html#t%3ARecord"
 		      >Record</A
-		      > b)</TD
+		      > r)</TD
 		    ></TR
 		  ><TR
 		  ><TD CLASS = "decl"
 		    ><A HREF = "#v%3AchunkFromRecord"
 		      >chunkFromRecord</A
-		      > :: (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
-		      >Typeable</A
-		      > b, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AShow"
-		      >Show</A
-		      > b, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.Storable.html#t%3AStorable"
-		      >Storable</A
-		      > b, <A HREF = "OpenAFP.Internals.Binary.html#t%3ABinary"
+		      > :: (<A HREF = "OpenAFP.Internals.Binary.html#t%3ABinary"
 		      >Binary</A
-		      > b) =&gt; b -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AIO"
-		      >IO</A
-		      > a</TD
+		      > r, Storable r, <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+		      >Rec</A
+		      > r) =&gt; r -&gt; IO c</TD
 		    ></TR
 		  ></TABLE
 		></TD
@@ -337,11 +387,11 @@
 		>class</SPAN
 		> (<A HREF = "OpenAFP.Types.Record.html#t%3ARec"
 		>Rec</A
-		> a, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-		>Chunk</A
-		> b) =&gt; <A HREF = "#t%3ARecChunk"
+		> r, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		>ChunkBuf</A
+		> c n b) =&gt; <A HREF = "#t%3ARecChunk"
 		>RecChunk</A
-		> a b | a -&gt; b <SPAN CLASS = "keyword"
+		> r c n b | r -&gt; c <SPAN CLASS = "keyword"
 		>where</SPAN
 		></TD
 	      ></TR
@@ -352,15 +402,13 @@
 		  ><TD CLASS = "decl"
 		    ><A HREF = "#v%3AreadChunks"
 		      >readChunks</A
-		      > :: a -&gt; [b]</TD
+		      > :: r -&gt; [c]</TD
 		    ></TR
 		  ><TR
 		  ><TD CLASS = "decl"
 		    ><A HREF = "#v%3AwriteChunks"
 		      >writeChunks</A
-		      > :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		      >MonadIO</A
-		      > m =&gt; a -&gt; m [b] -&gt; m a</TD
+		      > :: MonadIO m =&gt; r -&gt; m [c] -&gt; m r</TD
 		    ></TR
 		  ></TABLE
 		></TD
@@ -411,55 +459,11 @@
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "decl"
-	      ><SPAN CLASS = "keyword"
-		>class</SPAN
-		> (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-		>Chunk</A
-		> a, <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
-		>Buf</A
-		> b) =&gt; <A HREF = "#t%3AChunkBuf"
-		>ChunkBuf</A
-		> a b | a -&gt; b <SPAN CLASS = "keyword"
-		>where</SPAN
-		></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "body"
-	      ><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
-		><TR
-		  ><TD CLASS = "decl"
-		    ><A HREF = "#v%3AchunkCon"
-		      >chunkCon</A
-		      > :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
-		      >ChunkType</A
-		      >, b) -&gt; a</TD
-		    ></TR
-		  ><TR
-		  ><TD CLASS = "decl"
-		    ><A HREF = "#v%3AchunkDecon"
-		      >chunkDecon</A
-		      > :: a -&gt; (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
-		      >ChunkType</A
-		      >, b)</TD
-		    ></TR
-		  ></TABLE
-		></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "s8"
-	      ></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3A~~"
 		>(~~)</A
-		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-		>Chunk</A
-		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
-		>Typeable</A
-		> b) =&gt; a -&gt; b -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3ABool"
-		>Bool</A
-		></TD
+		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		>ChunkBuf</A
+		> c n b, Typeable t) =&gt; c -&gt; t -&gt; Bool</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -469,15 +473,13 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3A%3C~~"
 		>(&lt;~~)</A
-		> :: (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-		>Chunk</A
-		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
-		>Typeable</A
-		> t, <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		>ChunkBuf</A
+		> c n b, Typeable t, <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
 		>Rec</A
-		> b) =&gt; t -&gt; [a] -&gt; m b</TD
+		> r) =&gt; t -&gt; [c] -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+		>IOm</A
+		> r</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -487,15 +489,13 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3A~~%3E"
 		>(~~&gt;)</A
-		> :: (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-		>Chunk</A
-		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
-		>Typeable</A
-		> t, <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		>ChunkBuf</A
+		> c n b, Typeable t, <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
 		>Rec</A
-		> b) =&gt; [a] -&gt; t -&gt; m b</TD
+		> r) =&gt; [c] -&gt; t -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+		>IOm</A
+		> r</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -505,13 +505,11 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3A%3D%3D%3E"
 		>(==&gt;)</A
-		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-		>Chunk</A
-		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m) =&gt; [a] -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		>ChunkBuf</A
+		> c n b, MonadIO m) =&gt; [c] -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 		>ChunkType</A
-		>, a -&gt; m [a])] -&gt; m [a]</TD
+		>, c -&gt; m [c])] -&gt; m [c]</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -521,13 +519,11 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3A%3C%3D%3D"
 		>(&lt;==)</A
-		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-		>Chunk</A
-		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m) =&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		>ChunkBuf</A
+		> c n b, MonadIO m) =&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 		>ChunkType</A
-		>, a -&gt; m [a])] -&gt; [a] -&gt; m [a]</TD
+		>, c -&gt; m [c])] -&gt; [c] -&gt; m [c]</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -537,13 +533,11 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3A..%3E"
 		>(..&gt;)</A
-		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-		>Chunk</A
-		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m) =&gt; [a] -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		>ChunkBuf</A
+		> c n b, MonadIO m) =&gt; [c] -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 		>ChunkType</A
-		>, a -&gt; m [a])] -&gt; m ()</TD
+		>, c -&gt; m [c])] -&gt; m ()</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -553,29 +547,11 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3A%3C.."
 		>(&lt;..)</A
-		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-		>Chunk</A
-		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m) =&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		>ChunkBuf</A
+		> c n b, MonadIO m) =&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 		>ChunkType</A
-		>, a -&gt; m [a])] -&gt; [a] -&gt; m ()</TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "s8"
-	      ></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "decl"
-	      ><SPAN CLASS = "keyword"
-		>type</SPAN
-		> <A HREF = "#t%3AChunkWriter"
-		>ChunkWriter</A
-		> c = <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Writer.html#t%3AWriterT"
-		>WriterT</A
-		> (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkQueue"
-		>ChunkQueue</A
-		> c)</TD
+		>, c -&gt; m [c])] -&gt; [c] -&gt; m ()</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -585,13 +561,11 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3AprocessChunk"
 		>processChunk</A
-		> :: (<A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+		> :: (MonadIO m, <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
 		>Rec</A
-		> r, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-		>Chunk</A
-		> c, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m) =&gt; r -&gt; (r -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
+		> r, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		>ChunkBuf</A
+		> c n b) =&gt; r -&gt; (r -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
 		>ChunkWriter</A
 		> c m a) -&gt; c -&gt; m [c]</TD
 	      ></TR
@@ -603,13 +577,11 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3AinspectChunk"
 		>inspectChunk</A
-		> :: (<A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+		> :: (MonadIO m, <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
 		>Rec</A
-		> a, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-		>Chunk</A
-		> b, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m) =&gt; a -&gt; (a -&gt; m t) -&gt; b -&gt; m [b]</TD
+		> a, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		>ChunkBuf</A
+		> c n b) =&gt; a -&gt; (a -&gt; m t) -&gt; c -&gt; m [c]</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -619,13 +591,11 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3Apush"
 		>push</A
-		> :: (<A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		>ChunkBuf</A
+		> c n b, MonadIO m, <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
 		>Rec</A
-		> a, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-		>Chunk</A
-		> c, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m) =&gt; a -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
+		> a) =&gt; a -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
 		>ChunkWriter</A
 		> c m ()</TD
 	      ></TR
@@ -637,19 +607,17 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3AfilterChunks"
 		>filterChunks</A
-		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3ARecChunk"
+		> :: (MonadIO m, <A HREF = "OpenAFP.Types.Chunk.html#t%3ARecChunk"
 		>RecChunk</A
-		> a b, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-		>Chunk</A
-		> c, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m) =&gt; a -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		> r c n b, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		>ChunkBuf</A
+		> c' n' b') =&gt; r -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 		>ChunkType</A
-		>, b -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
+		>, c -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
 		>ChunkWriter</A
-		> c m [b])] -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
+		> c' m [c])] -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
 		>ChunkWriter</A
-		> c m ()</TD
+		> c' m ()</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -736,6 +704,40 @@
 	></TR
       ><TR
       ><TD CLASS = "decl"
+	><SPAN CLASS = "keyword"
+	  >type</SPAN
+	  > <A NAME = "t%3AChunkWriter"
+	  ></A
+	  ><B
+	  >ChunkWriter</B
+	  > c = WriterT (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkQueue"
+	  >ChunkQueue</A
+	  > c)</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><SPAN CLASS = "keyword"
+	  >type</SPAN
+	  > <A NAME = "t%3AWriterStateIO"
+	  ></A
+	  ><B
+	  >WriterStateIO</B
+	  > v a = (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+	  >ChunkBuf</A
+	  > c n b, MonadReader v m, MonadPlus m, MonadIO m, MonadError e m, Show e, Typeable e) =&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
+	  >ChunkWriter</A
+	  > c m a</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
 	><A NAME = "v%3A_NStr"
 	  ></A
 	  ><B
@@ -754,13 +756,11 @@
 	  ></A
 	  ><B
 	  >fromAStr</B
-	  > :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-	  >MonadIO</A
-	  > m =&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AAStr"
+	  > :: <A HREF = "OpenAFP.Types.Chunk.html#t%3AAStr"
 	  >AStr</A
-	  > -&gt; m <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Base.html#t%3AString"
-	  >String</A
-	  ></TD
+	  > -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+	  >IOm</A
+	  > String</TD
 	></TR
       ><TR
       ><TD CLASS = "s15"
@@ -772,11 +772,9 @@
 	  ></A
 	  ><B
 	  >toAStr</B
-	  > :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-	  >MonadIO</A
-	  > m =&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Base.html#t%3AString"
-	  >String</A
-	  > -&gt; m <A HREF = "OpenAFP.Types.Chunk.html#t%3AAStr"
+	  > :: String -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+	  >IOm</A
+	  > <A HREF = "OpenAFP.Types.Chunk.html#t%3AAStr"
 	  >AStr</A
 	  ></TD
 	></TR
@@ -790,11 +788,11 @@
 	  ></A
 	  ><B
 	  >fromNStr</B
-	  > :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-	  >MonadIO</A
-	  > m =&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3ANStr"
+	  > :: <A HREF = "OpenAFP.Types.Chunk.html#t%3ANStr"
 	  >NStr</A
-	  > -&gt; m [<A HREF = "OpenAFP.Internals.Binary.html#t%3AN1"
+	  > -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+	  >IOm</A
+	  > [<A HREF = "OpenAFP.Internals.Binary.html#t%3AN1"
 	  >N1</A
 	  >]</TD
 	></TR
@@ -808,11 +806,11 @@
 	  ></A
 	  ><B
 	  >toNStr</B
-	  > :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-	  >MonadIO</A
-	  > m =&gt; [<A HREF = "OpenAFP.Internals.Binary.html#t%3AN1"
+	  > :: [<A HREF = "OpenAFP.Internals.Binary.html#t%3AN1"
 	  >N1</A
-	  >] -&gt; m <A HREF = "OpenAFP.Types.Chunk.html#t%3ANStr"
+	  >] -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+	  >IOm</A
+	  > <A HREF = "OpenAFP.Types.Chunk.html#t%3ANStr"
 	  >NStr</A
 	  ></TD
 	></TR
@@ -823,13 +821,85 @@
       ><TR
       ><TD CLASS = "decl"
 	><SPAN CLASS = "keyword"
-	  >type</SPAN
+	  >newtype</SPAN
 	  > <A NAME = "t%3AChunkType"
 	  ></A
 	  ><B
 	  >ChunkType</B
-	  > = <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeRep"
-	  >TypeRep</A
+	  > </TD
+	></TR
+      ><TR
+      ><TD CLASS = "body"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD CLASS = "section4"
+	      >Constructors</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "body"
+	      ><TABLE CLASS = "vanilla" CELLSPACING = "1" CELLPADDING = "0"
+		><TR
+		  ><TD CLASS = "decl"
+		    ><A NAME = "v%3AMkChunkType"
+		      ></A
+		      ><B
+		      >MkChunkType</B
+		      > String</TD
+		    ><TD CLASS = "rdoc"
+		    ></TD
+		    ></TR
+		  ></TABLE
+		></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "section4"
+	      >Instances</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "body"
+	      ><TABLE CLASS = "vanilla" CELLSPACING = "1" CELLPADDING = "0"
+		><TR
+		  ><TD CLASS = "decl"
+		    >Show <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		      >ChunkType</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    >Eq <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		      >ChunkType</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    >Typeable <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		      >ChunkType</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    >Ord <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		      >ChunkType</A
+		      ></TD
+		    ></TR
+		  ></TABLE
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><A NAME = "v%3AchunkTypeOf"
+	  ></A
+	  ><B
+	  >chunkTypeOf</B
+	  > :: Typeable a =&gt; a -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+	  >ChunkType</A
 	  ></TD
 	></TR
       ><TR
@@ -840,15 +910,13 @@
       ><TD CLASS = "decl"
 	><SPAN CLASS = "keyword"
 	  >class</SPAN
-	  > (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AShow"
-	  >Show</A
-	  > a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
-	  >Typeable</A
-	  > a) =&gt; <A NAME = "t%3AChunk"
+	  > (Show c, Typeable c, <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
+	  >Buf</A
+	  > b, Num n, Enum n) =&gt; <A NAME = "t%3AChunkBuf"
 	  ></A
 	  ><B
-	  >Chunk</B
-	  > a  <SPAN CLASS = "keyword"
+	  >ChunkBuf</B
+	  > c n b | c -&gt; n, c -&gt; b <SPAN CLASS = "keyword"
 	  >where</SPAN
 	  ></TD
 	></TR
@@ -857,7 +925,7 @@
 	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
 	  ><TR
 	    ><TD CLASS = "ndoc"
-	      >The Chunk class represents non-parsed chunks, constructed from a
+	      >The ChunkBuf class represents non-parsed chunks, constructed from a
 (ChunkType, Buffer) tuple.</TD
 	      ></TR
 	    ><TR
@@ -873,11 +941,65 @@
 	      ><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
 		><TR
 		  ><TD CLASS = "decl"
+		    ><A NAME = "v%3AchunkApply"
+		      ></A
+		      ><B
+		      >chunkApply</B
+		      > :: MonadIO m =&gt; n -&gt; c -&gt; (<SPAN CLASS = "keyword"
+		      >forall</SPAN
+		      > a . <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+		      >Rec</A
+		      > a =&gt; a -&gt; m x) -&gt; m x</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "s8"
+		    ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A NAME = "v%3AchunkCon"
+		      ></A
+		      ><B
+		      >chunkCon</B
+		      > :: (n, b) -&gt; c</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "s8"
+		    ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A NAME = "v%3AchunkDecon"
+		      ></A
+		      ><B
+		      >chunkDecon</B
+		      > :: c -&gt; (n, b)</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "s8"
+		    ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
 		    ><A NAME = "v%3AchunkType"
 		      ></A
 		      ><B
 		      >chunkType</B
-		      > :: a -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		      > :: c -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		      >ChunkType</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "s8"
+		    ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A NAME = "v%3AchunkTypeLookup"
+		      ></A
+		      ><B
+		      >chunkTypeLookup</B
+		      > :: c -&gt; n -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 		      >ChunkType</A
 		      ></TD
 		    ></TR
@@ -891,7 +1013,7 @@
 		      ></A
 		      ><B
 		      >chunkToPStrLen</B
-		      > :: a -&gt; <A HREF = "OpenAFP.Internals.Binary.html#t%3APStringLen"
+		      > :: c -&gt; <A HREF = "OpenAFP.Internals.Binary.html#t%3APStringLen"
 		      >PStringLen</A
 		      ></TD
 		    ></TR
@@ -905,11 +1027,9 @@
 		      ></A
 		      ><B
 		      >chunkMapFiltersM_</B
-		      > :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		      >MonadIO</A
-		      > m =&gt; a -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		      > :: MonadIO m =&gt; c -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 		      >ChunkType</A
-		      >, a -&gt; m [a])] -&gt; m ()</TD
+		      >, c -&gt; m [c])] -&gt; m ()</TD
 		    ></TR
 		  ><TR
 		  ><TD CLASS = "s8"
@@ -921,11 +1041,9 @@
 		      ></A
 		      ><B
 		      >chunkMapFiltersM</B
-		      > :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		      >MonadIO</A
-		      > m =&gt; a -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		      > :: MonadIO m =&gt; c -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 		      >ChunkType</A
-		      >, a -&gt; m [a])] -&gt; m [a]</TD
+		      >, c -&gt; m [c])] -&gt; m [c]</TD
 		    ></TR
 		  ><TR
 		  ><TD CLASS = "s8"
@@ -937,11 +1055,9 @@
 		      ></A
 		      ><B
 		      >chunksMapFiltersM</B
-		      > :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		      >MonadIO</A
-		      > m =&gt; [a] -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		      > :: MonadIO m =&gt; [c] -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 		      >ChunkType</A
-		      >, a -&gt; m [a])] -&gt; m [a]</TD
+		      >, c -&gt; m [c])] -&gt; m [c]</TD
 		    ></TR
 		  ><TR
 		  ><TD CLASS = "s8"
@@ -953,11 +1069,9 @@
 		      ></A
 		      ><B
 		      >chunksMapFiltersM_</B
-		      > :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		      >MonadIO</A
-		      > m =&gt; [a] -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+		      > :: MonadIO m =&gt; [c] -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 		      >ChunkType</A
-		      >, a -&gt; m [a])] -&gt; m ()</TD
+		      >, c -&gt; m [c])] -&gt; m ()</TD
 		    ></TR
 		  ><TR
 		  ><TD CLASS = "s8"
@@ -973,11 +1087,9 @@
 		      >Binary</A
 		      > (<A HREF = "OpenAFP.Types.Record.html#t%3ARecord"
 		      >Record</A
-		      > b) =&gt; a -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AIO"
-		      >IO</A
-		      > (<A HREF = "OpenAFP.Types.Record.html#t%3ARecord"
+		      > r) =&gt; c -&gt; IO (<A HREF = "OpenAFP.Types.Record.html#t%3ARecord"
 		      >Record</A
-		      > b)</TD
+		      > r)</TD
 		    ></TR
 		  ><TR
 		  ><TD CLASS = "s8"
@@ -989,17 +1101,11 @@
 		      ></A
 		      ><B
 		      >chunkFromRecord</B
-		      > :: (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
-		      >Typeable</A
-		      > b, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AShow"
-		      >Show</A
-		      > b, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.Storable.html#t%3AStorable"
-		      >Storable</A
-		      > b, <A HREF = "OpenAFP.Internals.Binary.html#t%3ABinary"
+		      > :: (<A HREF = "OpenAFP.Internals.Binary.html#t%3ABinary"
 		      >Binary</A
-		      > b) =&gt; b -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AIO"
-		      >IO</A
-		      > a</TD
+		      > r, Storable r, <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+		      >Rec</A
+		      > r) =&gt; r -&gt; IO c</TD
 		    ></TR
 		  ></TABLE
 		></TD
@@ -1019,9 +1125,49 @@
 		  ><TD CLASS = "decl"
 		    ><A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
 		      >ChunkBuf</A
-		      > a b =&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-		      >Chunk</A
-		      > a</TD
+		      > <A HREF = "OpenAFP.Records.AFP.PTX.html#t%3APTX_"
+		      >PTX_</A
+		      > <A HREF = "OpenAFP.Internals.Binary.html#t%3AN1"
+		      >N1</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer1"
+		      >Buffer1</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		      >ChunkBuf</A
+		      > <A HREF = "OpenAFP.Types.html#t%3AT_"
+		      >T_</A
+		      > <A HREF = "OpenAFP.Internals.Binary.html#t%3AN1"
+		      >N1</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer1"
+		      >Buffer1</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		      >ChunkBuf</A
+		      > <A HREF = "OpenAFP.Records.html#t%3AAFP_"
+		      >AFP_</A
+		      > <A HREF = "OpenAFP.Internals.Binary.html#t%3AN3"
+		      >N3</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer2"
+		      >Buffer2</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		      >ChunkBuf</A
+		      > <A HREF = "OpenAFP.Records.AFP.MCF.html#t%3AMCF_"
+		      >MCF_</A
+		      > <A HREF = "OpenAFP.Internals.Binary.html#t%3AN0"
+		      >N0</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer2"
+		      >Buffer2</A
+		      ></TD
 		    ></TR
 		  ></TABLE
 		></TD
@@ -1039,13 +1185,13 @@
 	  >class</SPAN
 	  > (<A HREF = "OpenAFP.Types.Record.html#t%3ARec"
 	  >Rec</A
-	  > a, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-	  >Chunk</A
-	  > b) =&gt; <A NAME = "t%3ARecChunk"
+	  > r, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+	  >ChunkBuf</A
+	  > c n b) =&gt; <A NAME = "t%3ARecChunk"
 	  ></A
 	  ><B
 	  >RecChunk</B
-	  > a b | a -&gt; b <SPAN CLASS = "keyword"
+	  > r c n b | r -&gt; c <SPAN CLASS = "keyword"
 	  >where</SPAN
 	  ></TD
 	></TR
@@ -1074,7 +1220,7 @@ chunk types (children).</TD
 		      ></A
 		      ><B
 		      >readChunks</B
-		      > :: a -&gt; [b]</TD
+		      > :: r -&gt; [c]</TD
 		    ></TR
 		  ><TR
 		  ><TD CLASS = "s8"
@@ -1086,9 +1232,7 @@ chunk types (children).</TD
 		      ></A
 		      ><B
 		      >writeChunks</B
-		      > :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		      >MonadIO</A
-		      > m =&gt; a -&gt; m [b] -&gt; m a</TD
+		      > :: MonadIO m =&gt; r -&gt; m [c] -&gt; m r</TD
 		    ></TR
 		  ></TABLE
 		></TD
@@ -1108,20 +1252,12 @@ chunk types (children).</TD
 		  ><TD CLASS = "decl"
 		    ><A HREF = "OpenAFP.Types.Chunk.html#t%3ARecChunk"
 		      >RecChunk</A
-		      > <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AFilePath"
-		      >FilePath</A
-		      > <A HREF = "OpenAFP.Records.html#t%3AAFP_"
+		      > FilePath <A HREF = "OpenAFP.Records.html#t%3AAFP_"
 		      >AFP_</A
-		      ></TD
-		    ></TR
-		  ><TR
-		  ><TD CLASS = "decl"
-		    ><A HREF = "OpenAFP.Types.Chunk.html#t%3ARecChunk"
-		      >RecChunk</A
-		      > <A HREF = "OpenAFP.Records.AFP.MCF.html#t%3AMCF"
-		      >MCF</A
-		      > <A HREF = "OpenAFP.Records.AFP.MCF.html#t%3AMCF_"
-		      >MCF_</A
+		      > <A HREF = "OpenAFP.Internals.Binary.html#t%3AN3"
+		      >N3</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer2"
+		      >Buffer2</A
 		      ></TD
 		    ></TR
 		  ><TR
@@ -1132,6 +1268,24 @@ chunk types (children).</TD
 		      >PTX</A
 		      > <A HREF = "OpenAFP.Records.AFP.PTX.html#t%3APTX_"
 		      >PTX_</A
+		      > <A HREF = "OpenAFP.Internals.Binary.html#t%3AN1"
+		      >N1</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer1"
+		      >Buffer1</A
+		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "OpenAFP.Types.Chunk.html#t%3ARecChunk"
+		      >RecChunk</A
+		      > <A HREF = "OpenAFP.Records.AFP.MCF.html#t%3AMCF"
+		      >MCF</A
+		      > <A HREF = "OpenAFP.Records.AFP.MCF.html#t%3AMCF_"
+		      >MCF_</A
+		      > <A HREF = "OpenAFP.Internals.Binary.html#t%3AN0"
+		      >N0</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer2"
+		      >Buffer2</A
 		      ></TD
 		    ></TR
 		  ><TR
@@ -1142,6 +1296,10 @@ chunk types (children).</TD
 		      >TLE</A
 		      > <A HREF = "OpenAFP.Types.html#t%3AT_"
 		      >T_</A
+		      > <A HREF = "OpenAFP.Internals.Binary.html#t%3AN1"
+		      >N1</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer1"
+		      >Buffer1</A
 		      ></TD
 		    ></TR
 		  ><TR
@@ -1152,6 +1310,10 @@ chunk types (children).</TD
 		      >MCF_T</A
 		      > <A HREF = "OpenAFP.Types.html#t%3AT_"
 		      >T_</A
+		      > <A HREF = "OpenAFP.Internals.Binary.html#t%3AN1"
+		      >N1</A
+		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer1"
+		      >Buffer1</A
 		      ></TD
 		    ></TR
 		  ></TABLE
@@ -1299,140 +1461,13 @@ Rec data type (children).</TD
 	></TR
       ><TR
       ><TD CLASS = "decl"
-	><SPAN CLASS = "keyword"
-	  >class</SPAN
-	  > (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-	  >Chunk</A
-	  > a, <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
-	  >Buf</A
-	  > b) =&gt; <A NAME = "t%3AChunkBuf"
-	  ></A
-	  ><B
-	  >ChunkBuf</B
-	  > a b | a -&gt; b <SPAN CLASS = "keyword"
-	  >where</SPAN
-	  ></TD
-	></TR
-      ><TR
-      ><TD CLASS = "body"
-	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
-	  ><TR
-	    ><TD CLASS = "ndoc"
-	      >The ChunkBuf class unifies a Chunk (parent) with its contained
-buffer type (children).</TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "s8"
-	      ></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "section4"
-	      >Methods</TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "body"
-	      ><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
-		><TR
-		  ><TD CLASS = "decl"
-		    ><A NAME = "v%3AchunkCon"
-		      ></A
-		      ><B
-		      >chunkCon</B
-		      > :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
-		      >ChunkType</A
-		      >, b) -&gt; a</TD
-		    ></TR
-		  ><TR
-		  ><TD CLASS = "s8"
-		    ></TD
-		    ></TR
-		  ><TR
-		  ><TD CLASS = "decl"
-		    ><A NAME = "v%3AchunkDecon"
-		      ></A
-		      ><B
-		      >chunkDecon</B
-		      > :: a -&gt; (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
-		      >ChunkType</A
-		      >, b)</TD
-		    ></TR
-		  ></TABLE
-		></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "s8"
-	      ></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "section4"
-	      >Instances</TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "body"
-	      ><TABLE CLASS = "vanilla" CELLSPACING = "1" CELLPADDING = "0"
-		><TR
-		  ><TD CLASS = "decl"
-		    ><A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
-		      >ChunkBuf</A
-		      > <A HREF = "OpenAFP.Records.AFP.MCF.html#t%3AMCF_"
-		      >MCF_</A
-		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer2"
-		      >Buffer2</A
-		      ></TD
-		    ></TR
-		  ><TR
-		  ><TD CLASS = "decl"
-		    ><A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
-		      >ChunkBuf</A
-		      > <A HREF = "OpenAFP.Records.AFP.PTX.html#t%3APTX_"
-		      >PTX_</A
-		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer1"
-		      >Buffer1</A
-		      ></TD
-		    ></TR
-		  ><TR
-		  ><TD CLASS = "decl"
-		    ><A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
-		      >ChunkBuf</A
-		      > <A HREF = "OpenAFP.Records.html#t%3AAFP_"
-		      >AFP_</A
-		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer2"
-		      >Buffer2</A
-		      ></TD
-		    ></TR
-		  ><TR
-		  ><TD CLASS = "decl"
-		    ><A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
-		      >ChunkBuf</A
-		      > <A HREF = "OpenAFP.Types.html#t%3AT_"
-		      >T_</A
-		      > <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuffer1"
-		      >Buffer1</A
-		      ></TD
-		    ></TR
-		  ></TABLE
-		></TD
-	      ></TR
-	    ></TABLE
-	  ></TD
-	></TR
-      ><TR
-      ><TD CLASS = "s15"
-	></TD
-	></TR
-      ><TR
-      ><TD CLASS = "decl"
 	><A NAME = "v%3A~~"
 	  ></A
 	  ><B
 	  >(~~)</B
-	  > :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-	  >Chunk</A
-	  > a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
-	  >Typeable</A
-	  > b) =&gt; a -&gt; b -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3ABool"
-	  >Bool</A
-	  ></TD
+	  > :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+	  >ChunkBuf</A
+	  > c n b, Typeable t) =&gt; c -&gt; t -&gt; Bool</TD
 	></TR
       ><TR
       ><TD CLASS = "s15"
@@ -1444,15 +1479,13 @@ buffer type (children).</TD
 	  ></A
 	  ><B
 	  >(&lt;~~)</B
-	  > :: (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-	  >MonadIO</A
-	  > m, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-	  >Chunk</A
-	  > a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
-	  >Typeable</A
-	  > t, <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+	  > :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+	  >ChunkBuf</A
+	  > c n b, Typeable t, <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
 	  >Rec</A
-	  > b) =&gt; t -&gt; [a] -&gt; m b</TD
+	  > r) =&gt; t -&gt; [c] -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+	  >IOm</A
+	  > r</TD
 	></TR
       ><TR
       ><TD CLASS = "s15"
@@ -1464,15 +1497,13 @@ buffer type (children).</TD
 	  ></A
 	  ><B
 	  >(~~&gt;)</B
-	  > :: (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-	  >MonadIO</A
-	  > m, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-	  >Chunk</A
-	  > a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
-	  >Typeable</A
-	  > t, <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+	  > :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+	  >ChunkBuf</A
+	  > c n b, Typeable t, <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
 	  >Rec</A
-	  > b) =&gt; [a] -&gt; t -&gt; m b</TD
+	  > r) =&gt; [c] -&gt; t -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+	  >IOm</A
+	  > r</TD
 	></TR
       ><TR
       ><TD CLASS = "s15"
@@ -1484,13 +1515,11 @@ buffer type (children).</TD
 	  ></A
 	  ><B
 	  >(==&gt;)</B
-	  > :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-	  >Chunk</A
-	  > a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-	  >MonadIO</A
-	  > m) =&gt; [a] -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+	  > :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+	  >ChunkBuf</A
+	  > c n b, MonadIO m) =&gt; [c] -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 	  >ChunkType</A
-	  >, a -&gt; m [a])] -&gt; m [a]</TD
+	  >, c -&gt; m [c])] -&gt; m [c]</TD
 	></TR
       ><TR
       ><TD CLASS = "s15"
@@ -1502,13 +1531,11 @@ buffer type (children).</TD
 	  ></A
 	  ><B
 	  >(&lt;==)</B
-	  > :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-	  >Chunk</A
-	  > a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-	  >MonadIO</A
-	  > m) =&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+	  > :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+	  >ChunkBuf</A
+	  > c n b, MonadIO m) =&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 	  >ChunkType</A
-	  >, a -&gt; m [a])] -&gt; [a] -&gt; m [a]</TD
+	  >, c -&gt; m [c])] -&gt; [c] -&gt; m [c]</TD
 	></TR
       ><TR
       ><TD CLASS = "s15"
@@ -1520,13 +1547,11 @@ buffer type (children).</TD
 	  ></A
 	  ><B
 	  >(..&gt;)</B
-	  > :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-	  >Chunk</A
-	  > a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-	  >MonadIO</A
-	  > m) =&gt; [a] -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+	  > :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+	  >ChunkBuf</A
+	  > c n b, MonadIO m) =&gt; [c] -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 	  >ChunkType</A
-	  >, a -&gt; m [a])] -&gt; m ()</TD
+	  >, c -&gt; m [c])] -&gt; m ()</TD
 	></TR
       ><TR
       ><TD CLASS = "s15"
@@ -1538,31 +1563,11 @@ buffer type (children).</TD
 	  ></A
 	  ><B
 	  >(&lt;..)</B
-	  > :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-	  >Chunk</A
-	  > a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-	  >MonadIO</A
-	  > m) =&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+	  > :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+	  >ChunkBuf</A
+	  > c n b, MonadIO m) =&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 	  >ChunkType</A
-	  >, a -&gt; m [a])] -&gt; [a] -&gt; m ()</TD
-	></TR
-      ><TR
-      ><TD CLASS = "s15"
-	></TD
-	></TR
-      ><TR
-      ><TD CLASS = "decl"
-	><SPAN CLASS = "keyword"
-	  >type</SPAN
-	  > <A NAME = "t%3AChunkWriter"
-	  ></A
-	  ><B
-	  >ChunkWriter</B
-	  > c = <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Writer.html#t%3AWriterT"
-	  >WriterT</A
-	  > (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkQueue"
-	  >ChunkQueue</A
-	  > c)</TD
+	  >, c -&gt; m [c])] -&gt; [c] -&gt; m ()</TD
 	></TR
       ><TR
       ><TD CLASS = "s15"
@@ -1574,13 +1579,11 @@ buffer type (children).</TD
 	  ></A
 	  ><B
 	  >processChunk</B
-	  > :: (<A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+	  > :: (MonadIO m, <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
 	  >Rec</A
-	  > r, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-	  >Chunk</A
-	  > c, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-	  >MonadIO</A
-	  > m) =&gt; r -&gt; (r -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
+	  > r, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+	  >ChunkBuf</A
+	  > c n b) =&gt; r -&gt; (r -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
 	  >ChunkWriter</A
 	  > c m a) -&gt; c -&gt; m [c]</TD
 	></TR
@@ -1594,13 +1597,11 @@ buffer type (children).</TD
 	  ></A
 	  ><B
 	  >inspectChunk</B
-	  > :: (<A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+	  > :: (MonadIO m, <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
 	  >Rec</A
-	  > a, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-	  >Chunk</A
-	  > b, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-	  >MonadIO</A
-	  > m) =&gt; a -&gt; (a -&gt; m t) -&gt; b -&gt; m [b]</TD
+	  > a, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+	  >ChunkBuf</A
+	  > c n b) =&gt; a -&gt; (a -&gt; m t) -&gt; c -&gt; m [c]</TD
 	></TR
       ><TR
       ><TD CLASS = "s15"
@@ -1612,13 +1613,11 @@ buffer type (children).</TD
 	  ></A
 	  ><B
 	  >push</B
-	  > :: (<A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+	  > :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+	  >ChunkBuf</A
+	  > c n b, MonadIO m, <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
 	  >Rec</A
-	  > a, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-	  >Chunk</A
-	  > c, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-	  >MonadIO</A
-	  > m) =&gt; a -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
+	  > a) =&gt; a -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
 	  >ChunkWriter</A
 	  > c m ()</TD
 	></TR
@@ -1632,19 +1631,17 @@ buffer type (children).</TD
 	  ></A
 	  ><B
 	  >filterChunks</B
-	  > :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3ARecChunk"
+	  > :: (MonadIO m, <A HREF = "OpenAFP.Types.Chunk.html#t%3ARecChunk"
 	  >RecChunk</A
-	  > a b, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-	  >Chunk</A
-	  > c, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-	  >MonadIO</A
-	  > m) =&gt; a -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
+	  > r c n b, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+	  >ChunkBuf</A
+	  > c' n' b') =&gt; r -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
 	  >ChunkType</A
-	  >, b -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
+	  >, c -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
 	  >ChunkWriter</A
-	  > c m [b])] -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
+	  > c' m [c])] -&gt; <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkWriter"
 	  >ChunkWriter</A
-	  > c m ()</TD
+	  > c' m ()</TD
 	></TR
       ><TR
       ><TD CLASS = "s15"
@@ -1702,19 +1699,13 @@ buffer type (children).</TD
 	      ><TABLE CLASS = "vanilla" CELLSPACING = "1" CELLPADDING = "0"
 		><TR
 		  ><TD CLASS = "decl"
-		    ><A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Monoid.html#t%3AMonoid"
-		      >Monoid</A
-		      > (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkQueue"
+		    >Monoid (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkQueue"
 		      >ChunkQueue</A
 		      > a)</TD
 		    ></TR
 		  ><TR
 		  ><TD CLASS = "decl"
-		    >(<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AShow"
-		      >Show</A
-		      > a, ??? a) =&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AShow"
-		      >Show</A
-		      > (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkQueue"
+		    >(Show a, ??? a) =&gt; Show (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkQueue"
 		      >ChunkQueue</A
 		      > a)</TD
 		    ></TR
@@ -1732,7 +1723,7 @@ buffer type (children).</TD
       ><TD CLASS = "botbar"
 	>Produced by <A HREF = "http://www.haskell.org/haddock/"
 	  >Haddock</A
-	  > version HADDOCK_VERSION</TD
+	  > version ADDOCK_VERSION</TD
 	></TR
       ></TABLE
     ></BODY

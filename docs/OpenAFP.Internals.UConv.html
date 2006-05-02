@@ -105,15 +105,9 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3Auconv"
 		>uconv</A
-		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AString"
-		>String</A
-		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AString"
-		>String</A
-		> -&gt; [<A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Word.html#t%3AWord8"
-		>Word8</A
-		>] -&gt; [<A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Word.html#t%3AWord8"
-		>Word8</A
-		>]</TD
+		> :: String -&gt; String -&gt; [<A HREF = "OpenAFP.Internals.Binary.html#t%3AN1"
+		>N1</A
+		>] -&gt; Maybe String</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -123,31 +117,7 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3Aucnv_convert"
 		>ucnv_convert</A
-		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.C.String.html#t%3ACString"
-		>CString</A
-		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.C.String.html#t%3ACString"
-		>CString</A
-		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.Ptr.html#t%3APtr"
-		>Ptr</A
-		> <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.C.Types.html#t%3ACChar"
-		>CChar</A
-		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Int.html#t%3AInt32"
-		>Int32</A
-		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.Ptr.html#t%3APtr"
-		>Ptr</A
-		> <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.C.Types.html#t%3ACChar"
-		>CChar</A
-		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Int.html#t%3AInt32"
-		>Int32</A
-		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.Ptr.html#t%3APtr"
-		>Ptr</A
-		> <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Word.html#t%3AWord8"
-		>Word8</A
-		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AIO"
-		>IO</A
-		> <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Int.html#t%3AInt32"
-		>Int32</A
-		></TD
+		> :: CString -&gt; CString -&gt; Ptr CChar -&gt; Int32 -&gt; Ptr CChar -&gt; Int32 -&gt; Ptr Word8 -&gt; IO Int32</TD
 	      ></TR
 	    ></TABLE
 	  ></TD
@@ -177,33 +147,27 @@
 	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
 	  ><TR
 	    ><TD CLASS = "decl"
-	      >:: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AString"
-		>String</A
-		></TD
+	      >:: String</TD
 	      ><TD CLASS = "rdoc"
 	      >The encoding to convert from</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "decl"
-	      >-&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AString"
-		>String</A
-		></TD
+	      >-&gt; String</TD
 	      ><TD CLASS = "rdoc"
 	      >The encoding to convert to</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "decl"
-	      >-&gt; [<A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Word.html#t%3AWord8"
-		>Word8</A
+	      >-&gt; [<A HREF = "OpenAFP.Internals.Binary.html#t%3AN1"
+		>N1</A
 		>]</TD
 	      ><TD CLASS = "rdoc"
 	      >The byte sequence to convert</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "decl"
-	      >-&gt; [<A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Word.html#t%3AWord8"
-		>Word8</A
-		>]</TD
+	      >-&gt; Maybe String</TD
 	      ><TD CLASS = "rdoc"
 	      >The byte sequence converted</TD
 	      ></TR
@@ -224,31 +188,7 @@
 	  ></A
 	  ><B
 	  >ucnv_convert</B
-	  > :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.C.String.html#t%3ACString"
-	  >CString</A
-	  > -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.C.String.html#t%3ACString"
-	  >CString</A
-	  > -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.Ptr.html#t%3APtr"
-	  >Ptr</A
-	  > <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.C.Types.html#t%3ACChar"
-	  >CChar</A
-	  > -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Int.html#t%3AInt32"
-	  >Int32</A
-	  > -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.Ptr.html#t%3APtr"
-	  >Ptr</A
-	  > <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.C.Types.html#t%3ACChar"
-	  >CChar</A
-	  > -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Int.html#t%3AInt32"
-	  >Int32</A
-	  > -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.Ptr.html#t%3APtr"
-	  >Ptr</A
-	  > <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Word.html#t%3AWord8"
-	  >Word8</A
-	  > -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AIO"
-	  >IO</A
-	  > <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Int.html#t%3AInt32"
-	  >Int32</A
-	  ></TD
+	  > :: CString -&gt; CString -&gt; Ptr CChar -&gt; Int32 -&gt; Ptr CChar -&gt; Int32 -&gt; Ptr Word8 -&gt; IO Int32</TD
 	></TR
       ><TR
       ><TD CLASS = "s15"
@@ -258,7 +198,7 @@
       ><TD CLASS = "botbar"
 	>Produced by <A HREF = "http://www.haskell.org/haddock/"
 	  >Haddock</A
-	  > version HADDOCK_VERSION</TD
+	  > version ADDOCK_VERSION</TD
 	></TR
       ></TABLE
     ></BODY

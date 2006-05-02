@@ -3,7 +3,7 @@
 <HTML
 ><HEAD
   ><TITLE
-    >OpenAFP.Prelude</TITLE
+    >OpenAFP.Types.View</TITLE
     ><LINK HREF = "haddock.css" REL = "stylesheet" TYPE = "text/css"
     ></HEAD
   ><BODY
@@ -35,7 +35,7 @@
 	  ><TR
 	    ><TD
 	      ><FONT SIZE = "6"
-		>OpenAFP.Prelude</FONT
+		>OpenAFP.Types.View</FONT
 		></TD
 	      ><TD ALIGN = "right"
 	      ><TABLE CLASS = "narrow" CELLSPACING = "0" CELLPADDING = "0"
@@ -83,8 +83,7 @@
 	></TR
       ><TR
       ><TD CLASS = "doc"
-	>This module re-exports all Records, Types, Internals and Prelude modules,
-and provides some toplevel convenience functions.
+	>Concrete data views on Chunks and Records.
 </TD
 	></TR
       ><TR
@@ -104,135 +103,189 @@ and provides some toplevel convenience functions.
 	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
 	  ><TR
 	    ><TD CLASS = "decl"
-	      >module <A HREF = "OpenAFP.Types.html"
-		>OpenAFP.Types</A
+	      ><SPAN CLASS = "keyword"
+		>type</SPAN
+		> <A HREF = "#t%3AChunksType"
+		>ChunksType</A
+		> = TypeRep</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><SPAN CLASS = "keyword"
+		>type</SPAN
+		> <A HREF = "#t%3ARecordType"
+		>RecordType</A
+		> = TypeRep</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><SPAN CLASS = "keyword"
+		>type</SPAN
+		> <A HREF = "#t%3ANumberType"
+		>NumberType</A
+		> = TypeRep</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><SPAN CLASS = "keyword"
+		>type</SPAN
+		> <A HREF = "#t%3ANStrType"
+		>NStrType</A
+		> = TypeRep</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><SPAN CLASS = "keyword"
+		>type</SPAN
+		> <A HREF = "#t%3AStringType"
+		>StringType</A
+		> = TypeRep</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><SPAN CLASS = "keyword"
+		>type</SPAN
+		> <A HREF = "#t%3ADataType"
+		>DataType</A
+		> = TypeRep</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><SPAN CLASS = "keyword"
+		>type</SPAN
+		> <A HREF = "#t%3AFieldLabel"
+		>FieldLabel</A
+		> = String</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><SPAN CLASS = "keyword"
+		>newtype</SPAN
+		> <A HREF = "#t%3AViewRecord"
+		>ViewRecord</A
+		>  = <A HREF = "#v%3AViewRecord"
+		>ViewRecord</A
+		> (<A HREF = "OpenAFP.Types.View.html#t%3ARecordType"
+		>RecordType</A
+		>, [<A HREF = "OpenAFP.Types.View.html#t%3AViewField"
+		>ViewField</A
+		>])</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><SPAN CLASS = "keyword"
+		>newtype</SPAN
+		> <A HREF = "#t%3AViewField"
+		>ViewField</A
+		>  = <A HREF = "#v%3AViewField"
+		>ViewField</A
+		> (<A HREF = "OpenAFP.Types.View.html#t%3AFieldLabel"
+		>FieldLabel</A
+		>, <A HREF = "OpenAFP.Types.View.html#t%3AViewContent"
+		>ViewContent</A
+		>)</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+		><TR
+		  ><TD CLASS = "decl"
+		    ><SPAN CLASS = "keyword"
+		      >data</SPAN
+		      > <A HREF = "#t%3AViewContent"
+		      >ViewContent</A
+		      > </TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "body"
+		    ><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+		      ><TR
+			><TD CLASS = "decl"
+			  >= <A HREF = "#v%3AViewNumber"
+			    >ViewNumber</A
+			    > (<A HREF = "OpenAFP.Types.View.html#t%3ANumberType"
+			    >NumberType</A
+			    >, Int)</TD
+			  ></TR
+			><TR
+			><TD CLASS = "decl"
+			  >| <A HREF = "#v%3AViewString"
+			    >ViewString</A
+			    > (<A HREF = "OpenAFP.Types.View.html#t%3AStringType"
+			    >StringType</A
+			    >, String)</TD
+			  ></TR
+			><TR
+			><TD CLASS = "decl"
+			  >| <A HREF = "#v%3AViewNStr"
+			    >ViewNStr</A
+			    > (<A HREF = "OpenAFP.Types.View.html#t%3ANStrType"
+			    >NStrType</A
+			    >, [<A HREF = "OpenAFP.Internals.Binary.html#t%3AN1"
+			    >N1</A
+			    >])</TD
+			  ></TR
+			><TR
+			><TD CLASS = "decl"
+			  >| <A HREF = "#v%3AViewChunks"
+			    >ViewChunks</A
+			    > (<A HREF = "OpenAFP.Types.View.html#t%3AChunksType"
+			    >ChunksType</A
+			    >, [<A HREF = "OpenAFP.Types.View.html#t%3AViewRecord"
+			    >ViewRecord</A
+			    >])</TD
+			  ></TR
+			><TR
+			><TD CLASS = "decl"
+			  >| <A HREF = "#v%3AViewData"
+			    >ViewData</A
+			    > (<A HREF = "OpenAFP.Types.View.html#t%3ADataType"
+			    >DataType</A
+			    >, [<A HREF = "OpenAFP.Types.View.html#t%3AViewRecord"
+			    >ViewRecord</A
+			    >])</TD
+			  ></TR
+			></TABLE
+		      ></TD
+		    ></TR
+		  ></TABLE
 		></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "s8"
-	      ></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "decl"
-	      >module <A HREF = "OpenAFP.Records.html"
-		>OpenAFP.Records</A
-		></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "s8"
-	      ></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "decl"
-	      >module <A HREF = "OpenAFP.Internals.html"
-		>OpenAFP.Internals</A
-		></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "s8"
-	      ></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "decl"
-	      >module <A HREF = "OpenAFP.Prelude.Utils.html"
-		>OpenAFP.Prelude.Utils</A
-		></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "s8"
-	      ></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "decl"
-	      >module <A HREF = "OpenAFP.Prelude.Instances.html"
-		>OpenAFP.Prelude.Instances</A
-		></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "s8"
-	      ></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "decl"
-	      ><A HREF = "#v%3AreadAFP"
-		>readAFP</A
-		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m =&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AFilePath"
-		>FilePath</A
-		> -&gt; m [<A HREF = "OpenAFP.Records.html#t%3AAFP_"
-		>AFP_</A
-		>]</TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "s8"
-	      ></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "decl"
-	      ><A HREF = "#v%3AwriteAFP"
-		>writeAFP</A
-		> :: <A HREF = "OpenAFP.Internals.Binary.html#t%3ABinary"
-		>Binary</A
-		> a =&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AFilePath"
-		>FilePath</A
-		> -&gt; [a] -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AIO"
-		>IO</A
-		> ()</TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "s8"
-	      ></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "decl"
-	      ><A HREF = "#v%3AfilterAFP"
-		>filterAFP</A
-		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AFilePath"
-		>FilePath</A
-		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AFilePath"
-		>FilePath</A
-		> -&gt; [(<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkType"
-		>ChunkType</A
-		>, <A HREF = "OpenAFP.Records.html#t%3AAFP_"
-		>AFP_</A
-		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AIO"
-		>IO</A
-		> [<A HREF = "OpenAFP.Records.html#t%3AAFP_"
-		>AFP_</A
-		>])] -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AIO"
-		>IO</A
-		> ()</TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "s8"
-	      ></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "decl"
-	      ><A HREF = "#v%3AreadArgs"
-		>readArgs</A
-		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m =&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AInt"
-		>Int</A
-		> -&gt; m [<A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Base.html#t%3AString"
-		>String</A
-		>]</TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "s8"
-	      ></TD
-	      ></TR
-	    ><TR
-	    ><TD CLASS = "decl"
-	      ><A HREF = "#v%3Aafp_Chunks"
-		>afp_Chunks</A
-		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AFilePath"
-		>FilePath</A
-		> -&gt; [<A HREF = "OpenAFP.Records.html#t%3AAFP_"
-		>AFP_</A
-		>]</TD
 	      ></TR
 	    ></TABLE
 	  ></TD
@@ -249,7 +302,7 @@ and provides some toplevel convenience functions.
       ><TD CLASS = "botbar"
 	>Produced by <A HREF = "http://www.haskell.org/haddock/"
 	  >Haddock</A
-	  > version HADDOCK_VERSION</TD
+	  > version ADDOCK_VERSION</TD
 	></TR
       ></TABLE
     ></BODY

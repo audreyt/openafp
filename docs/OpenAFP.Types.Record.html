@@ -119,11 +119,7 @@
 	    ><TD CLASS = "decl"
 	      ><SPAN CLASS = "keyword"
 		>class</SPAN
-		> (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AShow"
-		>Show</A
-		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
-		>Typeable</A
-		> a) =&gt; <A HREF = "#t%3ARec"
+		> (Show a, Typeable a) =&gt; <A HREF = "#t%3ARec"
 		>Rec</A
 		> a  <SPAN CLASS = "keyword"
 		>where</SPAN
@@ -134,29 +130,11 @@
 	      ><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
 		><TR
 		  ><TD CLASS = "decl"
-		    ><A HREF = "#v%3ArecFuncs"
-		      >recFuncs</A
-		      > :: (<A HREF = "OpenAFP.Internals.Binary.html#t%3ABinHandle"
-		      >BinHandle</A
-		      > -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AIO"
-		      >IO</A
-		      > a, <A HREF = "OpenAFP.Internals.Binary.html#t%3ABinHandle"
-		      >BinHandle</A
-		      > -&gt; a -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AIO"
-		      >IO</A
-		      > (), a -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AInt"
-		      >Int</A
-		      >)</TD
-		    ></TR
-		  ><TR
-		  ><TD CLASS = "decl"
 		    ><A HREF = "#v%3ArecGet"
 		      >recGet</A
 		      > :: <A HREF = "OpenAFP.Internals.Binary.html#t%3ABinHandle"
 		      >BinHandle</A
-		      > -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AIO"
-		      >IO</A
-		      > a</TD
+		      > -&gt; IO a</TD
 		    ></TR
 		  ><TR
 		  ><TD CLASS = "decl"
@@ -164,17 +142,27 @@
 		      >recPut</A
 		      > :: <A HREF = "OpenAFP.Internals.Binary.html#t%3ABinHandle"
 		      >BinHandle</A
-		      > -&gt; a -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.IOBase.html#t%3AIO"
-		      >IO</A
-		      > ()</TD
+		      > -&gt; a -&gt; IO ()</TD
 		    ></TR
 		  ><TR
 		  ><TD CLASS = "decl"
 		    ><A HREF = "#v%3ArecSizeOf"
 		      >recSizeOf</A
-		      > :: a -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AInt"
-		      >Int</A
+		      > :: a -&gt; Int</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "#v%3ArecView"
+		      >recView</A
+		      > :: a -&gt; IO <A HREF = "OpenAFP.Types.View.html#t%3AViewRecord"
+		      >ViewRecord</A
 		      ></TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "decl"
+		    ><A HREF = "#v%3ArecType"
+		      >recType</A
+		      > :: a -&gt; Int</TD
 		    ></TR
 		  ></TABLE
 		></TD
@@ -194,7 +182,7 @@
       ><TD CLASS = "botbar"
 	>Produced by <A HREF = "http://www.haskell.org/haddock/"
 	  >Haddock</A
-	  > version HADDOCK_VERSION</TD
+	  > version ADDOCK_VERSION</TD
 	></TR
       ></TABLE
     ></BODY

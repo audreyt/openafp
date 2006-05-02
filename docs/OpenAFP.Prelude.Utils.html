@@ -107,11 +107,27 @@
 		>applyToChunk</A
 		> :: (<A HREF = "OpenAFP.Types.Record.html#t%3ARec"
 		>Rec</A
-		> a, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-		>Chunk</A
-		> c, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m) =&gt; (a -&gt; b) -&gt; c -&gt; m b</TD
+		> a, <A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		>ChunkBuf</A
+		> c n b) =&gt; (a -&gt; x) -&gt; c -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+		>IOm</A
+		> x</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AwithChunk"
+		>withChunk</A
+		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		>ChunkBuf</A
+		> a n b, MonadIO m) =&gt; a -&gt; (<SPAN CLASS = "keyword"
+		>forall</SPAN
+		> r . <A HREF = "OpenAFP.Types.Record.html#t%3ARec"
+		>Rec</A
+		> r =&gt; r -&gt; m x) -&gt; m x</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -121,11 +137,9 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3AsplitRecords"
 		>splitRecords</A
-		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunk"
-		>Chunk</A
-		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Data.Typeable.html#t%3ATypeable"
-		>Typeable</A
-		> t) =&gt; t -&gt; [a] -&gt; [[a]]</TD
+		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3AChunkBuf"
+		>ChunkBuf</A
+		> c n b, Typeable t) =&gt; t -&gt; [c] -&gt; [[c]]</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -135,9 +149,7 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3AfindRecord"
 		>findRecord</A
-		> :: (a -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3ABool"
-		>Bool</A
-		>) -&gt; [<A HREF = "OpenAFP.Types.Record.html#t%3ARecord"
+		> :: (a -&gt; Bool) -&gt; [<A HREF = "OpenAFP.Types.Record.html#t%3ARecord"
 		>Record</A
 		> a] -&gt; a</TD
 	      ></TR
@@ -151,9 +163,7 @@
 		>matchRecord</A
 		> :: (<A HREF = "OpenAFP.Types.Chunk.html#t%3ARecData"
 		>RecData</A
-		> a b, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AEq"
-		>Eq</A
-		> c) =&gt; c -&gt; (b -&gt; c) -&gt; a -&gt; b</TD
+		> a b, Eq c) =&gt; c -&gt; (b -&gt; c) -&gt; a -&gt; b</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -161,17 +171,13 @@
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "decl"
-	      ><A HREF = "#v%3AtoAsc"
-		>toAsc</A
-		> :: (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m, <A HREF = "OpenAFP.Internals.Binary.html#t%3ABinary"
+	      ><A HREF = "#v%3AfromA"
+		>fromA</A
+		> :: (<A HREF = "OpenAFP.Internals.Binary.html#t%3ABinary"
 		>Binary</A
-		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Foreign.Storable.html#t%3AStorable"
-		>Storable</A
-		> a) =&gt; a -&gt; m <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Base.html#t%3AString"
-		>String</A
-		></TD
+		> a, Storable a) =&gt; a -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+		>IOm</A
+		> String</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -181,11 +187,7 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3Atrim"
 		>trim</A
-		> :: <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Base.html#t%3AString"
-		>String</A
-		> -&gt; <A HREF = "/usr/local/share/doc/ghc6/libraries/base/GHC.Base.html#t%3AString"
-		>String</A
-		></TD
+		> :: String -&gt; String</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -195,11 +197,11 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3AcatBuf"
 		>catBuf</A
-		> :: (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m, <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
+		> :: <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
 		>Buf</A
-		> a) =&gt; a -&gt; a -&gt; m a</TD
+		> a =&gt; a -&gt; a -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+		>IOm</A
+		> a</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -209,15 +211,11 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3AsubBuf"
 		>subBuf</A
-		> :: (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m, <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
+		> :: (<A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
 		>Buf</A
-		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AIntegral"
-		>Integral</A
-		> b, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AIntegral"
-		>Integral</A
-		> c) =&gt; a -&gt; b -&gt; c -&gt; m a</TD
+		> a, Integral b, Integral c) =&gt; a -&gt; b -&gt; c -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+		>IOm</A
+		> a</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -227,15 +225,11 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3AsubBufs"
 		>subBufs</A
-		> :: (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m, <A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
+		> :: (<A HREF = "OpenAFP.Types.Buffer.html#t%3ABuf"
 		>Buf</A
-		> a, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AIntegral"
-		>Integral</A
-		> b, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AIntegral"
-		>Integral</A
-		> c) =&gt; [a] -&gt; b -&gt; c -&gt; m a</TD
+		> a, Integral b, Integral c) =&gt; [a] -&gt; b -&gt; c -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+		>IOm</A
+		> a</TD
 	      ></TR
 	    ><TR
 	    ><TD CLASS = "s8"
@@ -245,13 +239,55 @@
 	    ><TD CLASS = "decl"
 	      ><A HREF = "#v%3AshowBitmap"
 		>showBitmap</A
-		> :: (<A HREF = "/usr/local/share/doc/ghc6/libraries/base/Control.Monad.Trans.html#t%3AMonadIO"
-		>MonadIO</A
-		> m, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AIntegral"
-		>Integral</A
-		> i, <A HREF = "/usr/local/share/doc/ghc6/libraries/base/Prelude.html#t%3AShow"
-		>Show</A
-		> a) =&gt; [a] -&gt; i -&gt; m ()</TD
+		> :: (Integral i, Show a) =&gt; [a] -&gt; i -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+		>IOm</A
+		> ()</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AfromA8"
+		>fromA8</A
+		> :: <A HREF = "OpenAFP.Internals.Binary.html#t%3AA8"
+		>A8</A
+		> -&gt; String</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3Awarn"
+		>warn</A
+		> :: String -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+		>IOm</A
+		> ()</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3Adie"
+		>die</A
+		> :: String -&gt; <A HREF = "OpenAFP.Internals.html#t%3AIOm"
+		>IOm</A
+		> a</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3ArequiredOpt"
+		>requiredOpt</A
+		> :: (String -&gt; IO a) -&gt; String -&gt; a</TD
 	      ></TR
 	    ></TABLE
 	  ></TD
@@ -268,7 +304,7 @@
       ><TD CLASS = "botbar"
 	>Produced by <A HREF = "http://www.haskell.org/haddock/"
 	  >Haddock</A
-	  > version HADDOCK_VERSION</TD
+	  > version ADDOCK_VERSION</TD
 	></TR
       ></TABLE
     ></BODY

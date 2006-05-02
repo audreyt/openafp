@@ -1,0 +1,512 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--Rendered using the Haskell Html Library v0.2-->
+<HTML
+><HEAD
+  ><TITLE
+    >OpenAFP.Prelude.Exts</TITLE
+    ><LINK HREF = "haddock.css" REL = "stylesheet" TYPE = "text/css"
+    ></HEAD
+  ><BODY
+  ><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+    ><TR
+      ><TD CLASS = "topbar"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD
+	      ><IMG SRC = "haskell_icon.gif" WIDTH = "16" HEIGHT = "16" ALT = " "
+		></TD
+	      ><TD CLASS = "title"
+	      >OpenAFP</TD
+	      ><TD CLASS = "topbut"
+	      ><A HREF = "index.html"
+		>Contents</A
+		></TD
+	      ><TD CLASS = "topbut"
+	      ><A HREF = "doc-index.html"
+		>Index</A
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "modulebar"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD
+	      ><FONT SIZE = "6"
+		>OpenAFP.Prelude.Exts</FONT
+		></TD
+	      ><TD ALIGN = "right"
+	      ><TABLE CLASS = "narrow" CELLSPACING = "0" CELLPADDING = "0"
+		><TR
+		  ><TD CLASS = "infohead"
+		    >Portability</TD
+		    ><TD CLASS = "infoval"
+		    >  non-portable (GHC-only)</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "infohead"
+		    >Stability</TD
+		    ><TD CLASS = "infoval"
+		    >  experimental</TD
+		    ></TR
+		  ><TR
+		  ><TD CLASS = "infohead"
+		    >Maintainer</TD
+		    ><TD CLASS = "infoval"
+		    >  audreyt@audreyt.org</TD
+		    ></TR
+		  ></TABLE
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "section1"
+	>Description</TD
+	></TR
+      ><TR
+      ><TD CLASS = "doc"
+	>PreludeExts from the Haskell Wiki under the BSD license.
+</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "section1"
+	>Synopsis</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "body"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3Armap"
+		>rmap</A
+		> :: [a -&gt; b] -&gt; a -&gt; [b]</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AonUserError"
+		>onUserError</A
+		> :: IO a -&gt; (String -&gt; IO a) -&gt; IO a</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><SPAN CLASS = "keyword"
+		>type</SPAN
+		> <A HREF = "#t%3ARE"
+		>RE</A
+		> = String</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3A%3D~"
+		>(=~)</A
+		> :: String -&gt; String -&gt; Bool</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AsplitRegexWithMatches"
+		>splitRegexWithMatches</A
+		> :: <A HREF = "OpenAFP.Prelude.Exts.html#t%3ARE"
+		>RE</A
+		> -&gt; String -&gt; ([String], [String])</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AsplitBy"
+		>splitBy</A
+		> :: (a -&gt; Bool) -&gt; [a] -&gt; [[a]]</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3Alower"
+		>lower</A
+		> :: String -&gt; String</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3Aupper"
+		>upper</A
+		> :: String -&gt; String</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AjoinList"
+		>joinList</A
+		> :: [a] -&gt; [[a]] -&gt; [a]</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3Asplit"
+		>split</A
+		> :: Eq a =&gt; [a] -&gt; [a] -&gt; [[a]]</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3AbreakOnGlue"
+		>breakOnGlue</A
+		> :: Eq a =&gt; [a] -&gt; [a] -&gt; ([a], [a])</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "s8"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      ><A HREF = "#v%3Asplit_first_word"
+		>split_first_word</A
+		> :: String -&gt; (String, String)</TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "section1"
+	>Documentation</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><A NAME = "v%3Armap"
+	  ></A
+	  ><B
+	  >rmap</B
+	  > :: [a -&gt; b] -&gt; a -&gt; [b]</TD
+	></TR
+      ><TR
+      ><TD CLASS = "doc"
+	>Applies a bunch of functions to a value.</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><A NAME = "v%3AonUserError"
+	  ></A
+	  ><B
+	  >onUserError</B
+	  > :: IO a -&gt; (String -&gt; IO a) -&gt; IO a</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><SPAN CLASS = "keyword"
+	  >type</SPAN
+	  > <A NAME = "t%3ARE"
+	  ></A
+	  ><B
+	  >RE</B
+	  > = String</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><A NAME = "v%3A%3D~"
+	  ></A
+	  ><B
+	  >(=~)</B
+	  > :: String -&gt; String -&gt; Bool</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><A NAME = "v%3AsplitRegexWithMatches"
+	  ></A
+	  ><B
+	  >splitRegexWithMatches</B
+	  > :: <A HREF = "OpenAFP.Prelude.Exts.html#t%3ARE"
+	  >RE</A
+	  > -&gt; String -&gt; ([String], [String])</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><A NAME = "v%3AsplitBy"
+	  ></A
+	  ><B
+	  >splitBy</B
+	  > :: (a -&gt; Bool) -&gt; [a] -&gt; [[a]]</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><A NAME = "v%3Alower"
+	  ></A
+	  ><B
+	  >lower</B
+	  > :: String -&gt; String</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><A NAME = "v%3Aupper"
+	  ></A
+	  ><B
+	  >upper</B
+	  > :: String -&gt; String</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><A NAME = "v%3AjoinList"
+	  ></A
+	  ><B
+	  >joinList</B
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "body"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD CLASS = "decl"
+	      >:: [a]</TD
+	      ><TD CLASS = "rdoc"
+	      >Glue to join with</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      >-&gt; [[a]]</TD
+	      ><TD CLASS = "rdoc"
+	      >Elements to glue together</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      >-&gt; [a]</TD
+	      ><TD CLASS = "rdoc"
+	      >Result: glued-together list</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "ndoc" COLSPAN = "2"
+	      ><P
+		>Join lists with the given glue elements. Example:
+</P
+		><PRE
+		> joinList &quot;, &quot; [&quot;one&quot;,&quot;two&quot;,&quot;three&quot;] ===&gt; &quot;one, two, three&quot;</PRE
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><A NAME = "v%3Asplit"
+	  ></A
+	  ><B
+	  >split</B
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "body"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD CLASS = "decl"
+	      >:: Eq a</TD
+	      ><TD CLASS = "rdoc"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      >=&gt; [a]</TD
+	      ><TD CLASS = "rdoc"
+	      >Glue that holds pieces together</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      >-&gt; [a]</TD
+	      ><TD CLASS = "rdoc"
+	      >List to break into pieces</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      >-&gt; [[a]]</TD
+	      ><TD CLASS = "rdoc"
+	      >Result: list of pieces</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "ndoc" COLSPAN = "2"
+	      ><P
+		>Split a list into pieces that were held together by glue.  Example:
+</P
+		><PRE
+		> split &quot;, &quot; &quot;one, two, three&quot; ===&gt; [&quot;one&quot;,&quot;two&quot;,&quot;three&quot;]</PRE
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><A NAME = "v%3AbreakOnGlue"
+	  ></A
+	  ><B
+	  >breakOnGlue</B
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "body"
+	><TABLE CLASS = "vanilla" CELLSPACING = "0" CELLPADDING = "0"
+	  ><TR
+	    ><TD CLASS = "decl"
+	      >:: Eq a</TD
+	      ><TD CLASS = "rdoc"
+	      ></TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      >=&gt; [a]</TD
+	      ><TD CLASS = "rdoc"
+	      >Glue that holds pieces together</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      >-&gt; [a]</TD
+	      ><TD CLASS = "rdoc"
+	      >List from which to break off a piece</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "decl"
+	      >-&gt; ([a], [a])</TD
+	      ><TD CLASS = "rdoc"
+	      >Result: (first piece, glue ++ rest of list)</TD
+	      ></TR
+	    ><TR
+	    ><TD CLASS = "ndoc" COLSPAN = "2"
+	      ><P
+		>Break off the first piece of a list held together by glue,
+leaving the glue attached to the remainder of the list.  Example:
+</P
+		><PRE
+		> breakOnGlue &quot;, &quot; &quot;one, two, three&quot; ===&gt; (&quot;one&quot;, &quot;, two, three&quot;)</PRE
+		></TD
+	      ></TR
+	    ></TABLE
+	  ></TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "decl"
+	><A NAME = "v%3Asplit_first_word"
+	  ></A
+	  ><B
+	  >split_first_word</B
+	  > :: String -&gt; (String, String)</TD
+	></TR
+      ><TR
+      ><TD CLASS = "s15"
+	></TD
+	></TR
+      ><TR
+      ><TD CLASS = "botbar"
+	>Produced by <A HREF = "http://www.haskell.org/haddock/"
+	  >Haddock</A
+	  > version ADDOCK_VERSION</TD
+	></TR
+      ></TABLE
+    ></BODY
+  ></HTML
+>
