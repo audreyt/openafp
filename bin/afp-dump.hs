@@ -118,8 +118,9 @@ recHtml (ViewRecord (t, fs))
 typeHtml :: RecordType -> Html
 typeHtml t = thediv << (typeStr +++ primHtml " &mdash; " +++ typeDesc)
     where
-    typeStr = bold << last (split "." (show t))
-    typeDesc = stringToHtml $ descLookup (MkChunkType t)
+    typeStr = bold << last (split "." typeRepr)
+    typeDesc = stringToHtml $ descLookup (MkChunkType typeRepr)
+    typeRepr = show t
 
 ptxHtml :: WithVars ([N1] -> [Html])
 ptxHtml nstr = [table << textHtml]

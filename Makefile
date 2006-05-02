@@ -1,4 +1,6 @@
-all :: dist/build/libHSOpenAFP-1.0.a afp-validate afp-udcfix afp-replace afp-dump
+all :: dist/build/libHSOpenAFP-1.0.a binaries
+    
+binaries :: afp-validate afp-udcfix afp-replace afp-dump
 
 afp-validate ::
 	ghc -H128m --make -static -o afp-validate -O bin/afp-validate.hs

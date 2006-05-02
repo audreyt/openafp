@@ -76,17 +76,11 @@ toNStr list = liftIO $ do
         pokeArray cstr list
         return $ bufFromPStrLen (castForeignPtr pstr, len)
 
-newtype ChunkType = MkChunkType TypeRep
-    deriving (Eq, Typeable)
+newtype ChunkType = MkChunkType String
+    deriving (Show, Eq, Typeable, Ord)
 
 chunkTypeOf :: Typeable a => a -> ChunkType
-chunkTypeOf = MkChunkType . typeOf
-
-instance Ord ChunkType where
-    compare x y = coerce x `compare` coerce y
-        where
-        coerce :: a -> Int
-        coerce = unsafeCoerce#
+chunkTypeOf = MkChunkType . show . typeOf
 
 -- | The ChunkBuf class represents non-parsed chunks, constructed from a
 --   (ChunkType, Buffer) tuple.
