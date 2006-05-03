@@ -33,11 +33,6 @@ type RE = String
 (=~) :: String -> String -> Bool
 s =~ p = isJust $ matchRegex (mkRegexWithOpts p False True) s
 
-#if __GLASGOW_HASKELL__ <= 602
-splitRegex :: RE -> String -> [String]
-splitRegex regexpr src = fst $ splitRegexWithMatches regexpr src
-#endif
-
 splitRegexWithMatches :: RE -> String -> ([String], [String])
 splitRegexWithMatches regexpr src = splitRegex' src
   where
@@ -106,3 +101,15 @@ breakOnGlue glue rest@(x:xs)
 split_first_word :: String -> (String, String)
 split_first_word xs = (w, dropWhile isSpace xs')
   where (w, xs') = break isSpace xs
+
+forM :: (Monad m) 
+     => [a]        -- ^ List of values to loop over
+     -> (a -> m b) -- ^ The \'body\' of the for loop
+     -> m [b]      -- ^ Monad containing a list of the results
+forM = flip mapM
+
+forM_ :: (Monad m) 
+      => [a]        -- ^ List of values to loop over
+      -> (a -> m b) -- ^ The \'body\' of the for loop
+      -> m ()
+forM_ = flip mapM_

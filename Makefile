@@ -52,7 +52,7 @@ docs ::
 	rm -rf docs
 	mkdir docs
 	cp -Rf src/OpenAFP docs/OpenAFP
-	cp Main.hs docs/Main.hs
+	cp -Rf src/OpenAFP.hs docs/OpenAFP.hs
 	perl -pi -e 's/IArray UArray/UArray/g' docs/OpenAFP/Internals/Binary.hs
 	chdir docs && find . -name '*.*hs' | \
 	xargs haddock \

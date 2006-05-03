@@ -26,8 +26,8 @@ stateMain = do
     chunks  <- liftOpt readInputAFP
     fh      <- liftOpt openOutputAFP
     bh      <- liftIO $ openBinIO_ fh
-    mapM_ ((liftIO . put bh =<<) . pageHandler)
-        $ splitRecords _PGD chunks
+    forM_ (splitRecords _PGD chunks)
+          ((liftIO . put bh =<<) . pageHandler)
     liftIO $ hClose fh
 
 -- | Check a page's PTX records for UDC characters.  If none is seen,
@@ -66,33 +66,31 @@ mcf1Handler r = do
 
 -- | Split PTX into "groups", each one begins with a SCFL chunk.
 ptxCheckUDC :: PTX -> VarsIO ()
-ptxCheckUDC r = mapM_ ptxGroupCheckUDC groups
+ptxCheckUDC r = forM_ groups ptxGroupCheckUDC
     where
     groups = splitRecords _PTX_SCFL chunks
-    chunks = [ c | c <- readChunks r, want c ]
+    chunks = filter want (readChunks r)
     want c = (c ~~ _PTX_SCFL) || (c ~~ _PTX_TRN) 
 
 -- | Check a PTX to see if the leading SCFL indicates a DBCS font;
 -- if yes, pass remaining TRN chunks to trnCheckUDC.
 ptxGroupCheckUDC :: [PTX_] -> VarsIO ()
 ptxGroupCheckUDC (scfl:trnList) = do
-    font    <- readArray _IdToFont
-            =<< ptx_scfl `applyToChunk` scfl
+    font    <- readArray _IdToFont =<< ptx_scfl `applyToChunk` scfl
     isDBCS  <- fontIsDBCS &: font
     when (isDBCS) $ liftIO $ do
-        mapM_ (>>= trnCheckUDC)
-            $ [ ptx_trn `applyToChunk` c | c <- trnList ]
+        forM_ (map (ptx_trn `applyToChunk`) trnList)
+            (>>= trnCheckUDC)
 
 -- | Look inside TRN buffers for UDC characters.  If we find one,
 -- raise an IO exception so the page handler can switch to UDC mode.
 trnCheckUDC :: NStr -> IO ()
 trnCheckUDC nstr = do
-    withForeignPtr (castForeignPtr pstr) $ \cstr ->
-        mapM_ (\off -> do
-                hi <- peekByteOff cstr off
-                when (isUDC hi) $
-                    throwError $ strMsg "Found UDC")
-            $ offsets
+    withForeignPtr (castForeignPtr pstr) $ \cstr -> do
+        forM_ offsets $ \off -> do
+            hi <- peekByteOff cstr off
+            when (isUDC hi) $ do
+                throwError (strMsg "Found UDC")
     where
     (pstr, len) = bufToPStrLen nstr
     offsets = [0, 2..len-1]
@@ -145,7 +143,8 @@ trnHandler r = do
         False -> do
             -- If font is single byte, simply add each byte's increments.
             -- without parsing UDC.
-            incrs   <- mapM (\r -> incrementOf font (0x00, r)) trn
+            incrs   <- forM trn $ \r -> do
+                incrementOf font (0x00, r)
             (_X += sum) incrs
             push r
 
@@ -187,8 +186,7 @@ endPageHandler r = do
             , ioc_YMap            = 0x03E8
             , ioc_YOrientation    = yo
             }
-        mapM_ (udcCharHandler xp yo)
-            $ reverse udcList
+        forM_ (reverse udcList) (udcCharHandler xp yo)
         push _EII
     push r
 
@@ -405,8 +403,7 @@ getOpts = do
     paths <- filterM checkPath $ fontlibPaths opts
     when (null paths) $ do
         die $ "cannot find a valid font library path"
-    seq (fontIsDBCS opts) $
-        mapM_ warn errs
+    fontIsDBCS opts `seq` forM_ errs warn
     return opts { readFontlibAFP = reader paths (fontlibSuffix opts) }
     where
     checkPath path = do
@@ -451,11 +448,9 @@ defaultOpts = Opts
     isUDC :: N1 -> Bool
     isUDC hi = hi >= 0x92 && hi <= 0xFE
     -- isDBCS hi = hi >= 0x40 && hi <= 0x91
-    checkUDC (cstr, len) = do
-        mapM_ (\off -> do
-                hi <- peekByteOff cstr off
-                when (isUDC hi) $ fail "UDC")
-            $ [0, 2..len-1]
+    checkUDC (cstr, len) = forM_ [0, 2..len-1] $ \off -> do
+        hi <- peekByteOff cstr off
+        when (isUDC hi) $ fail "UDC"
     segment :: FontField -> [N1] -> VarsIO [N1]
     segment = dbcsHandler
 {-
