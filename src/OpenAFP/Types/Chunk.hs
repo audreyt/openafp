@@ -175,7 +175,9 @@ t <~~ cs = do
     return r
 
 (~~>) :: (ChunkBuf c n b, Typeable t, Rec r) => [c] -> t -> IOm r
-(~~>) = flip (<~~)
+cs ~~> t = do
+    Record r <- liftIO $ chunkToRecord $ fromJust $ find (~~ t) cs
+    return r
 
 (==>) :: (ChunkBuf c n b, MonadIO m) => [c] -> [(ChunkType, c -> m [c])] -> m [c]
 cs ==> fs = chunksMapFiltersM cs fs
