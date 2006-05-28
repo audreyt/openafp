@@ -81,8 +81,8 @@ exposed-modules:    OpenAFP.Internals.UConv OpenAFP.Internals.Binary OpenAFP.Int
 includes:           unicode/ucnv.h
 extensions:         CPP, ForeignFunctionInterface
 build-depends:      base, mtl, haskell98
-include-dirs:       /usr/local/include
-extra-lib-dirs:     /usr/local/lib
+include-dirs:       /usr/local/include /opt/local/include
+extra-lib-dirs:     /usr/local/lib /opt/local/lib
 ld-options:         -licuuc
 ghc-options:        -O -fglasgow-exts -funbox-strict-fields -fno-warn-missing-signatures
 hs-source-dirs:     src
