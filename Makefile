@@ -1,5 +1,8 @@
 all :: dist/build/libHSOpenAFP-1.0.a binaries
-    
+
+ghci ::
+	ghci -isrc src/OpenAFP.hs
+
 binaries :: afp-validate afp-udcfix afp-replace afp-dump
 
 afp-validate ::

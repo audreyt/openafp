@@ -50,13 +50,13 @@ apply ctr c f = f =<< (liftIO $ ctr c)
 
 my %module;
 
-open my $fh, "$FindBin::Bin/../Records.hs";
+open my $fh, "$FindBin::Bin/../Records.hs" or die $!;
 my %type;
 while (<$fh>) {
-    if (/(typeOf _\w+)\s*-- (.+)/) {
+    if (/(chunkTypeOf _\w+)\s*-- (.+)/) {
         print LOOKUP "    (show \$ $1, \"$2\"),\n";
     }
-    /(0x\S+) -> typeOf _(\w+)\s*/ or next;
+    /(0x\S+) -> chunkTypeOf _(\w+)\s*/ or next;
     push @{$type{$2}}, $1;
 }
 
@@ -84,7 +84,7 @@ print << ".";
 .
 
 my ($foo, $bar);
-foreach my $file (sort (glob("$FindBin::Bin/../Records/*.hs"), glob("$FindBin::Bin/../Records/*/*.hs")), "$FindBin::Bin/../Types.hs") {
+foreach my $file (sort(glob("$FindBin::Bin/../Records/*.hs"), glob("$FindBin::Bin/../Records/*/*.hs")), "$FindBin::Bin/../Types.hs") {
     open my $fh, $file or die $!;
     local $/ = '';
     while (<$fh>) {
@@ -103,26 +103,27 @@ instance ChunkBuf $t $n Buffer$b where
 
 .
             print << ".";
-apply$s :: (MonadIO m) => $n -> $t -> (forall a. (Rec a) => (a -> m b)) -> m b
-apply$s x = case x of
+apply$s :: forall m x. (MonadIO m)
+    => $n -> $t -> (forall a. (Rec a) => (a -> m x)) -> m x
+apply$s x rec f = case x of
 .
 
             # now populate things with the headers
             my %vals = map { my $k = $_; map +($_ => $k), @{$type{$k}} } grep { /${s}_/ } keys %type;
             foreach my $val (sort keys %vals) {
                 print << ".";
-    $val -> apply (recOf :: $t -> IO $vals{$val})
+    $val -> apply recOf rec (f :: $vals{$val} -> m x)
 .
             }
             if ($s =~ /MCF/) {
                 print << ".";
-    _    -> apply (recOf :: $t -> IO MCF_T)
+    _    -> apply recOf rec (f :: MCF_T -> m x)
 
 .
             }
             else {
                 print << ".";
-    _    -> apply (recOf :: $t -> IO Unknown)
+    _    -> apply recOf rec (f :: Unknown -> m x)
 
 .
             }
