@@ -192,6 +192,7 @@ endPageHandler r = do
 
 udcCharHandler :: N2 -> N2 -> CharUDC -> WriterVarsIO ()
 udcCharHandler xp yo char = do
+    (verbose . _Opts) $$ ("Found: " ++ show char)
     info <- fontInfoOf (udcFont char) (udcChar char)
     base <- adjustY &: fontBaseOffset info
     let (x, y) = orientate x' y'
