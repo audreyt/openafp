@@ -224,14 +224,16 @@ currentFont :: VarsIO FontField
 currentFont = readArray _IdToFont =<< readVar _FontId
 
 incrementOf :: FontField -> NChar -> VarsIO N2
-incrementOf = cachedLibReader _IncrCache fillInc 0
+incrementOf x y = do
+    cachedLibReader _IncrCache fillInc 0 x y
     where
     fillInc font (hi, _) _ redo = do
         readIncrements font hi
         redo
 
 fontInfoOf :: FontField -> NChar -> VarsIO FontInfo
-fontInfoOf = cachedLibReader _InfoCache fillInfo _FontInfo
+fontInfoOf x y = do
+    cachedLibReader _InfoCache fillInfo _FontInfo x y
     where
     fillInfo font char key _ = do
         info <- readFontInfo font char
@@ -288,9 +290,9 @@ cfiHandler (_, lo) cfi = do
     let gcg = cpi_GCGID $ lo `matchRecord` cpi_CodePoint $ cpi_
     run lo gcg cfi
     where
-    run 0x40 0   = const $ return _FontInfo
-    run _    0   = cfiHandler (0x00, 0x40)
-    run _    gcg = fcsHandler gcg
+    run 0x40 0   x = return _FontInfo
+    run _    0   x = cfiHandler (0x00, 0x40) x
+    run _    gcg x = fcsHandler gcg x
 
 fcsHandler :: A8 -> CFI_Data -> VarsIO FontInfo
 fcsHandler gcg cfi = do
@@ -320,7 +322,7 @@ fcsHandler gcg cfi = do
         , fontResolution  = fnc_UnitXValue fnc
         }
 
-readLibRecord :: (Typeable t, Rec b) => t -> (a -> A8) -> a -> VarsIO b
+readLibRecord :: (Show t, Typeable t, Rec b) => t -> (a -> A8) -> a -> VarsIO b
 readLibRecord t f r = (t <~~) =<< readFontlibAFP &<< (fromFontField $ f r)
 
 -- | Data structures.
@@ -384,7 +386,7 @@ initVars = do
     bi  <- newIORef 0
     fid <- newIORef 0
     udc <- newIORef []
-    idf <- newIOArray (0x00, 0xFF) undefined
+    idf <- newIOArray (0x00, 0xFF) []
     ifc <- hashNew (==) hashString
     inc <- hashNew (==) hashString
     opt <- getOpts
@@ -436,7 +438,7 @@ defaultOpts = Opts
     , dbcsPattern       = Nothing
     , readInputAFP      = requiredOpt usage "input"
     , openOutputAFP     = requiredOpt usage "output"
-    , readFontlibAFP    = undefined -- calculated with the two fields below
+    , readFontlibAFP    = error "fontlib" -- calculated with the two fields below
     , fontlibPaths      = ["fontlib"]
     , fontlibSuffix     = ""
     , cstrlenCheckUDC   = checkUDC
@@ -499,6 +501,10 @@ options =
     where
     setMatchDBCS "M..T" (_:_:'M':_:_:'T':_) = True
     setMatchDBCS "M..T" _                   = False
+    setMatchDBCS "NS.." (_:_:'N':'S':_:_:_) = True
+    setMatchDBCS "NS.." _                   = False
+    setMatchDBCS "NS"   (_:_:'N':'S':_)     = True
+    setMatchDBCS "NS"   _                   = False
     setMatchDBCS s a   = (a =~ s)
     setCodepage "835"  = id
     setCodepage "947"  = \o -> o
@@ -515,7 +521,7 @@ options =
         str <- peekCStringLen cstrlen
         unless (str =~ noUDC) $ fail "UDC"
     noUDC = "^([\x00-\x7f]+|([\xA1-\xC5\xC9-\xF9].)+|(\xC6[^\xA1-\xFE])+)$"
-    segment = undefined
+    segment = error "segment"
 
 type NChar = (N1, N1)
 type FontField = String

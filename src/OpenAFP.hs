@@ -23,7 +23,7 @@ module OpenAFP (
     module OpenAFP.Prelude.Utils,
     module OpenAFP.Prelude.Lookups,
     module OpenAFP.Prelude.Instances,
-    module OpenAFP.Internals.UConv,
+--  module OpenAFP.Internals.UConv,
 
     readAFP, writeAFP, filterAFP,
     readArgs, afp_Chunks,
@@ -31,7 +31,7 @@ module OpenAFP (
 import OpenAFP.Types
 import OpenAFP.Records
 import OpenAFP.Internals
-import OpenAFP.Internals.UConv
+--import OpenAFP.Internals.UConv
 import OpenAFP.Prelude.Utils
 import OpenAFP.Prelude.Lookups
 import OpenAFP.Prelude.Instances
