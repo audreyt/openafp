@@ -18,7 +18,6 @@ module OpenAFP.Types.Chunk where
 import OpenAFP.Internals
 import OpenAFP.Types.Buffer
 import OpenAFP.Types.Record
-import GHC.Exts (unsafeCoerce#)
 
 infixl 4 ~~
 infixl 4 <~~

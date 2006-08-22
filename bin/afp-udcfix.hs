@@ -60,8 +60,8 @@ mcfHandler r = do
 mcf1Handler :: MCF1 -> VarsIO ()
 mcf1Handler r = do
     _IdToFont %%=
-        [ (mcf1_CodedFontLocalId r, fromA8 $ mcf1_CodedFontName r)
-            | Record r <- readData r
+        [ (mcf1_CodedFontLocalId mcf1, fromA8 $ mcf1_CodedFontName mcf1)
+            | Record mcf1 <- readData r
         ]
 
 -- | Split PTX into "groups", each one begins with a SCFL chunk.
@@ -75,10 +75,11 @@ ptxCheckUDC r = forM_ groups ptxGroupCheckUDC
 -- | Check a PTX to see if the leading SCFL indicates a DBCS font;
 -- if yes, pass remaining TRN chunks to trnCheckUDC.
 ptxGroupCheckUDC :: [PTX_] -> VarsIO ()
+ptxGroupCheckUDC [] = return ()
 ptxGroupCheckUDC (scfl:trnList) = do
     font    <- readArray _IdToFont =<< ptx_scfl `applyToChunk` scfl
     isDBCS  <- fontIsDBCS &: font
-    when (isDBCS) $ liftIO $ do
+    when (isDBCS) . liftIO $ do
         forM_ (map (ptx_trn `applyToChunk`) trnList)
             (>>= trnCheckUDC)
 
@@ -105,8 +106,8 @@ udcPageHandler page = do
         [ _PGD  ... _XPageSize $= pgd_XPageSize
         , _MCF  ... mcfHandler
         , _MCF1 ... mcf1Handler
-        , _PTX  === \r -> do
-            filterChunks r
+        , _PTX  === \ptx -> do
+            filterChunks ptx
                 [ _PTX_AMI  ... _X            $= ptx_ami
                 , _PTX_AMB  ... _Y            $= ptx_amb
                 , _PTX_RMI  ... _X            += ptx_rmi
@@ -114,9 +115,9 @@ udcPageHandler page = do
                 , _PTX_SCFL ... _FontId       $= ptx_scfl
                 , _PTX_SBI  ... _BaselineIncr $= ptx_sbi
                 , _PTX_SIM  ... _InlineMargin $= ptx_sim
-                , _PTX_STO  ... \r -> do
-                    _XOrientation $= ptx_sto_Orientation   $ r
-                    _YOrientation $= ptx_sto_WrapDirection $ r
+                , _PTX_STO  ... \sto -> do
+                    _XOrientation $= ptx_sto_Orientation   $ sto
+                    _YOrientation $= ptx_sto_WrapDirection $ sto
                 , _PTX_BLN  ... \_ -> do
                     x' <- readVar _InlineMargin
                     y' <- readVar _BaselineIncr
@@ -143,13 +144,16 @@ trnHandler r = do
         False -> do
             -- If font is single byte, simply add each byte's increments.
             -- without parsing UDC.
-            incrs   <- forM trn $ \r -> do
-                incrementOf font (0x00, r)
+            incrs   <- forM trn $ \ch -> do
+                incrementOf font (0x00, ch)
             (_X += sum) incrs
             push r
 
 dbcsHandler :: FontField -> [N1] -> VarsIO [N1]
-dbcsHandler _ [] = return []
+dbcsHandler _ []    = return []
+dbcsHandler _ [x]   = do
+    warn $ "invalid DBCS sequence: " ++ show x
+    return []
 dbcsHandler font (hi:lo:xs) = do
     (incChar, (hi', lo'))   <- dbcsCharHandler font (hi, lo)
     incr                    <- incrementOf font incChar
@@ -192,30 +196,32 @@ endPageHandler r = do
 
 udcCharHandler :: N2 -> N2 -> CharUDC -> WriterVarsIO ()
 udcCharHandler xp yo char = do
-    (verbose . _Opts) $$ ("Found: " ++ show char)
-    info <- fontInfoOf (udcFont char) (udcChar char)
-    base <- adjustY &: fontBaseOffset info
-    let (x, y) = orientate x' y'
-        x' = udcX char + (fromIntegral $ fontASpace info)
-        y' = udcY char - (fromIntegral $ base)
-    push _IID
-        { iid_Color           = 0x0008
-        , iid_ConstantData1   = 0x000009600960000000000000
-        , iid_ConstantData2   = 0x000000002D00
-        , iid_XUnits          = fontResolution info
-        , iid_YUnits          = fontResolution info
-        }
-    push _ICP
-        { icp_XCellOffset = x
-        , icp_XCellSize   = fontWidth info
-        , icp_XFillSize   = fontWidth info
-        , icp_YCellOffset = y
-        , icp_YCellSize   = fontHeight info
-        , icp_YFillSize   = fontHeight info
-        }
-    push _IRD {
-        ird_ImageData = fontBitmap info
-    }
+    infoMaybe <- fontInfoOf (udcFont char) (udcChar char)
+    case infoMaybe of
+        Nothing -> return ()
+        Just info -> do
+            base <- adjustY &: fontBaseOffset info
+            let (x, y) = orientate x' y'
+                x' = udcX char + (fromIntegral $ fontASpace info)
+                y' = udcY char - (fromIntegral $ base)
+            push _IID
+                { iid_Color           = 0x0008
+                , iid_ConstantData1   = 0x000009600960000000000000
+                , iid_ConstantData2   = 0x000000002D00
+                , iid_XUnits          = fontResolution info
+                , iid_YUnits          = fontResolution info
+                }
+            push _ICP
+                { icp_XCellOffset = x
+                , icp_XCellSize   = fontWidth info
+                , icp_XFillSize   = fontWidth info
+                , icp_YCellOffset = y
+                , icp_YCellSize   = fontHeight info
+                , icp_YFillSize   = fontHeight info
+                }
+            push _IRD {
+                ird_ImageData = fontBitmap info
+            }
     where
     orientate x y
         | (yo == 0x5a00)    = (xp - y, x)
@@ -228,19 +234,28 @@ incrementOf :: FontField -> NChar -> VarsIO N2
 incrementOf x y = do
     cachedLibReader _IncrCache fillInc 0 x y
     where
-    fillInc font (hi, _) _ redo = do
-        readIncrements font hi
-        redo
+    fillInc font char@(hi, _) f redo = do
+        rv <- readIncrements font hi
+        if rv then redo else do
+            udcRef <- asks _UDC
+            liftIO $ do
+                -- Remove this from the list of UDCs to gen image for
+                putStrLn $ "Skipping unknown UDC: " ++ show char ++ ", font: " ++ show (drop 2 f)
+                modifyIORef udcRef (filter ((/= char) . udcChar))
+            return 0
 
-fontInfoOf :: FontField -> NChar -> VarsIO FontInfo
+fontInfoOf :: FontField -> NChar -> VarsIO (Maybe FontInfo)
 fontInfoOf x y = do
-    cachedLibReader _InfoCache fillInfo _FontInfo x y
+    cachedLibReader _InfoCache fillInfo (Just _FontInfo) x y
     where
     fillInfo font char key _ = do
-        info <- readFontInfo font char
-        _InfoCache  %= (key, info)
-        _IncrCache  %= (key, fontIncrement info)
-        return info
+        infoMaybe <- readFontInfo font char
+        case infoMaybe of
+            Just info -> do
+                _InfoCache  %= (key, infoMaybe)
+                _IncrCache  %= (key, fontIncrement info)
+                return infoMaybe
+            _ -> return Nothing
 
 cachedLibReader :: (MonadIO m, MonadReader Vars m, MonadPlus m, MonadError e m, Show e, Typeable e) =>
                      (Vars -> HashTable String a)
@@ -267,23 +282,28 @@ cachedLibReader cache filler fallback font char = do
         return fallback
             | otherwise = throwError err
 
-readIncrements :: String -> N1 -> VarsIO ()
+readIncrements :: String -> N1 -> VarsIO Bool
 readIncrements font hi = do
-    cfi_    <- (_CFI <~~) =<< readFontlibAFP &<< font
-    let cfi = hi `matchRecord` cfi_Section $ cfi_
-    fni_    <- _FNI `readLibRecord` cfi_FontCharacterSetName $ cfi
-    cpi_    <- _CPI `readLibRecord` cfi_CodePageName $ cfi
-    let gcgToIncr = Map.fromList . map (pair . fromRecord) $ readData fni_
-        pair r    = (fni_GCGID r, fni_CharacterIncrement r)
-        incr      = fromJust . (`Map.lookup` gcgToIncr) . cpi_GCGID
-    sequence_ [ _IncrCache %= (key r, incr r) | Record r <- readData cpi_ ]
-    where
-    key r = cacheKey font (hi, cpi_CodePoint r)
+    cfi <- (_CFI <~~) =<< readFontlibAFP &<< font
+    case hi `matchRecordMaybe` cfi_Section $ cfi of
+        Nothing     -> return False
+        Just cfi'   -> do
+            fni <- _FNI `readLibRecord` cfi_FontCharacterSetName $ cfi'
+            cpi <- _CPI `readLibRecord` cfi_CodePageName $ cfi'
+            let gcgToIncr = Map.fromList . map (pair . fromRecord) $ readData fni
+                pair r    = (fni_GCGID r, fni_CharacterIncrement r)
+                incr      = fromJust . (`Map.lookup` gcgToIncr) . cpi_GCGID
+            sequence_ [ _IncrCache %= (key r, incr r) | Record r <- readData cpi ]
+            return True
+     where
+     key r = cacheKey font (hi, cpi_CodePoint r)
 
-readFontInfo :: String -> NChar -> VarsIO FontInfo
+readFontInfo :: String -> NChar -> VarsIO (Maybe FontInfo)
 readFontInfo font char@(hi, _) = do
-    cfi_ <- (_CFI <~~) =<< readFontlibAFP &<< font
-    cfiHandler char $ (hi `matchRecord` cfi_Section) cfi_
+    cfi <- (_CFI <~~) =<< readFontlibAFP &<< font
+    case (hi `matchRecordMaybe` cfi_Section) cfi of
+        Nothing     -> return Nothing
+        Just cfi'   -> liftM Just (cfiHandler char cfi')
 
 cfiHandler :: NChar -> CFI_Data -> VarsIO FontInfo
 cfiHandler (_, lo) cfi = do
@@ -305,10 +325,14 @@ fcsHandler gcg cfi = do
         fnm     = fromRecord $ readData fnm_ `genericIndex` fni_FNMCount fni
         (w, h)  = (1 + fnm_Width fnm, 1 + fnm_Height fnm)
         bytes   = ((w + 7) `div` 8) * h
-    fngs <- sequence [ fng `applyToChunk` n | n <- fcs, n ~~ _FNG ]
-    bitmap <- subBufs fngs (fnm_Offset fnm) bytes
-    -- nstr <- fromNStr bitmap
-    -- showBitmap nstr (bytes `div` h)
+    fngs    <- sequence [ fng `applyToChunk` n | n <- fcs, n ~~ _FNG ]
+    bitmap  <- subBufs fngs (fnm_Offset fnm) bytes
+
+    vars    <- ask
+    when (verbose (_Opts vars)) $ do
+        nstr <- fromNStr bitmap
+        showBitmap nstr (bytes `div` h)
+
     return FontInfo
         { fontIncrement   = fni_CharacterIncrement fni
         , fontAscend      = fni_AscendHeight fni
@@ -352,7 +376,7 @@ _FontInfo = FontInfo 0 0 0 0 0 0 0 _NStr 0 0 0
 
 -- | Simple test case.
 run :: IO ()
-run = withArgs (split " " "-a -s .afp -d M..T -i ln-1.afp -o fixed-1.afp") main
+run = withArgs (split " " "-a -d NS -i tmp -o x") main
 
 data Vars = Vars
     { _XPageSize      :: !(IORef N2)
@@ -365,7 +389,7 @@ data Vars = Vars
     , _FontId         :: !(IORef N1)
     , _UDC            :: !(IORef [CharUDC])
     , _IdToFont       :: !(IOArray N1 FontField)
-    , _InfoCache      :: !(HashTable String FontInfo)
+    , _InfoCache      :: !(HashTable String (Maybe FontInfo))
     , _IncrCache      :: !(HashTable String N2)
     , _Opts           :: !Opts
     }
@@ -398,7 +422,6 @@ getOpts = do
     (optsIO, rest, errs) <- return . getOpt Permute options
                                 $ if (null args) then ["-h"] else args
     let opts    = foldl (flip ($)) defaultOpts optsIO
-        paths   = fontlibPaths opts
         suffix  = fontlibSuffix opts
     showHelp opts
     unless (null rest) $ do
@@ -448,8 +471,6 @@ defaultOpts = Opts
     , showHelp          = return ()
     }
     where
-    isUDC :: N1 -> Bool
-    isUDC hi = hi >= 0x92 && hi <= 0xFE
     -- isDBCS hi = hi >= 0x40 && hi <= 0x91
     checkUDC (cstr, len) = forM_ [0, 2..len-1] $ \off -> do
         hi <- peekByteOff cstr off

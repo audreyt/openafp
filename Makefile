@@ -9,7 +9,7 @@ afp-validate ::
 	ghc -H128m --make -static -o afp-validate -O bin/afp-validate.hs
 
 afp-udcfix ::
-	ghc -H128m --make -static -o afp-udcfix -O bin/afp-udcfix.hs
+	ghc -H128m -prof -auto-all --make -static -o afp-udcfix -O0 bin/afp-udcfix.hs
 
 afp-replace ::
 	ghc -H128m --make -static -o afp-replace -O bin/afp-replace.hs

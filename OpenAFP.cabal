@@ -85,5 +85,5 @@ build-depends:      base, mtl, haskell98
 --include-dirs:       /usr/local/include /opt/local/include
 --extra-lib-dirs:     /usr/local/lib /opt/local/lib
 --ld-options:         -licuuc
-ghc-options:        -O -fglasgow-exts -funbox-strict-fields -fno-warn-missing-signatures
+ghc-options:        -O0 -fglasgow-exts -funbox-strict-fields -fno-warn-missing-signatures
 hs-source-dirs:     src

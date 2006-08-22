@@ -62,7 +62,7 @@ l %= (k, v) = do
 l %? k = do
     vars    <- ask
     liftIO $ hashLookup (l vars) k
-l %: k = return . fromJust =<< (l %? k)
+l %: k = return . fromJust'' =<< (l %? k)
 
 l %%= kvList = do
     vars    <- ask
@@ -78,10 +78,22 @@ splitRecords :: (ChunkBuf c n b, Typeable t) => t -> [c] -> [[c]]
 splitRecords t = groupBy (const $ not . (~~ t))
 
 findRecord :: (a -> Bool) -> [Record a] -> a
-findRecord f = fromRecord . fromJust . find (f . fromRecord)
+findRecord f = fromRecord . fromJust' . find (f . fromRecord)
+
+fromJust' (Just x) = x
+fromJust' Nothing = error "fromJust1 - fail"
+
+fromJust'' (Just x) = x
+fromJust'' Nothing = error "fromJust2 - fail"
 
 matchRecord :: (RecData a b, Eq c) => c -> (b -> c) -> a -> b
 matchRecord n f = findRecord ((n ==) . f) . readData
+
+matchRecordMaybe :: (RecData a b, Eq c) => c -> (b -> c) -> a -> Maybe b
+matchRecordMaybe n f = findRecordMaybe ((n ==) . f) . readData
+
+findRecordMaybe :: (a -> Bool) -> [Record a] -> Maybe a
+findRecordMaybe f = maybe Nothing (Just . fromRecord) . find (f . fromRecord)
 
 fromA :: (Binary a, Storable a) => a -> IOm String
 fromA item = liftIO $ do
