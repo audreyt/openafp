@@ -5,7 +5,7 @@ License-file:       LICENSE
 author:             Audrey Tang
 maintainer:         audreyt@audreyt.org
 exposed-modules:    OpenAFP.Internals.Binary OpenAFP.Internals.Ebc2Asc
---                  OpenAFP.Internals.UConv
+                    OpenAFP.Internals.UConv
                     OpenAFP.Prelude.Utils OpenAFP.Prelude.Instances OpenAFP.Prelude.InstanceT
                     OpenAFP.Prelude.Lookups
                     OpenAFP.Prelude.InstanceAFP OpenAFP.Prelude.InstancePTX OpenAFP.Prelude.Exts
@@ -79,11 +79,11 @@ exposed-modules:    OpenAFP.Internals.Binary OpenAFP.Internals.Ebc2Asc
                     OpenAFP.Records.AFP OpenAFP.Records.PTX OpenAFP.Records.T OpenAFP.Records.MCF
                     OpenAFP.Types.Chunk OpenAFP.Types.Buffer OpenAFP.Types.View
                     OpenAFP.Types.Record OpenAFP.Internals OpenAFP.Records OpenAFP.Types OpenAFP 
---includes:           unicode/ucnv.h
+includes:           unicode/ucnv.h
 extensions:         CPP, ForeignFunctionInterface
-build-depends:      base, mtl, haskell98
---include-dirs:       /usr/local/include /opt/local/include
---extra-lib-dirs:     /usr/local/lib /opt/local/lib
---ld-options:         -licuuc
+build-depends:      base, mtl, haskell98, regex-compat
+include-dirs:       /usr/local/include /opt/local/include
+extra-lib-dirs:     /usr/local/lib /opt/local/lib
+ld-options:         -licuuc
 ghc-options:        -O0 -fglasgow-exts -funbox-strict-fields -fno-warn-missing-signatures
 hs-source-dirs:     src

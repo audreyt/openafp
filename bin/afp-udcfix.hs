@@ -145,7 +145,7 @@ trnHandler r = do
             -- If font is single byte, simply add each byte's increments.
             -- without parsing UDC.
             incrs   <- forM trn $ \ch -> do
-                incrementOf font (0x00, ch)
+                incrementOf font (0x00, if ch == 0x00 then 0x40 else ch)
             (_X += sum) incrs
             push r
 
@@ -183,15 +183,16 @@ endPageHandler r = do
         xp  <- readVar _XPageSize
         xo  <- readVar _XOrientation
         yo  <- readVar _YOrientation
-        push _BII
-        push _IOC
-            { ioc_XMap            = 0x03E8
-            , ioc_XOrientation    = xo
-            , ioc_YMap            = 0x03E8
-            , ioc_YOrientation    = yo
-            }
-        forM_ (reverse udcList) (udcCharHandler xp yo)
-        push _EII
+        forM_ (reverse udcList) $ \udc -> do
+            push _BII
+            push _IOC
+                { ioc_XMap            = 0x03E8
+                , ioc_XOrientation    = xo
+                , ioc_YMap            = 0x03E8
+                , ioc_YOrientation    = yo
+                }
+            udcCharHandler xp yo udc
+            push _EII
     push r
 
 udcCharHandler :: N2 -> N2 -> CharUDC -> WriterVarsIO ()
@@ -236,7 +237,7 @@ incrementOf x y = do
     where
     fillInc font char@(hi, _) f redo = do
         rv <- readIncrements font hi
-        if rv then redo else do
+        if rv then liftM (maybe 0 id) redo else do
             udcRef <- asks _UDC
             liftIO $ do
                 -- Remove this from the list of UDCs to gen image for
@@ -259,12 +260,12 @@ fontInfoOf x y = do
 
 cachedLibReader :: (MonadIO m, MonadReader Vars m, MonadPlus m, MonadError e m, Show e, Typeable e) =>
                      (Vars -> HashTable String a)
-                       -> (String -> NChar -> String -> m a -> m a)
+                       -> (String -> NChar -> String -> m (Maybe a) -> m a)
                          -> a -> FontField -> NChar -> m a
 cachedLibReader cache filler fallback font char = do
     vars <- ask
     let val = liftIO $ hashLookup (cache vars) key
-        fillCache = filler fontstr char key (return . fromJust =<< val)
+        fillCache = filler fontstr char key val
     val >>= maybe (fillCache `catchError` hdl) return
     where
     key = cacheKey fontstr char
@@ -292,7 +293,7 @@ readIncrements font hi = do
             cpi <- _CPI `readLibRecord` cfi_CodePageName $ cfi'
             let gcgToIncr = Map.fromList . map (pair . fromRecord) $ readData fni
                 pair r    = (fni_GCGID r, fni_CharacterIncrement r)
-                incr      = fromJust . (`Map.lookup` gcgToIncr) . cpi_GCGID
+                incr      = maybe 0 id . (`Map.lookup` gcgToIncr) . cpi_GCGID
             sequence_ [ _IncrCache %= (key r, incr r) | Record r <- readData cpi ]
             return True
      where
@@ -306,14 +307,16 @@ readFontInfo font char@(hi, _) = do
         Just cfi'   -> liftM Just (cfiHandler char cfi')
 
 cfiHandler :: NChar -> CFI_Data -> VarsIO FontInfo
-cfiHandler (_, lo) cfi = do
+cfiHandler char@(_, lo) cfi = do
     cpi_    <- _CPI `readLibRecord` cfi_CodePageName $ cfi
     let gcg = cpi_GCGID $ lo `matchRecord` cpi_CodePoint $ cpi_
     run lo gcg cfi
     where
     run 0x40 0   x = return _FontInfo
     run _    0   x = cfiHandler (0x00, 0x40) x
-    run _    gcg x = fcsHandler gcg x
+    run _    gcg x = do
+        liftIO $ putStrLn ("Replacing UDC: " ++ show char)
+        fcsHandler gcg x
 
 fcsHandler :: A8 -> CFI_Data -> VarsIO FontInfo
 fcsHandler gcg cfi = do
