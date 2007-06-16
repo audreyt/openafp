@@ -4,6 +4,8 @@ license:            BSD3
 License-file:       LICENSE
 author:             Audrey Tang
 maintainer:         audreyt@audreyt.org
+synopsis:           IBM AFP document format parser and generator
+description:        IBM AFP document format parser and generator
 exposed-modules:    OpenAFP.Internals.Binary OpenAFP.Internals.Ebc2Asc
                     OpenAFP.Internals.UConv
                     OpenAFP.Prelude.Utils OpenAFP.Prelude.Instances OpenAFP.Prelude.InstanceT
@@ -79,11 +81,12 @@ exposed-modules:    OpenAFP.Internals.Binary OpenAFP.Internals.Ebc2Asc
                     OpenAFP.Records.AFP OpenAFP.Records.PTX OpenAFP.Records.T OpenAFP.Records.MCF
                     OpenAFP.Types.Chunk OpenAFP.Types.Buffer OpenAFP.Types.View
                     OpenAFP.Types.Record OpenAFP.Internals OpenAFP.Records OpenAFP.Types OpenAFP 
+category:           Data
 includes:           unicode/ucnv.h
 extensions:         CPP, ForeignFunctionInterface
-build-depends:      base, mtl, haskell98, regex-compat
-include-dirs:       /usr/local/include /opt/local/include
-extra-lib-dirs:     /usr/local/lib /opt/local/lib
+build-depends:      base, mtl, haskell98, regex-compat, directory, process
+include-dirs:       /usr/include /usr/local/include /opt/local/include
+extra-lib-dirs:     /usr/lib /usr/local/lib /opt/local/lib
 ld-options:         -licuuc
-ghc-options:        -O0 -fglasgow-exts -funbox-strict-fields -fno-warn-missing-signatures
+ghc-options:        -fglasgow-exts -funbox-strict-fields -fno-warn-missing-signatures
 hs-source-dirs:     src

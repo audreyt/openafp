@@ -16,94 +16,66 @@
 -----------------------------------------------------------------------------
 
 module OpenAFP.Internals (
-    module OpenAFP.Internals.Binary,
-    module OpenAFP.Internals.Ebc2Asc,
-
-    module Control.Exception,
-    module Control.Monad.RWS,
-    module Control.Monad.Error,
-    module Data.Array.Unboxed,
-    module Data.Bits,
-    module Data.Char,
-    module Data.List,
-    module Data.HashTable,
-    module Data.Word,
-    module Data.Typeable,
-    module Data.IORef,
-    module Data.Maybe,
-    module Debug.Trace,
-    module Foreign.C.String,
-    module Foreign.C.Types,
-    module Foreign.Marshal.Alloc,
-    module Foreign.Marshal.Array,
-    module Foreign.Marshal.Utils,
-    module Foreign.Ptr,
-    module Foreign.ForeignPtr,
-    module Foreign.Storable,
-    module System.Mem.Weak,
-    module System.Console.GetOpt,
-    module System.IO,
-    module System.Cmd,
-    module System.Environment,
-    module System.Exit,
-    module System.IO.Unsafe,
-    module System.IO.Error,
-    module System.Directory,
-    module Text.Regex,
-    module GHC.IOBase,
+    module X,
 
     IOm, StateIO,
 
     hashNew, hashLookup, hashInsert, hashDelete,
     stateGet, statePut
 ) where
-import OpenAFP.Internals.Binary
-import OpenAFP.Internals.Ebc2Asc
+import OpenAFP.Internals.Binary  as X 
+import OpenAFP.Internals.Ebc2Asc as X 
 
-import Control.Exception hiding (try, catch, ioError)
-import Control.Monad.Error (throwError, catchError, MonadError(..), Error(..))
-import Control.Monad.RWS hiding (get, put)
+import Control.Exception         as X hiding (try, catch, ioError)
+import Control.Monad             as X
+import Control.Monad.Trans       as X
+import Control.Monad.Error       as X (throwError, catchError, MonadError(..), Error(..))
+import Control.Monad.Writer      as X
+import Control.Monad.Reader      as X
+import Control.Monad.RWS         as X hiding (get, put)
+import Data.Array.Unboxed        as X 
+import Data.Bits                 as X 
+import Data.Char                 as X 
+import Data.List                 as X 
+import Data.HashTable            as X hiding (lookup, insert, delete, new)
+import Data.Word                 as X 
+import Data.Typeable             as X 
+import Data.IORef                as X 
+import Data.Maybe                as X 
+import Data.Monoid               as X 
+import Debug.Trace               as X 
+import Foreign.C.String          as X 
+import Foreign.C.Types           as X 
+import Foreign.Marshal.Alloc     as X 
+import Foreign.Marshal.Array     as X 
+import Foreign.Marshal.Utils     as X 
+import Foreign.Ptr               as X 
+import Foreign.ForeignPtr        as X 
+import Foreign.Storable          as X 
+import Numeric                   as X 
+import System.Cmd                as X 
+import System.Console.GetOpt     as X 
+import System.IO                 as X 
+import System.Environment        as X 
+import System.Exit               as X 
+import System.Mem.Weak           as X 
+import System.IO.Unsafe          as X 
+import System.IO.Error           as X 
+import System.Directory          as X 
+import Text.Regex                as X 
+import GHC.IOBase                as X (IOArray, newIOArray, readIOArray, writeIOArray)
 import qualified Control.Monad.RWS (get, put)
-import Data.Array.Unboxed
-import Data.Bits
-import Data.Char
-import Data.List
-import Data.HashTable hiding (lookup, insert, delete, new)
+import qualified Control.Monad.State (MonadState)
 import qualified Data.HashTable (lookup, insert, delete, new)
-import Data.Word
-import Data.Typeable
-import Data.IORef
-import Data.Maybe
-import Debug.Trace
-import Foreign.C.String
-import Foreign.C.Types
-import Foreign.Marshal.Alloc
-import Foreign.Marshal.Array
-import Foreign.Marshal.Utils
-import Foreign.Ptr
-import Foreign.ForeignPtr
-import Foreign.Storable
-import Numeric
-import System.Cmd
-import System.Console.GetOpt
-import System.IO
-import System.Environment
-import System.Exit
-import System.Mem.Weak
-import System.IO.Unsafe
-import System.IO.Error
-import System.Directory
-import Text.Regex
-import GHC.IOBase (IOArray, newIOArray, readIOArray, writeIOArray)
 
 hashNew     = Data.HashTable.new
 hashLookup  = Data.HashTable.lookup
 hashInsert  = Data.HashTable.insert
 hashDelete  = Data.HashTable.delete
 
-stateGet :: (Control.Monad.RWS.MonadState s m) => m s
+stateGet :: (Control.Monad.State.MonadState s m) => m s
 stateGet = Control.Monad.RWS.get
-statePut :: (Control.Monad.RWS.MonadState s m) => s -> m ()
+statePut :: (Control.Monad.State.MonadState s m) => s -> m ()
 statePut = Control.Monad.RWS.put
 
 type IOm a = (MonadPlus m, MonadIO m, MonadError e m, Show e, Typeable e) => m a

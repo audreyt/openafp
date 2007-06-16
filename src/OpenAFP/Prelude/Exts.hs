@@ -102,14 +102,3 @@ split_first_word :: String -> (String, String)
 split_first_word xs = (w, dropWhile isSpace xs')
   where (w, xs') = break isSpace xs
 
-forM :: (Monad m) 
-     => [a]        -- ^ List of values to loop over
-     -> (a -> m b) -- ^ The \'body\' of the for loop
-     -> m [b]      -- ^ Monad containing a list of the results
-forM = flip mapM
-
-forM_ :: (Monad m) 
-      => [a]        -- ^ List of values to loop over
-      -> (a -> m b) -- ^ The \'body\' of the for loop
-      -> m ()
-forM_ = flip mapM_

@@ -56,7 +56,7 @@ uconv fromcode tocode bytes = unsafePerformIO $ do
         out_len = (4 * in_len)
         in_len  = (length bytes)
 
-foreign import ccall ucnv_convert ::
+foreign import ccall "ucnv_convert_3_4" ucnv_convert ::
     CString     -> -- toConverterName
     CString     -> -- fromConverterName
     Ptr CChar   -> -- target

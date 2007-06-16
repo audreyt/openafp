@@ -8,7 +8,6 @@ import OpenAFP hiding ((!))
 -- See OpenAFP.Types.View for details.
 
 type Encodings = [String]
-type WithVars a = (?encs :: Encodings) => a
 
 data Opts = Opts
     { encodings         :: Encodings
@@ -69,12 +68,20 @@ main = do
     let put = (hPutStr fh)
     put $ renderMessage ++ "<HTML>" ++ htmlPage input
     put $ "<OL class='top'>"
-    let ?encs = (encodings opts)
+    writeIORef encsRef $ encodings opts
     mapM_ (`withChunk` viewRec put) cs
     put $ "</OL></HTML>"
     hClose fh
 
-viewRec :: WithVars ((Rec a) => (String -> IO ()) -> a -> IO ())
+{-# NOINLINE encs #-}
+encs :: Encodings
+encs = unsafePerformIO (readIORef encsRef)
+
+{-# NOINLINE encsRef #-}
+encsRef :: IORef Encodings
+encsRef = unsafePerformIO (newIORef (error "oops"))
+
+viewRec :: Rec a => (String -> IO ()) -> a -> IO ()
 viewRec put r = do
     rec <- recView r
     mapM_ put [ dropWhile isSpace l | l <- lines . show $ recHtml rec ]
@@ -107,7 +114,7 @@ styles = joinList "\n" [
     "div { text-decoration: underline; background: #e0e0ff; font-family: arial unicode ms, helvetica }"
     ]
 
-recHtml :: WithVars (ViewRecord -> Html)
+recHtml :: ViewRecord -> Html
 recHtml (ViewRecord (t, fs))
     | t == typeOf _PTX_TRN
     , (_ : ViewField (_, ViewNStr (_, nstr)) : []) <- fs
@@ -119,18 +126,18 @@ typeHtml :: RecordType -> Html
 typeHtml t = thediv << (typeStr +++ primHtml " &mdash; " +++ typeDesc)
     where
     typeStr = bold << last (split "." typeRepr)
-    typeDesc = stringToHtml $ descLookup (MkChunkType typeRepr)
+    typeDesc = stringToHtml $ descLookup (MkChunkType $ typeInt t)
     typeRepr = show t
 
-ptxHtml :: WithVars ([N1] -> [Html])
+ptxHtml :: [N1] -> [Html]
 ptxHtml nstr = [table << textHtml]
     where
     textHtml = textLine ++ [ nstrLine ]
     textLine = [ fieldHtml ("(" ++ n ++ ")", ViewString (undefined, txt)) | (n, txt) <- texts nstr ]
     nstrLine = tr << td ! [colspan 2] << thespan << nstrHtml nstr
 
-texts :: WithVars ([N1] -> [(String, String)])
-texts nstr = maybeToList $ msum [ maybe Nothing (Just . ((,) cp)) $ conv (codeName cp) | cp <- ?encs ]
+texts :: [N1] -> [(String, String)]
+texts nstr = maybeToList $ msum [ maybe Nothing (Just . ((,) cp)) $ conv (codeName cp) | cp <- encs ]
     where
     conv c@"ibm-937"
         | (even $ length nstr)  = uconv c "utf8" (0x0E : nstr)
@@ -140,7 +147,7 @@ texts nstr = maybeToList $ msum [ maybe Nothing (Just . ((,) cp)) $ conv (codeNa
         | isJust $ find (not . isDigit) c   = c
         | otherwise                         = "ibm-" ++ c
 
-fieldsHtml :: WithVars ([ViewField] -> [Html])
+fieldsHtml :: [ViewField] -> [Html]
 fieldsHtml fs = [table << fsHtml] ++ membersHtml
     where
     fsHtml = [ map fieldHtml fields ]
@@ -162,7 +169,7 @@ fieldsHtml fs = [table << fsHtml] ++ membersHtml
     strOk "SubType"         = False
     strOk _                 = True
 
-chunksHtml :: WithVars ([[ViewRecord]] -> [Html])
+chunksHtml :: [[ViewRecord]] -> [Html]
 chunksHtml [] = []
 chunksHtml (cs:_) = [olist << map recHtml cs]
 

@@ -18,6 +18,7 @@ module OpenAFP.Types.Chunk where
 import OpenAFP.Internals
 import OpenAFP.Types.Buffer
 import OpenAFP.Types.Record
+import System.IO.Unsafe (unsafePerformIO)
 
 infixl 4 ~~
 infixl 4 <~~
@@ -75,11 +76,14 @@ toNStr list = liftIO $ do
         pokeArray cstr list
         return $ bufFromPStrLen (castForeignPtr pstr, len)
 
-newtype ChunkType = MkChunkType String
+newtype ChunkType = MkChunkType Int
     deriving (Show, Eq, Typeable, Ord)
 
+typeInt :: TypeRep -> Int
+typeInt x = unsafePerformIO (typeRepKey x)
+
 chunkTypeOf :: Typeable a => a -> ChunkType
-chunkTypeOf = MkChunkType . show . typeOf
+chunkTypeOf = MkChunkType . typeInt . typeOf
 
 -- | The ChunkBuf class represents non-parsed chunks, constructed from a
 --   (ChunkType, Buffer) tuple.
