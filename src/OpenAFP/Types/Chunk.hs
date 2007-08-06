@@ -183,13 +183,13 @@ cs ~~> t = do
     return r
 
 (==>) :: (ChunkBuf c n b, MonadIO m) => [c] -> [(ChunkType, c -> m [c])] -> m [c]
-cs ==> fs = chunksMapFiltersM cs fs
+cs ==> fs = length cs `seq` chunksMapFiltersM cs fs
 
 (<==) :: (ChunkBuf c n b, MonadIO m) => [(ChunkType, c -> m [c])] -> [c] -> m [c]
 (<==) = flip (==>)
 
 (..>) :: (ChunkBuf c n b, MonadIO m) => [c] -> [(ChunkType, c -> m [c])] -> m ()
-cs ..> fs = chunksMapFiltersM_ cs fs
+cs ..> fs = length cs `seq` chunksMapFiltersM_ cs fs
 
 (<..) :: (ChunkBuf c n b, MonadIO m) => [(ChunkType, c -> m [c])] -> [c] -> m ()
 (<..) = flip (..>)

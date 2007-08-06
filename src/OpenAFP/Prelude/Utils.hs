@@ -199,3 +199,5 @@ requiredOpt :: (String -> IO a) -> String -> a
 requiredOpt usage r = unsafePerformIO $ do
     usage $ "missing argument: --" ++ r
 
+io :: MonadIO m => IO a -> m a
+io = liftIO

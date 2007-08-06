@@ -9,7 +9,7 @@ afp-validate ::
 	ghc -H128m --make -static -o afp-validate -O bin/afp-validate.hs
 
 afp-udcfix ::
-	ghc -H128m --make -static -o afp-udcfix -O0 bin/afp-udcfix.hs
+	ghc -H128m --make -static -o afp-udcfix -O2 bin/afp-udcfix.hs -prof -auto-all
 
 afp-replace ::
 	ghc -H128m --make -static -o afp-replace -O bin/afp-replace.hs
@@ -17,8 +17,11 @@ afp-replace ::
 afp-dump ::
 	ghc -H128m --make -static -o afp-dump -O bin/afp-dump.hs
 
+afp-scanudc ::
+	ghc -H128m --make -static -o afp-scanudc -O3 bin/afp-scanudc.hs -threaded
+
 dist/build/libHSOpenAFP-1.0.a ::
-	runghc Setup.lhs configure --user
+	runghc Setup.lhs configure --user --enable-library-profiling
 	runghc Setup.lhs build
 	sudo runghc Setup.lhs install
 
