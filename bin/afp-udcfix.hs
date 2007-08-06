@@ -309,8 +309,9 @@ readFontInfo font char@(hi, _) = do
 cfiHandler :: NChar -> CFI_Data -> VarsIO FontInfo
 cfiHandler char@(_, lo) cfi = do
     cpi_    <- _CPI `readLibRecord` cfi_CodePageName $ cfi
-    let gcg = cpi_GCGID $ lo `matchRecord` cpi_CodePoint $ cpi_
-    run lo gcg cfi
+    case lo `matchRecordMaybe` cpi_CodePoint $ cpi_ of
+        Nothing -> return _FontInfo
+        Just c  -> run lo (cpi_GCGID c) cfi
     where
     run 0x40 0   x = return _FontInfo
     run _    0   x = cfiHandler (0x00, 0x40) x
@@ -441,9 +442,20 @@ getOpts = do
             warn $ "directory does not exist: `" ++ path ++ "'"
         return exists
     reader paths suffix name = do
-        (afp:_) <- filterM doesFileExist
-                         $ map (++ "/" ++ name ++ suffix) paths
-        readAFP afp
+        -- Here we memoize by name.
+        let key = concat (suffix:name:paths)
+        rv <- hashLookup _ReaderCache key
+        case rv of
+            Just chunks -> return chunks
+            _           -> do
+                (afp:_) <- filterM doesFileExist $ map (++ "/" ++ name ++ suffix) paths
+                chunks  <- readAFP afp
+                hashInsert _ReaderCache key chunks
+                return chunks
+
+{-# NOINLINE _ReaderCache #-}
+_ReaderCache :: HashTable String [AFP_]
+_ReaderCache = unsafePerformIO (hashNew (==) hashString)
 
 infixl 4 &:
 l &: v = do
