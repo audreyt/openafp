@@ -1,4 +1,4 @@
-{-# OPTIONS -O -fglasgow-exts -funbox-strict-fields #-}
+{-# OPTIONS -O -fglasgow-exts -funbox-strict-fields -fbang-patterns #-}
 
 module Main where
 import OpenAFP
@@ -25,10 +25,23 @@ stateMain :: ReaderT Vars IO ()
 stateMain = do
     chunks  <- liftOpt readInputAFP
     fh      <- liftOpt openOutputAFP
-    bh      <- liftIO $ openBinIO_ fh
+    bh      <- io $ openBinIO_ fh
     forM_ (splitRecords _PGD chunks)
-          ((liftIO . put bh =<<) . pageHandler)
-    liftIO $ hClose fh
+          ((io . put bh =<<) . pageHandler)
+    io $ hClose fh
+
+{-
+mcfType, mcf1Type, ptxType :: ChunkType
+mcfType     = chunkTypeOf _MCF
+mcf1Type    = chunkTypeOf _MCF1
+ptxType     = chunkTypeOf _PTX
+
+    (`mapM_` page) $ \c -> case chunkType c of
+        t   | t == mcfType  -> mcfHandler  . fromRecord =<< io (chunkToRecord c)
+            | t == mcf1Type -> mcf1Handler . fromRecord =<< io (chunkToRecord c)
+            | t == ptxType  -> ptxCheckUDC . fromRecord =<< io (chunkToRecord c)
+            | otherwise     -> return ()
+-}
 
 -- | Check a page's PTX records for UDC characters.  If none is seen,
 -- simply output the page; otherwise pass the page to udcPageHandler
@@ -66,7 +79,7 @@ mcf1Handler r = do
 
 -- | Split PTX into "groups", each one begins with a SCFL chunk.
 ptxCheckUDC :: PTX -> VarsIO ()
-ptxCheckUDC r = forM_ groups ptxGroupCheckUDC
+ptxCheckUDC r = length groups `seq` forM_ groups ptxGroupCheckUDC
     where
     groups = splitRecords _PTX_SCFL chunks
     chunks = filter want (readChunks r)
@@ -76,10 +89,10 @@ ptxCheckUDC r = forM_ groups ptxGroupCheckUDC
 -- if yes, pass remaining TRN chunks to trnCheckUDC.
 ptxGroupCheckUDC :: [PTX_] -> VarsIO ()
 ptxGroupCheckUDC [] = return ()
-ptxGroupCheckUDC (scfl:trnList) = do
+ptxGroupCheckUDC (scfl:trnList) = seq (length trnList) $ do
     font    <- readArray _IdToFont =<< ptx_scfl `applyToChunk` scfl
     isDBCS  <- fontIsDBCS &: font
-    when (isDBCS) . liftIO $ do
+    when (isDBCS) . io $ do
         forM_ (map (ptx_trn `applyToChunk`) trnList)
             (>>= trnCheckUDC)
 
@@ -239,7 +252,7 @@ incrementOf x y = do
         rv <- readIncrements font hi
         if rv then liftM (maybe 0 id) redo else do
             udcRef <- asks _UDC
-            liftIO $ do
+            io $ do
                 -- Remove this from the list of UDCs to gen image for
                 putStrLn $ "Skipping unknown UDC: " ++ show char ++ ", font: " ++ show (drop 2 f)
                 modifyIORef udcRef (filter ((/= char) . udcChar))
@@ -264,7 +277,7 @@ cachedLibReader :: (MonadIO m, MonadReader Vars m, MonadPlus m, MonadError e m, 
                          -> a -> FontField -> NChar -> m a
 cachedLibReader cache filler fallback font char = do
     vars <- ask
-    let val = liftIO $ hashLookup (cache vars) key
+    let val = io $ hashLookup (cache vars) key
         fillCache = filler fontstr char key val
     val >>= maybe (fillCache `catchError` hdl) return
     where
@@ -316,7 +329,7 @@ cfiHandler char@(_, lo) cfi = do
     run 0x40 0   x = return _FontInfo
     run _    0   x = cfiHandler (0x00, 0x40) x
     run _    gcg x = do
-        liftIO $ putStrLn ("Replacing UDC: " ++ show char)
+        io $ putStrLn ("Replacing UDC: " ++ show char)
         fcsHandler gcg x
 
 fcsHandler :: A8 -> CFI_Data -> VarsIO FontInfo
@@ -352,7 +365,7 @@ fcsHandler gcg cfi = do
         }
 
 readLibRecord :: (Show t, Typeable t, Rec b) => t -> (a -> A8) -> a -> VarsIO b
-readLibRecord t f r = (t <~~) =<< readFontlibAFP &<< (fromFontField $ f r)
+readLibRecord !t !f !r = (t <~~) =<< readFontlibAFP &<< (fromFontField $ f r)
 
 -- | Data structures.
 data CharUDC = CharUDC
@@ -450,7 +463,7 @@ getOpts = do
             _           -> do
                 (afp:_) <- filterM doesFileExist $ map (++ "/" ++ name ++ suffix) paths
                 chunks  <- readAFP afp
-                hashInsert _ReaderCache key chunks
+                hashInsert _ReaderCache key (seq (length chunks) chunks)
                 return chunks
 
 {-# NOINLINE _ReaderCache #-}
@@ -465,11 +478,11 @@ l &: v = do
 infixl 4 &<<
 l &<< v = do
     vars <- ask
-    liftIO $ l (_Opts vars) v
+    io $ l (_Opts vars) v
 
 liftOpt l = do
     vars <- ask
-    liftIO $ l (_Opts vars)
+    io $ l (_Opts vars)
 
 defaultOpts = Opts
     { adjustY           = id
