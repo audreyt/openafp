@@ -41,12 +41,13 @@ afp_Chunks :: FilePath -> [AFP_]
 afp_Chunks filename = unsafePerformIO $ readAFP filename
 
 writeAFP :: (Binary a) => FilePath -> [a] -> IO ()
+writeAFP "-" c = do
+    hSetBinaryMode stdout True
+    openBinIO_ stdout >>= (`put` c)
 writeAFP filename c = do
     fh  <- openBinaryFile filename WriteMode
-    bh  <- openBinIO_ fh
-    put bh $ c
+    openBinIO_ fh >>= (`put` c)
     hClose fh
-    return ()
 
 filterAFP :: FilePath -> FilePath -> [(ChunkType, AFP_ -> IO [AFP_])] -> IO ()
 filterAFP input output filters = do
@@ -80,14 +81,16 @@ instance RecChunk FilePath AFP_ N3 Buffer2 where
 instance Rec Char
 
 readAFP :: (MonadIO m) => FilePath -> m [AFP_]
-readAFP filename = liftIO $ do
+readAFP "-" = io $ do
+    hSetBinaryMode stdin True
+    openBinIO_ stdin >>= get
+
+readAFP filename = io $ do
     fh  <- openBinaryFile filename ReadMode
-    bh  <- openBinIO_ fh
-    cs  <- get bh
-    return cs
+    openBinIO_ fh >>= get
 
 readArgs :: (MonadIO m) => Int -> m [String]
-readArgs n = liftIO $ do
+readArgs n = io $ do
     args <- getArgs
     when ((length args) < n) $ do
         pgm <- getProgName
