@@ -25,13 +25,13 @@ class (Show a, Typeable a) => Rec a where
     recGet :: BinHandle -> IO a
     recGet = error "recGet not defined"
     recPut :: BinHandle -> a -> IO ()
-    recPut = error "recPut not defined"
+    recPut _ x = error ("recPut not defined: " ++ show x)
     recSizeOf :: a -> Int
-    recSizeOf = error "recSizeOf not defined"
+    recSizeOf x = error ("recSizeOf not defined: " ++ show x)
     recView :: a -> IO ViewRecord
-    recView x = error ("recView not defined for " ++ show x)
+    recView x = error ("recView not defined: " ++ show x)
     recType :: a -> Int
-    recType = error "recType not defined"
+    recType x = error ("recType not defined: " ++ show x)
 
 -- (forall a. (Rec a) => (a -> m b))
 instance (Rec a) => Storable (Record a) where
@@ -47,6 +47,7 @@ func x y = 0
 
 instance (Rec a) => Rec (Record a) where
     recView (Record a) = recView a
+    recSizeOf (Record a) = recSizeOf a
 
 instance (Rec a) => Binary (Record a) where
     get bh = do
