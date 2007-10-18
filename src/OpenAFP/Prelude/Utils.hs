@@ -160,6 +160,15 @@ hex2bin 'D' = "@@.@"
 hex2bin 'E' = "@@@."
 hex2bin 'F' = "@@@@"
 
+toA8 :: String -> A8
+toA8 s = sum
+    [ n1 `shiftL` 56, n2 `shiftL` 48, n3 `shiftL` 40, n4 `shiftL` 32
+    , n5 `shiftL` 24, n6 `shiftL` 16, n7 `shiftL` 8 , n8
+    ]
+    where
+    [n1, n2, n3, n4, n5, n6, n7, n8] = map (fromIntegral . (asc2ebc !) . ord) padded
+    padded = take 8 (s ++ repeat ' ')
+
 fromA8 :: A8 -> String
 fromA8 w = [
     (ebc2asc ! fromIntegral (w `shiftR` 56)),
