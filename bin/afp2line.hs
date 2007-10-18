@@ -155,11 +155,15 @@ packAStr astr = do
 pack835 :: NStr -> IO B.ByteString
 pack835 nstr = do
     let (pstr, len) = bufToPStrLen nstr 
-    withForeignPtr (castForeignPtr pstr) $ \dbcstr -> do
+    withForeignPtr (castForeignPtr pstr) $ \cstr -> do
         forM_ [0..(len `div` 2)-1] $ \i -> do
-            elm <- peekElemOff dbcstr i
-            pokeElemOff dbcstr i (toEnum $ convert835to950 (fromEnum (elm :: Word16)))
-        B.packCStringLen (castPtr dbcstr, len)
+            hi  <- peekElemOff cstr (i*2)   :: IO Word8
+            lo  <- peekElemOff cstr (i*2+1) :: IO Word8
+            let cp950       = convert835to950 (fromEnum hi * 256 + fromEnum lo)
+                (hi', lo')  = cp950 `divMod` 256
+            pokeElemOff cstr (i*2)   (toEnum hi')
+            pokeElemOff cstr (i*2+1) (toEnum lo')
+        B.packCStringLen (castPtr cstr, len)
 
 ebc2ascWord :: UArray Word8 Word8
 ebc2ascWord = listArray (0x00, 0xff) [
