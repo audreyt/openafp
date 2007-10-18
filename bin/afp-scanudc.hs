@@ -22,7 +22,7 @@ main = do
     files   <- filterM doesFileExist =<< case args of
 	(_:_)	-> return args
 	[]	-> getDirectoryContents "."
-    seq (length files) . (`mapM_` files) $ \fn -> do
+    seq (length files) . (`mapM_` sort files) $ \fn -> do
         rv <- scanUDC fn
         when rv (putStrLn fn)
     -- doAllLists files
