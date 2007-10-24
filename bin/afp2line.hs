@@ -134,13 +134,13 @@ ptxGroupDump (scfl:cs) = do
                         modifyIORef _CurrentColumn (+ B.length bstr)
                 , _PTX_BLN ... \_ -> do
                     writeIORef _CurrentColumn 0
-                    modifyIORef _CurrentLine succ
+                    modifyIORef _CurrentLine (+1)
                 , _PTX_AMB ... \x -> do
                     minSize <- readIORef _MinFontSize
                     writeIORef _CurrentLine (fromEnum (ptx_amb x) `div` minSize)
                 , _PTX_AMI ... \x -> do
                     minSize <- readIORef _MinFontSize
-                    let offset  = fromEnum (ptx_ami x)
+                    let offset  = (fromEnum $ ptx_ami x)
                         pos'    = offset `div` minSize
                     writeIORef _CurrentColumn pos'
                 ]
@@ -151,13 +151,13 @@ packAStr astr = return $ B.map (ebc2ascWord !) (packBuf astr)
 pack835 :: NStr -> IO B.ByteString
 pack835 nstr = B.useAsCStringLen (packBuf nstr) $ \(cstr', len) -> do
     let cstr = castPtr cstr'
-    forM_ [0,2..len-1] $ \i -> do
-        hi  <- peekElemOff cstr i       :: IO Word8
-        lo  <- peekElemOff cstr (i+1)   :: IO Word8
-        let cp950       = convert835to950 (fromEnum hi * 0xFF + fromEnum lo)
-            (hi', lo')  = cp950 `divMod` 0xFF
-        pokeElemOff cstr i     (toEnum hi' :: Word8)
-        pokeElemOff cstr (i+1) (toEnum lo' :: Word8)
+    forM_ [0..(len `div` 2)-1] $ \i -> do
+        hi  <- peekElemOff cstr (i*2)       :: IO Word8
+        lo  <- peekElemOff cstr (i*2+1)     :: IO Word8
+        let cp950       = convert835to950 (fromEnum hi * 256 + fromEnum lo)
+            (hi', lo')  = cp950 `divMod` 256
+        pokeElemOff cstr (i*2)   (toEnum hi' :: Word8)
+        pokeElemOff cstr (i*2+1) (toEnum lo' :: Word8)
     B.packCStringLen (castPtr cstr, len)
 
 ebc2ascWord :: UArray Word8 Word8
