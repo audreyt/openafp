@@ -45,9 +45,12 @@ func x y = sizeOf y
 -}
 func x y = 0
 
-instance (Rec a) => Rec (Record a) where
-    recView (Record a) = recView a
+instance Rec a => Rec (Record a) where
+    recGet               = liftM Record recGet
+    recPut (Record a)    = recPut a
+    recView (Record a)   = recView a
     recSizeOf (Record a) = recSizeOf a
+    recType (Record a)   = recType a
 
 instance (Rec a) => Binary (Record a) where
     get = fmap Record recGet

@@ -179,5 +179,7 @@ data ChunkQueue a = ChunkQueue [a] | ChunkItem a deriving (Show)
 
 instance Monoid (ChunkQueue a) where
     mempty = ChunkQueue []
-    mappend (ChunkItem a) (ChunkQueue b) = ChunkQueue (a:b)
-    mappend (ChunkQueue a) (ChunkQueue b)     = ChunkQueue (a ++ b)
+    mappend (ChunkItem a)  (ChunkItem b)  = ChunkQueue [a, b]
+    mappend (ChunkItem a)  (ChunkQueue b) = ChunkQueue (a:b)
+    mappend (ChunkQueue a) (ChunkQueue b) = ChunkQueue (a ++ b)
+    mappend (ChunkQueue a) (ChunkItem b)  = ChunkQueue (a ++ [b])

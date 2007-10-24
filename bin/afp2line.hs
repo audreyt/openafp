@@ -78,7 +78,7 @@ mcfHandler :: MCF -> IO ()
 mcfHandler r = do
     readChunks r ..>
         [ _MCF_T ... \mcf -> do
-            let cs = readChunks mcf
+            let cs  = readChunks mcf
             ids   <- sequence [ t_rli `applyToChunk` c | c <- cs, c ~~ _T_RLI ]
             fonts <- sequence [ t_fqn `applyToChunk` c | c <- cs, c ~~ _T_FQN ]
             insertFonts (ids `zip` map fromAStr fonts)

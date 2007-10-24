@@ -46,7 +46,7 @@ trnHandler trn = do
     scanTrn 0 0 Nil
     io $ touchForeignPtr pstr'
     where
-    bs@(PS pstr off len) = bufToPStrLen $ ptx_trn trn
+    bs@(PS pstr off len) = packBuf $ ptx_trn trn
     isDBCS 0x40 = Nil
     isDBCS ch   = if (ch >= 0x41 && ch <= 0x7F) then DBCS else SBCS
 
@@ -102,7 +102,7 @@ trnHandler trn = do
         where
         emit = {-# SCC "emit" #-} do
             scfl    <- io $ readIORef currentFont
-            let curTRN = trn{ ptx_trn = bufFromPStrLen (S.take (i-prev) (S.drop prev bs)) }
+            let curTRN = trn{ ptx_trn = mkBuf (S.take (i-prev) (S.drop prev bs)) }
             case mode of
                 SBCS    -> do
                     push scfl
