@@ -151,7 +151,7 @@ _T_FHSF = T_FHSF 0x5D _NStr
 _T_FO :: T_FO
 _T_FO = T_FO 0x85 _NStr
 _T_FQN :: T_FQN
-_T_FQN = T_FQN 0x02 0 0 0
+_T_FQN = T_FQN 0x02 0 0 _NStr
 _T_FRMT :: T_FRMT
 _T_FRMT = T_FRMT 0x84 _NStr
 _T_II :: T_II

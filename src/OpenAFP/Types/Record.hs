@@ -18,14 +18,14 @@ module OpenAFP.Types.Record where
 import OpenAFP.Internals
 import OpenAFP.Types.View
 
-newtype Record a = Record a
+newtype Record a = Record { fromRecord :: a }
     deriving (Show, Eq, Typeable)
 
 class (Show a, Typeable a) => Rec a where
-    recGet :: BinHandle -> IO a
+    recGet :: Get a
     recGet = error "recGet not defined"
-    recPut :: BinHandle -> a -> IO ()
-    recPut _ x = error ("recPut not defined: " ++ show x)
+    recPut :: a -> Put
+    recPut x = error ("recPut not defined: " ++ show x)
     recSizeOf :: a -> Int
     recSizeOf x = error ("recSizeOf not defined: " ++ show x)
     recView :: a -> IO ViewRecord
@@ -50,21 +50,14 @@ instance (Rec a) => Rec (Record a) where
     recSizeOf (Record a) = recSizeOf a
 
 instance (Rec a) => Binary (Record a) where
-    get bh = do
-        b <- recGet bh
-        return $ Record b
-    put bh (Record a) = do
-        recPut bh a
-        return ()
+    get = fmap Record recGet
+    put (Record a) = recPut a
 
 instance (Binary a, Rec a, Show a, Typeable a) => Rec [a] where
     recSizeOf list = sum $ map recSizeOf list
-    recGet bh = get bh
-    recPut bh list = do
-        mapM_ (put bh) list
+    recGet = getList
+    recPut = mapM_ put
 
 instance Rec N1 where
     recSizeOf _ = 1
-
-fromRecord (Record a) = a
 

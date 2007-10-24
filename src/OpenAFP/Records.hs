@@ -33,33 +33,33 @@ import OpenAFP.Records.PTX
 import OpenAFP.Records.MCF
 import OpenAFP.Records.T
 
+import Data.Binary.Get
+import qualified Data.ByteString.Lazy as L
+
 ---[ Unknown ]--------------------------------------------------
 
 newtype Unknown = Unknown NStr
     deriving (Show, Typeable)
 
 instance Rec Unknown where
-    recGet bh = get bh >>= return . Unknown
-    recPut bh (Unknown r) = put bh r
+    recGet = fmap Unknown get
+    recPut (Unknown r) = put r
     recSizeOf (Unknown r) = sizeOf r
     recView (Unknown r) = viewRecord (typeOf _Unknown) [ viewField "" (viewNStr r) ]
 
 instance Binary Unknown where
-    get bh = return $ Unknown $ bufFromPStrLen (bufOf bh)
-    put bh (Unknown buf) = putBuf bh $ bufToPStrLen buf
+    get = fmap Unknown get
+    put (Unknown buf) = put buf
 
 _Unknown = Unknown _NStr
 
 ---[ AFP ]-----------------------------------------------------
 
-newtype AFP_ = AFP_ (N3, Buffer2) deriving (Show, Typeable)
+data AFP_ = AFP_ !N3 !Buffer2 deriving (Show, Typeable)
 
 instance Binary AFP_ where
-    put bh (AFP_ (_, buf)) = do
-        put bh ('\x5A', buf)
-    get bh = do
-        getByte bh
-	get' AFP_ bh
+    put (AFP_ _ buf) = putWord8 0x5A >> put buf
+    get = skip 1 >> get' AFP_
 
 lookupMCF :: MCF_ -> N0 -> ChunkType
 lookupMCF _ _ = chunkTypeOf _MCF_T    -- MCF Triplets
@@ -301,29 +301,23 @@ lookupPTX _ x = case x of
     _    -> chunkTypeOf _Unknown
 
 -- XXX -- refactor it back to class
-get' :: (Binary t, Buf b, Binary b) => ((t, b) -> c) -> BinHandle -> IO c
-get' constr bh = do
-    buf     <- get bh
-    buftype <- getBufType buf
-    let chunk = constr (buftype, buf)
-    let (pstr, len) = bufToPStrLen buf
-    addFinalizer chunk $ touchForeignPtr pstr
-    return chunk
-
-getBufType buf = do
-    bh <- openBinBuf $ bufToPStrLen buf
-    get bh
+get' :: (Binary t, Buf b, Binary b) => (t -> b -> c) -> Get c
+get' constr = do
+    buf <- get
+    let ty = decode $ L.fromChunks [packBuf buf]
+    return $ constr ty buf
+    -- addFinalizer chunk $ touchForeignPtr pstr
 
 instance Binary PTX_ where
-    put bh (PTX_ (_, buf)) = put bh buf
+    put (PTX_ _ buf) = put buf
     get = get' PTX_
 
 instance Binary MCF_ where
-    put bh (MCF_ (_, buf)) = put bh buf
-    get bh = do
-        buf     <- get bh
-        return $ MCF_ (N0 (), buf)
+    put (MCF_ _ buf) = put buf
+    get = do
+        buf     <- get
+        return $ MCF_ N0 buf
 
 instance Binary T_ where
-    put bh (T_ (_, buf)) = put bh buf
+    put (T_ _ buf) = put buf
     get = get' T_

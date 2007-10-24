@@ -25,7 +25,7 @@ module OpenAFP (
     module OpenAFP.Prelude.Instances,
     module OpenAFP.Internals.UConv,
 
-    readAFP, writeAFP, filterAFP,
+    readAFP, writeAFP, -- filterAFP,
     readArgs, afp_Chunks,
 ) where
 import OpenAFP.Types
@@ -36,6 +36,7 @@ import OpenAFP.Prelude.Utils
 import OpenAFP.Prelude.Lookups
 import OpenAFP.Prelude.Instances
 import OpenAFP.Prelude.Exts
+import qualified Data.ByteString.Lazy as L
 
 afp_Chunks :: FilePath -> [AFP_]
 afp_Chunks filename = unsafePerformIO $ readAFP filename
@@ -43,12 +44,10 @@ afp_Chunks filename = unsafePerformIO $ readAFP filename
 writeAFP :: (Binary a) => FilePath -> [a] -> IO ()
 writeAFP "-" c = do
     hSetBinaryMode stdout True
-    openBinIO_ stdout >>= (`put` c)
-writeAFP filename c = do
-    fh  <- openBinaryFile filename WriteMode
-    openBinIO_ fh >>= (`put` c)
-    hClose fh
+    L.hPut stdout (encodeList c)
+writeAFP filename c = encodeListFile filename c
 
+{-
 filterAFP :: FilePath -> FilePath -> [(ChunkType, AFP_ -> IO [AFP_])] -> IO ()
 filterAFP input output filters = do
     ifh  <- openBinaryFile input ReadMode
@@ -75,6 +74,7 @@ filterChunk c possibleFilters bh
     where
 	filters = filter (\(t, _) -> (t == chunkType c)) possibleFilters
 
+-}
 instance RecChunk FilePath AFP_ N3 Buffer2 where
     readChunks = afp_Chunks
 
@@ -83,11 +83,8 @@ instance Rec Char
 readAFP :: (MonadIO m) => FilePath -> m [AFP_]
 readAFP "-" = io $ do
     hSetBinaryMode stdin True
-    openBinIO_ stdin >>= get
-
-readAFP filename = io $ do
-    fh  <- openBinaryFile filename ReadMode
-    openBinIO_ fh >>= get
+    fmap decodeList (L.hGetContents stdin)
+readAFP filename = io $ decodeListFile filename
 
 readArgs :: (MonadIO m) => Int -> m [String]
 readArgs n = io $ do

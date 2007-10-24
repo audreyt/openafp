@@ -4,7 +4,7 @@ module OpenAFP.Records.AFP.PTX where
 import OpenAFP.Types
 import OpenAFP.Internals
 
-newtype PTX_ = PTX_ (N1, Buffer1) deriving (Show, Typeable)
+data PTX_ = PTX_ !N1 !Buffer1 deriving (Show, Typeable)
 
 data PTX = PTX {
     ptx_Type                         :: !N3

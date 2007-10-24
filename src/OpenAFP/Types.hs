@@ -1,4 +1,4 @@
-{-# OPTIONS -fglasgow-exts #-}
+{-# OPTIONS -fglasgow-exts -funbox-strict-fields #-}
 
 -----------------------------------------------------------------------------
 -- |
@@ -21,15 +21,16 @@ module OpenAFP.Types (
     module OpenAFP.Types.Record,
     module OpenAFP.Types.View,
     T_(..), viewChunks, viewData, viewNumber,
-    viewString, viewNStr, viewField, viewRecord
+    viewString, viewNStr, viewAStr, viewField, viewRecord
 ) where
 import OpenAFP.Types.Buffer
 import OpenAFP.Types.Chunk
 import OpenAFP.Types.Record
 import OpenAFP.Types.View
 import OpenAFP.Internals
+import qualified Data.ByteString as S
 
-newtype T_ = T_ (N1, Buffer1) deriving (Show, Typeable)
+data T_ = T_ !N1 !Buffer1 deriving (Show, Typeable)
 
 viewChunks cs = do
     rs <- mapM viewChunk cs
@@ -37,7 +38,7 @@ viewChunks cs = do
 
 viewChunk c = withChunk c recView
 
-withChunk :: (ChunkBuf a n b, MonadIO m) => a -> (forall r. (Rec r) => r -> m x) -> m x
+withChunk :: (ChunkBuf a n b) => a -> (forall r. (Rec r) => r -> x) -> x
 withChunk c = chunkApply (fst . chunkDecon $ c) c
 
 viewData ds = do
@@ -49,11 +50,9 @@ viewNumber n = return $ ViewNumber (typeOf n, fromEnum n)
 viewString a = return $ ViewString (typeOf a, reverse [ toAsc n | n <- [ 0..((sizeOf a)-1) ] ])
     where toAsc n = ebc2asc ! fromIntegral ((a `shiftR` (8 * n)) .&. 0xFF)
 
-viewNStr nstr = do
-    let (pstr, len) = bufToPStrLen nstr
-    withForeignPtr (castForeignPtr pstr) $ \cstr -> do
-        ns <- peekArray (min len 80) cstr
-        return $ ViewNStr (typeOf nstr, ns)
+viewNStr nstr = return $ ViewNStr (typeOf nstr, map N1 (S.unpack (S.take 80 $ packBuf nstr)))
+
+viewAStr nstr = return $ ViewString (typeOf nstr, map ((ebc2asc !) . N1) (S.unpack (S.take 80 $ packBuf nstr)))
 
 viewField l io = do
     content <- io

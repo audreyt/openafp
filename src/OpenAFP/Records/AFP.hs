@@ -512,5 +512,5 @@ _PTD1 = PTD1 0xD3A69B 0 _NStr
 _PTX  :: PTX
 _PTX  = PTX  0xD3EE9B 0 0 []
 _TLE  :: TLE
-_TLE  = TLE  0xD3A090 0 [] 0 0 0 0 0 0 _NStr
+_TLE  = TLE  0xD3A090 0 []
 

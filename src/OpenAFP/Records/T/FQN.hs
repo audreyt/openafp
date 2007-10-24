@@ -7,6 +7,6 @@ data T_FQN = T_FQN {
     t_fqn_Type                       :: !N1
     ,t_fqn_SubType                   :: !N1
     ,t_fqn_Format                    :: !N1
-    ,t_fqn                           :: !A8
+    ,t_fqn                           :: !AStr
 } deriving (Show, Typeable)
 

@@ -84,7 +84,7 @@ exposed-modules:    OpenAFP.Internals.Binary OpenAFP.Internals.Ebc2Asc
 category:           Data
 includes:           unicode/ucnv.h
 extensions:         CPP, ForeignFunctionInterface
-build-depends:      base, mtl, haskell98, regex-compat, directory, process
+build-depends:      base, mtl, haskell98, regex-compat, directory, process, array, containers, binary, bytestring
 include-dirs:       /usr/include /usr/local/include /opt/local/include
 extra-lib-dirs:     /usr/lib /usr/local/lib /opt/local/lib
 ld-options:         -licuuc

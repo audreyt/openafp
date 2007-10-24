@@ -81,7 +81,7 @@ mcfHandler r = do
             let cs = readChunks mcf
             ids   <- sequence [ t_rli `applyToChunk` c | c <- cs, c ~~ _T_RLI ]
             fonts <- sequence [ t_fqn `applyToChunk` c | c <- cs, c ~~ _T_FQN ]
-            insertFonts (ids `zip` map fromA8 fonts)
+            insertFonts (ids `zip` map fromAStr fonts)
         ]
 
 
@@ -146,23 +146,19 @@ ptxGroupDump (scfl:cs) = do
                 ]
 
 packAStr :: AStr -> IO B.ByteString
-packAStr astr = do
-    let (pstr, len) = bufToPStrLen astr 
-    withForeignPtr (castForeignPtr pstr) $ \cstr -> do
-        fmap (B.map (ebc2ascWord !)) (B.packCStringLen (cstr, len))
+packAStr astr = return $ B.map (ebc2ascWord !) (packBuf astr)
 
 pack835 :: NStr -> IO B.ByteString
-pack835 nstr = do
-    let (pstr, len) = bufToPStrLen nstr 
-    withForeignPtr (castForeignPtr pstr) $ \cstr -> do
-        forM_ [0..(len `div` 2)-1] $ \i -> do
-            hi  <- peekElemOff cstr (i*2)   :: IO Word8
-            lo  <- peekElemOff cstr (i*2+1) :: IO Word8
-            let cp950       = convert835to950 (fromEnum hi * 256 + fromEnum lo)
-                (hi', lo')  = cp950 `divMod` 256
-            pokeElemOff cstr (i*2)   (toEnum hi')
-            pokeElemOff cstr (i*2+1) (toEnum lo')
-        B.packCStringLen (castPtr cstr, len)
+pack835 nstr = B.useAsCStringLen (packBuf nstr) $ \(cstr', len) -> do
+    let cstr = castPtr cstr'
+    forM_ [0..(len `div` 2)-1] $ \i -> do
+        hi  <- peekElemOff cstr (i*2)       :: IO Word8
+        lo  <- peekElemOff cstr (i*2+1)     :: IO Word8
+        let cp950       = convert835to950 (fromEnum hi * 256 + fromEnum lo)
+            (hi', lo')  = cp950 `divMod` 256
+        pokeElemOff cstr (i*2)   (toEnum hi' :: Word8)
+        pokeElemOff cstr (i*2+1) (toEnum lo' :: Word8)
+    B.packCStringLen (castPtr cstr, len)
 
 ebc2ascWord :: UArray Word8 Word8
 ebc2ascWord = listArray (0x00, 0xff) [

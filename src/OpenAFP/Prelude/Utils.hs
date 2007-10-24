@@ -18,6 +18,8 @@ module OpenAFP.Prelude.Utils where
 import OpenAFP.Types
 import OpenAFP.Records
 import OpenAFP.Internals
+import qualified Data.ByteString as S
+import qualified Data.ByteString.Lazy as L
 
 infixl 5 $$
 infixl 5 $=
@@ -68,10 +70,10 @@ l %%= kvList = do
     vars    <- ask
     liftIO $ mapM_ (\(k, v) -> writeIOArray (l vars) k v) kvList
 
-applyToChunk :: (Rec a, ChunkBuf c n b) => (a -> x) -> c -> IOm x
-applyToChunk f c = return . f . fromRecord =<< (liftIO . chunkToRecord) c
+applyToChunk :: (Monad m, Rec a, ChunkBuf c n b) => (a -> x) -> c -> m x
+applyToChunk f = return . f . decodeChunk
 
-withChunk :: (ChunkBuf a n b, MonadIO m) => a -> (forall r. (Rec r) => r -> m x) -> m x
+withChunk :: (ChunkBuf a n b) => a -> (forall r. (Rec r) => r -> x) -> x
 withChunk c = chunkApply (fst . chunkDecon $ c) c
 
 splitRecords :: (ChunkBuf c n b, Typeable t) => t -> [c] -> [[c]]
@@ -95,47 +97,24 @@ matchRecordMaybe n f = findRecordMaybe ((n ==) . f) . readData
 findRecordMaybe :: (a -> Bool) -> [Record a] -> Maybe a
 findRecordMaybe f = maybe Nothing (Just . fromRecord) . find (f . fromRecord)
 
-fromA :: (Binary a, Storable a) => a -> IOm String
-fromA item = liftIO $ do
-    bh  <- newBinBuf (sizeOf item)
-    put bh item
-    seekBin bh 0
-    return . trim =<< fromAStr =<< get bh
+fromA :: (Binary a, Storable a) => a -> String
+fromA = trim . fromAStr . mkBuf . S.concat . L.toChunks . encode
 
 trim :: String -> String
 trim = takeWhile $ not . isSpace
 
-catBuf :: (Buf a) => a -> a -> IOm a
-catBuf b1 b2 = liftIO $ do
-    pstr    <- mallocForeignPtrBytes len
-    withForeignPtr pstr $ \cstr -> do
-        when (l1 > 0) $
-            withForeignPtr p1 $ \c1 -> copyBytes cstr c1 l1
-        when (l2 > 0) $
-            withForeignPtr p2 $ \c2 -> copyBytes (plusPtr cstr l1) c2 l2
-    return $ bufFromPStrLen (pstr, len)
-    where
-    len      = l1 + l2
-    (p1, l1) = bufToPStrLen b1
-    (p2, l2) = bufToPStrLen b2
+catBuf :: Buf a => a -> a -> a
+catBuf b1 b2 = mkBuf (packBuf b1 `S.append` packBuf b2)
 
-subBuf :: (Buf a, Integral b, Integral c) => a -> b -> c -> IOm a
-subBuf buf pos len = liftIO $ do
-    withForeignPtr pstr $ \cstr -> do
-        pstr' <- newForeignPtr_ (plusPtr cstr $ fromEnum pos)
-        addFinalizer pstr' $ touchForeignPtr pstr -- ???
-        return $ bufFromPStrLen (pstr', fromEnum len)
-    where
-    (pstr, _) = bufToPStrLen buf -- XXX - check size bounds?
+subBuf :: (Buf a, Integral b, Integral c) => a -> b -> c -> a
+subBuf buf pos len = mkBuf (S.take (fromIntegral len) (S.drop (fromIntegral pos) (packBuf buf)))
 
-subBufs :: (Buf a, Integral b, Integral c) => [a] -> b -> c -> IOm a
-subBufs (b:bs) pos len = do
-    if (pos <= len') then
-        subBuf b pos len
-        else
-        subBufs bs (pos - len') len
+subBufs :: (Buf a, Integral b, Integral c) => [a] -> b -> c -> a
+subBufs (b:bs) pos len
+    | pos <= len' = subBuf b pos len
+    | otherwise   = subBufs bs (pos - len') len
     where
-    len' = toEnum $ snd $ bufToPStrLen b -- XXX - check size bounds?
+    len' = fromIntegral . S.length $ packBuf b
 
 showBitmap :: (Integral i, Show a) => [a] -> i -> IOm ()
 showBitmap [] _ = return ()

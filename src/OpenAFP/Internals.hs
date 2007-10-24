@@ -18,7 +18,7 @@
 module OpenAFP.Internals (
     module X,
 
-    IOm, StateIO,
+    IOm, StateIO, BS,
 
     hashNew, hashLookup, hashInsert, hashDelete,
     stateGet, statePut
@@ -67,11 +67,16 @@ import GHC.IOBase                as X (IOArray, newIOArray, readIOArray, writeIO
 import qualified Control.Monad.RWS (get, put)
 import qualified Control.Monad.State (MonadState)
 import qualified Data.HashTable (lookup, insert, delete, new)
+import qualified Data.ByteString as S
+import qualified Data.ByteString.Lazy as L
 
 hashNew     = Data.HashTable.new
 hashLookup  = Data.HashTable.lookup
 hashInsert  = Data.HashTable.insert
 hashDelete  = Data.HashTable.delete
+
+type BS = S.ByteString
+type BL = L.ByteString
 
 stateGet :: (Control.Monad.State.MonadState s m) => m s
 stateGet = Control.Monad.RWS.get

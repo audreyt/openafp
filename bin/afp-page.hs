@@ -2,7 +2,7 @@
 
 module Main where
 import OpenAFP
-import Data.ByteString as B (findIndex)
+import Data.ByteString as S (findIndex, take, drop)
 import Data.ByteString.Internal (fromForeignPtr)
 import System.Exit
 
@@ -14,8 +14,6 @@ main = do
     let outputFile = case args of
             (_:fn:_)    -> fn
             _           -> "output.afp"
-    fh  <- openBinaryFile outputFile WriteMode
-    bh  <- openBinIO_ fh
     cs' <- cs !==>!
         [ _MCF === (`filterChunks`
             [ _MCF_T === (`filterChunks`
@@ -29,8 +27,7 @@ main = do
             , _PTX_SCFL ... io . writeIORef currentFont
             ])
         ]
-    put bh cs'
-    hClose fh
+    writeAFP outputFile cs'
 
 cs !==>! list = iter cs
     where
@@ -49,8 +46,7 @@ trnHandler trn = do
     scanTrn 0 0 Nil
     io $ touchForeignPtr pstr'
     where
-    (pstr, len) = bufToPStrLen $ ptx_trn trn
-    bs          = fromForeignPtr pstr' 0 len
+    bs@(PS pstr off len) = bufToPStrLen $ ptx_trn trn
     isDBCS 0x40 = Nil
     isDBCS ch   = if (ch >= 0x41 && ch <= 0x7F) then DBCS else SBCS
 
@@ -69,7 +65,7 @@ trnHandler trn = do
     isPunctuation _    = False
 
     pstr'       = castForeignPtr pstr
-    cstr        = unsafeForeignPtrToPtr pstr'
+    cstr        = unsafeForeignPtrToPtr pstr' `plusPtr` off
     scanTrn i prev mode = {-# SCC "scanTrn" #-} do
         if i == len
             then case mode of
@@ -105,14 +101,13 @@ trnHandler trn = do
                     _       -> emit >> scanTrn (i+1) i SBCS
         where
         emit = {-# SCC "emit" #-} do
-            fptr    <- io $ newForeignPtr_ (cstr `plusPtr` prev)
             scfl    <- io $ readIORef currentFont
-            let curTRN = trn{ ptx_trn = bufFromPStrLen (fptr, i - prev) }
+            let curTRN = trn{ ptx_trn = bufFromPStrLen (S.take (i-prev) (S.drop prev bs)) }
             case mode of
                 SBCS    -> do
                     push scfl
                     push curTRN
-                DBCS | prev > 0 || i /= len || isJust (B.findIndex (not . isPunctuation) bs) -> do
+                DBCS | prev > 0 || i /= len || isJust (S.findIndex (not . isPunctuation) bs) -> do
                     c <- io $ readIORef cnt  
                     push scfl{ ptx_scfl = if c >= 35 then 36 else 1 }
                     push curTRN
@@ -138,8 +133,8 @@ cnt = unsafePerformIO (newIORef 0)
 fqnHandler fqn = do
     c <- io $ readIORef cnt  
     let fqn' = case c of
-            0  -> fqn{ t_fqn = toA8 "T0XXXX" }
-            35 -> fqn{ t_fqn = toA8 "T0XXXX" }
+            0  -> fqn{ t_fqn = toAStr "T0XXXX" }
+            35 -> fqn{ t_fqn = toAStr "T0XXXX" }
             _  -> fqn
     push fqn'
     return ()
