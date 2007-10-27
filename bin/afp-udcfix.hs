@@ -1,12 +1,14 @@
-{-# OPTIONS -O -fglasgow-exts -funbox-strict-fields -fbang-patterns #-}
+{-# OPTIONS -O -fglasgow-exts -funbox-strict-fields #-}
 
 module Main where
 import OpenAFP
 import qualified Data.Map as Map
+import qualified Data.ByteString as B
+import qualified Data.ByteString.Unsafe as B
+import qualified Data.ByteString.Lazy as L
 
 -- | Flags.
 type VarsIO a = StateIO Vars a
-type WriterVarsIO a = WriterStateIO Vars a
 
 -- | Global configuration parameters.
 dbcsSpace, dbcsFirst :: NChar
@@ -25,28 +27,14 @@ stateMain :: ReaderT Vars IO ()
 stateMain = do
     chunks  <- liftOpt readInputAFP
     fh      <- liftOpt openOutputAFP
-    bh      <- io $ openBinIO_ fh
-    forM_ (splitRecords _PGD chunks)
-          ((io . put bh =<<) . pageHandler)
+    forM_ (splitRecords _PGD chunks) $ \cs -> do
+        cs' <- pageHandler cs
+        io $ L.hPutStr fh (encodeList cs')
     io $ hClose fh
-
-{-
-mcfType, mcf1Type, ptxType :: ChunkType
-mcfType     = chunkTypeOf _MCF
-mcf1Type    = chunkTypeOf _MCF1
-ptxType     = chunkTypeOf _PTX
-
-    (`mapM_` page) $ \c -> case chunkType c of
-        t   | t == mcfType  -> mcfHandler  . fromRecord =<< io (chunkToRecord c)
-            | t == mcf1Type -> mcf1Handler . fromRecord =<< io (chunkToRecord c)
-            | t == ptxType  -> ptxCheckUDC . fromRecord =<< io (chunkToRecord c)
-            | otherwise     -> return ()
--}
 
 -- | Check a page's PTX records for UDC characters.  If none is seen,
 -- simply output the page; otherwise pass the page to udcPageHandler
 -- and output the result.
-pageHandler :: [AFP_] -> VarsIO [AFP_]
 pageHandler page = (`catchError` hdl) $ do
     page ..>
         [ _MCF  ... mcfHandler
@@ -59,18 +47,16 @@ pageHandler page = (`catchError` hdl) $ do
             | otherwise = throwError err
 
 -- | Record font Id to Name mappings in MCF's RLI and FQN chunks.
-mcfHandler :: MCF -> VarsIO ()
 mcfHandler r = do
     readChunks r ..>
         [ _MCF_T ... \mcf -> do
             let cs = readChunks mcf
             ids   <- sequence [ t_rli `applyToChunk` c | c <- cs, c ~~ _T_RLI ]
             fonts <- sequence [ t_fqn `applyToChunk` c | c <- cs, c ~~ _T_FQN ]
-            _IdToFont %%= ids `zip` map fromA8 fonts
+            _IdToFont %%= (ids `zip` map fromAStr fonts)
         ]
 
 -- | Record font Id to Name mappings in MCF1's Data chunks.
-mcf1Handler :: MCF1 -> VarsIO ()
 mcf1Handler r = do
     _IdToFont %%=
         [ (mcf1_CodedFontLocalId mcf1, fromA8 $ mcf1_CodedFontName mcf1)
@@ -78,7 +64,6 @@ mcf1Handler r = do
         ]
 
 -- | Split PTX into "groups", each one begins with a SCFL chunk.
-ptxCheckUDC :: PTX -> VarsIO ()
 ptxCheckUDC r = length groups `seq` forM_ groups ptxGroupCheckUDC
     where
     groups = splitRecords _PTX_SCFL chunks
@@ -87,7 +72,6 @@ ptxCheckUDC r = length groups `seq` forM_ groups ptxGroupCheckUDC
 
 -- | Check a PTX to see if the leading SCFL indicates a DBCS font;
 -- if yes, pass remaining TRN chunks to trnCheckUDC.
-ptxGroupCheckUDC :: [PTX_] -> VarsIO ()
 ptxGroupCheckUDC [] = return ()
 ptxGroupCheckUDC (scfl:trnList) = seq (length trnList) $ do
     font    <- readArray _IdToFont =<< ptx_scfl `applyToChunk` scfl
@@ -99,18 +83,13 @@ ptxGroupCheckUDC (scfl:trnList) = seq (length trnList) $ do
 -- | Look inside TRN buffers for UDC characters.  If we find one,
 -- raise an IO exception so the page handler can switch to UDC mode.
 trnCheckUDC :: NStr -> IO ()
-trnCheckUDC nstr = do
-    withForeignPtr (castForeignPtr pstr) $ \cstr -> do
-        forM_ offsets $ \off -> do
-            hi <- peekByteOff cstr off
-            when (isUDC hi) $ do
-                throwError (strMsg "Found UDC")
-    where
-    (pstr, len) = bufToPStrLen nstr
-    offsets = [0, 2..len-1]
+trnCheckUDC nstr = B.unsafeUseAsCStringLen (packBuf nstr) $ \(cstr, len) -> do
+    forM_ [0, 2..len-1] $ \off -> do
+        hi <- peekByteOff cstr off
+        when (isUDC hi) $ do
+            throwError (strMsg "Found UDC")
 
 -- | The main handler for pages with UDC characters.
-udcPageHandler :: [AFP_] -> VarsIO [AFP_]
 udcPageHandler page = do
     (_X     $= id) 0
     (_Y     $= id) 0
@@ -142,18 +121,16 @@ udcPageHandler page = do
         , _EPG  === endPageHandler
         ]
 
-trnHandler :: PTX_TRN -> WriterVarsIO ()
 trnHandler r = do
     font    <- currentFont
-    trn     <- fromNStr $ ptx_trn r
+    let trn = fromNStr $ ptx_trn r
     isDBCS  <- fontIsDBCS &: font
     case isDBCS of
         True -> do
             -- If font is double byte, transform the TRN with dbcsHandler.
-            vars <- ask
-            db      <- trnToSegments (_Opts vars) font trn -- XXX
-            nstr    <- toNStr db
-            push r { ptx_trn = nstr }
+            vars    <- ask
+            db      <- dbcsHandler font trn -- XXX
+            push r { ptx_trn = toNStr db }
         False -> do
             -- If font is single byte, simply add each byte's increments.
             -- without parsing UDC.
@@ -174,7 +151,6 @@ dbcsHandler font (hi:lo:xs) = do
     rest                    <- dbcsHandler font xs
     return (hi':lo':rest)
 
-dbcsCharHandler :: FontField -> NChar -> VarsIO (NChar, NChar)
 dbcsCharHandler font char@(hi, _)
     | isUDC hi = do
         x <- readVar _X
@@ -189,7 +165,6 @@ dbcsCharHandler font char@(hi, _)
     | otherwise = return (dbcsFirst, char)
     -- isNotDBCS hi = return (char, char)
 
-endPageHandler :: (Rec r) => r -> WriterVarsIO ()
 endPageHandler r = do
     udcList <- readVar _UDC
     unless (null udcList) $ do
@@ -208,7 +183,6 @@ endPageHandler r = do
             push _EII
     push r
 
-udcCharHandler :: N2 -> N2 -> CharUDC -> WriterVarsIO ()
 udcCharHandler xp yo char = do
     infoMaybe <- fontInfoOf (udcFont char) (udcChar char)
     case infoMaybe of
@@ -241,10 +215,8 @@ udcCharHandler xp yo char = do
         | (yo == 0x5a00)    = (xp - y, x)
         | otherwise         = (x, y)
 
-currentFont :: VarsIO FontField
 currentFont = readArray _IdToFont =<< readVar _FontId
 
-incrementOf :: FontField -> NChar -> VarsIO N2
 incrementOf x y = do
     cachedLibReader _IncrCache fillInc 0 x y
     where
@@ -258,7 +230,6 @@ incrementOf x y = do
                 modifyIORef udcRef (filter ((/= char) . udcChar))
             return 0
 
-fontInfoOf :: FontField -> NChar -> VarsIO (Maybe FontInfo)
 fontInfoOf x y = do
     cachedLibReader _InfoCache fillInfo (Just _FontInfo) x y
     where
@@ -296,7 +267,6 @@ cachedLibReader cache filler fallback font char = do
         return fallback
             | otherwise = throwError err
 
-readIncrements :: String -> N1 -> VarsIO Bool
 readIncrements font hi = do
     cfi <- (_CFI <~~) =<< readFontlibAFP &<< font
     case hi `matchRecordMaybe` cfi_Section $ cfi of
@@ -312,14 +282,12 @@ readIncrements font hi = do
      where
      key r = cacheKey font (hi, cpi_CodePoint r)
 
-readFontInfo :: String -> NChar -> VarsIO (Maybe FontInfo)
 readFontInfo font char@(hi, _) = do
     cfi <- (_CFI <~~) =<< readFontlibAFP &<< font
     case (hi `matchRecordMaybe` cfi_Section) cfi of
         Nothing     -> return Nothing
         Just cfi'   -> liftM Just (cfiHandler char cfi')
 
-cfiHandler :: NChar -> CFI_Data -> VarsIO FontInfo
 cfiHandler char@(_, lo) cfi = do
     cpi_    <- _CPI `readLibRecord` cfi_CodePageName $ cfi
     case lo `matchRecordMaybe` cpi_CodePoint $ cpi_ of
@@ -332,7 +300,6 @@ cfiHandler char@(_, lo) cfi = do
         io $ putStrLn ("Replacing UDC: " ++ show char)
         fcsHandler gcg x
 
-fcsHandler :: A8 -> CFI_Data -> VarsIO FontInfo
 fcsHandler gcg cfi = do
     fcs  <- readFontlibAFP &<< (fromFontField $ cfi_FontCharacterSetName cfi)
     fni_ <- _FNI <~~ fcs
@@ -343,11 +310,11 @@ fcsHandler gcg cfi = do
         (w, h)  = (1 + fnm_Width fnm, 1 + fnm_Height fnm)
         bytes   = ((w + 7) `div` 8) * h
     fngs    <- sequence [ fng `applyToChunk` n | n <- fcs, n ~~ _FNG ]
-    bitmap  <- subBufs fngs (fnm_Offset fnm) bytes
+    let bitmap  = subBufs fngs (fnm_Offset fnm) bytes
 
     vars    <- ask
     when (verbose (_Opts vars)) $ do
-        nstr <- fromNStr bitmap
+        let nstr = fromNStr bitmap
         showBitmap nstr (bytes `div` h)
 
     return FontInfo
@@ -364,8 +331,7 @@ fcsHandler gcg cfi = do
         , fontResolution  = fnc_UnitXValue fnc
         }
 
-readLibRecord :: (Show t, Typeable t, Rec b) => t -> (a -> A8) -> a -> VarsIO b
-readLibRecord !t !f !r = (t <~~) =<< readFontlibAFP &<< (fromFontField $ f r)
+readLibRecord t f r = t `seq` f `seq` r `seq` ((t <~~) =<< readFontlibAFP &<< (fromFontField $ f r))
 
 -- | Data structures.
 data CharUDC = CharUDC
@@ -484,17 +450,18 @@ liftOpt l = do
     vars <- ask
     io $ l (_Opts vars)
 
+
 defaultOpts = Opts
     { adjustY           = id
-    , fontIsDBCS        = requiredOpt usage "dbcs-pattern"
+    , fontIsDBCS        = const $ requiredOpt usage "dbcs-pattern"
     , dbcsPattern       = Nothing
-    , readInputAFP      = requiredOpt usage "input"
-    , openOutputAFP     = requiredOpt usage "output"
-    , readFontlibAFP    = error "fontlib" -- calculated with the two fields below
+    , readInputAFP      = fail $ requiredOpt usage "input"
+    , openOutputAFP     = fail $ requiredOpt usage "output"
+    , readFontlibAFP    = const $ error "fontlib" -- calculated with the two fields below
     , fontlibPaths      = ["fontlib"]
     , fontlibSuffix     = ""
     , cstrlenCheckUDC   = checkUDC
-    , trnToSegments     = segment
+    , trnToSegments     = dbcsHandler
     , verbose           = False
     , showHelp          = return ()
     }
@@ -503,8 +470,6 @@ defaultOpts = Opts
     checkUDC (cstr, len) = forM_ [0, 2..len-1] $ \off -> do
         hi <- peekByteOff cstr off
         when (isUDC hi) $ fail "UDC"
-    segment :: FontField -> [N1] -> VarsIO [N1]
-    segment = dbcsHandler
 {-
     segment buf = do
         let (pstr, len) = bufToPStrLen buf
@@ -592,16 +557,16 @@ data Segment
     deriving (Show, Typeable)
 
 data Opts = Opts
-    { fontIsDBCS        :: FontField -> Bool
-    , dbcsPattern       :: Maybe String
-    , adjustY           :: I2 -> I2
-    , readInputAFP      :: IO [AFP_]
-    , openOutputAFP     :: IO Handle
-    , readFontlibAFP    :: String -> IO [AFP_]
-    , fontlibPaths      :: [FilePath]
-    , fontlibSuffix     :: String
-    , cstrlenCheckUDC   :: CStringLen -> IO ()
+    { fontIsDBCS        :: !(FontField -> Bool)
+    , dbcsPattern       :: !(Maybe String)
+    , adjustY           :: !(I2 -> I2)
+    , readInputAFP      :: !(IO [AFP_])
+    , openOutputAFP     :: !(IO Handle)
+    , readFontlibAFP    :: !(String -> IO [AFP_])
+    , fontlibPaths      :: !([FilePath])
+    , fontlibSuffix     :: !(String)
+    , cstrlenCheckUDC   :: !(CStringLen -> IO ())
     , trnToSegments     :: FontField -> [N1] -> VarsIO [N1]
-    , verbose           :: Bool
-    , showHelp          :: IO ()
+    , verbose           :: !(Bool)
+    , showHelp          :: !(IO ())
     } deriving (Typeable)
