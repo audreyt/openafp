@@ -1,8 +1,12 @@
 {-# OPTIONS -O -fglasgow-exts -funbox-strict-fields -fimplicit-params #-}
 
 module Main where
-import Text.Html
+import Text.XHtml
 import OpenAFP hiding ((!))
+import qualified Data.Set as Set
+import qualified Data.ByteString as S
+import qualified Data.ByteString.Char8 as C
+import qualified Data.HashTable as H
 
 -- The key here is inventing a ConcreteDataView for our data structure.
 -- See OpenAFP.Types.View for details.
@@ -65,12 +69,15 @@ main = do
     let input = inputFile opts
     cs      <- readAFP input
     fh      <- openOutputHandle opts
-    let put = (hPutStr fh)
-    put $ renderMessage ++ "<HTML>" ++ htmlPage input
-    put $ "<OL class='top'>"
     writeIORef encsRef $ encodings opts
-    mapM_ (`withChunk` viewRec put) cs
-    put $ "</OL></HTML>"
+    let put = hPutStr fh
+    put "<?xml version=\"1.0\"?>"
+    put "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
+    put "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">"
+    put $ htmlPage input
+    put "<ol class=\"top\">"
+    mapM_ (hPutStrLn fh . (`withChunk` (showHtmlFragment . recHtml . recView))) cs
+    put "</ol></body></html>"
     hClose fh
 
 {-# NOINLINE encs #-}
@@ -81,13 +88,8 @@ encs = unsafePerformIO (readIORef encsRef)
 encsRef :: IORef Encodings
 encsRef = unsafePerformIO (newIORef (error "oops"))
 
-viewRec :: Rec a => (String -> IO ()) -> a -> IO ()
-viewRec put r = do
-    rec <- recView r
-    mapM_ put [ dropWhile isSpace l | l <- lines . show $ recHtml rec ]
-
 htmlPage :: String -> String
-htmlPage title = show
+htmlPage title = showHtmlFragment
     [ header <<
         [ meta !
             [ httpequiv "Content-Type"
@@ -115,15 +117,29 @@ styles = joinList "\n" [
     ]
 
 recHtml :: ViewRecord -> Html
-recHtml (ViewRecord (t, fs))
+recHtml (ViewRecord t fs)
     | t == typeOf _PTX_TRN
-    , (_ : ViewField (_, ViewNStr (_, nstr)) : []) <- fs
-    = li << (typeHtml t +++ ptxHtml nstr)
+    , (_ : ViewField _ (ViewNStr _ nstr) : []) <- fs
+    = li << (typeHtml t +++ ptxHtml (map N1 (S.unpack nstr)))
     | otherwise
     = li << (typeHtml t +++ fieldsHtml fs)
 
+{-# NOINLINE _TypeHtmlCache #-}
+_TypeHtmlCache :: H.HashTable RecordType Html 
+_TypeHtmlCache = unsafePerformIO $ H.new (==) (hashInt . typeInt)
+
 typeHtml :: RecordType -> Html
-typeHtml t = thediv << (typeStr +++ primHtml " &mdash; " +++ typeDesc)
+typeHtml t = unsafePerformIO $ do
+    rv <- H.lookup _TypeHtmlCache t
+    case rv of 
+        Just html   -> return html
+        _           -> do
+            let html = typeHtml' t
+            H.insert _TypeHtmlCache t html
+            return html
+
+typeHtml' :: RecordType -> Html
+typeHtml' t = thediv << (typeStr +++ primHtml " &mdash; " +++ typeDesc)
     where
     typeStr = bold << last (split "." typeRepr)
     typeDesc = stringToHtml $ descLookup (MkChunkType $ typeInt t)
@@ -133,10 +149,9 @@ ptxHtml :: [N1] -> [Html]
 ptxHtml nstr = [table << textHtml]
     where
     textHtml = textLine ++ [ nstrLine ]
-    textLine = [ fieldHtml ("(" ++ n ++ ")", ViewString (undefined, txt)) | (n, txt) <- texts nstr ]
+    textLine = [ fieldHtml (ViewField (C.pack $ "(" ++ n ++ ")") (ViewString (typeOf ()) (C.pack txt))) | (n, txt) <- texts nstr ]
     nstrLine = tr << td ! [colspan 2] << thespan << nstrHtml nstr
 
-texts :: [N1] -> [(String, String)]
 texts nstr = maybeToList $ msum [ maybe Nothing (Just . ((,) cp)) $ conv (codeName cp) | cp <- encs ]
     where
     conv c@"ibm-937"
@@ -152,40 +167,39 @@ fieldsHtml fs = [table << fsHtml] ++ membersHtml
     where
     fsHtml = [ map fieldHtml fields ]
     membersHtml = chunksHtml $ csHtml ++ dataHtml
-    csHtml = [ c | ViewField (_, ViewChunks (t, c)) <- fs ]
-    dataHtml = [ c | ViewField (_, ViewData (t, c)) <- fs ]
-    fields = sortBy fieldOrder [ field | ViewField field@(str, _) <- fs, strOk str ]
-    fieldOrder ("", _) _    = GT
-    fieldOrder _ ("", _)    = LT
-    fieldOrder (a,_) (b,_)  = compare a b
-    strOk ('_':_)           = False
-    strOk "Data"            = False
-    strOk "EscapeSequence"  = False
-    strOk "Chunks"          = False
-    strOk "ControlCode"     = False
-    strOk "CC"              = False
-    strOk "FlagByte"        = False
-    strOk "Type"            = False
-    strOk "SubType"         = False
-    strOk _                 = True
+    csHtml = [ c | ViewField _ (ViewChunks t c) <- fs ]
+    dataHtml = [ c | ViewField _ (ViewData t c) <- fs ]
+    fields = sortBy fieldOrder [ v | v@(ViewField str _) <- fs, strOk str ]
+    fieldOrder (ViewField a _) (ViewField b _)
+        | S.null a  = GT
+        | S.null b  = LT
+        | otherwise = compare a b
+    strOk str
+        | S.null str        = True
+        | '_' <- C.head str = False
+        | otherwise         = Set.notMember str blobFields
+
+
+blobFields :: Set.Set FieldLabel
+blobFields = Set.fromList $ map C.pack
+    [ "Data", "EscapeSequence", "Chunks", "ControlCode", "CC", "FlagByte", "Type", "SubType" ]
 
 chunksHtml :: [[ViewRecord]] -> [Html]
 chunksHtml [] = []
 chunksHtml (cs:_) = [olist << map recHtml cs]
 
-fieldHtml :: (String, ViewContent) -> Html
-fieldHtml ("", ViewNStr (_, [])) = noHtml
-fieldHtml ("", content) =
-    tr << td ! [colspan 2, theclass "item"] << contentHtml content
-fieldHtml (str, content) =
-    tr << [td ! [theclass "label"] << str, td ! [theclass "item"] << contentHtml content ]
+fieldHtml (ViewField str content)
+    | S.null str = case content of
+        ViewNStr _ nstr | S.null nstr -> noHtml
+        _             -> tr << td ! [colspan 2, theclass "item"] << contentHtml content
+    | otherwise = tr << [td ! [theclass "label"] << C.unpack str, td ! [theclass "item"] << contentHtml content ]
 
 contentHtml :: ViewContent -> Html
 contentHtml x = case x of
-    ViewNumber (_, n) -> stringToHtml $ show n
-    ViewString (_, s) -> stringToHtml $ ['"'] ++ s ++ ['"']
-    ViewNStr  (_, cs) -> thespan << nstrHtml cs
-    _                 -> error (show x)
+    ViewNumber _ n -> stringToHtml $ show n
+    ViewString _ s -> stringToHtml $ ['"'] ++ C.unpack s ++ ['"']
+    ViewNStr  _ cs -> thespan << nstrHtml (map N1 (S.unpack cs))
+    _              -> error (show x)
 
 nstrHtml :: [N1] -> String
 nstrHtml nstr
