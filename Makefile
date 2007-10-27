@@ -49,7 +49,7 @@ instances ::
 	perl src/OpenAFP/Prelude/instances.pl
 
 dist ::
-	tar czf afp.tar.gz _darcs Makefile *.*hs OpenAFP/*.*hs OpenAFP/*/*.*hs OpenAFP/*/*.pl OpenAFP/*/*/*hs
+	tar czf openafp.tar.gz Makefile bin/*.*hs *.*hs src/OpenAFP/*.*hs src/OpenAFP/*/*.*hs src/OpenAFP/*/*.pl src/OpenAFP/*/*/*hs src/OpenAFP.hs
 
 clean ::
 	rm -f *.hi *.o src/OpenAFP/*.hi src/OpenAFP/*.o src/OpenAFP/*/*.hi src/OpenAFP/*/*.o src/OpenAFP/*/*/*.hi src/OpenAFP/*/*/*.o

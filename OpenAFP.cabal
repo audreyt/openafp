@@ -81,6 +81,15 @@ exposed-modules:    OpenAFP.Internals.Binary OpenAFP.Internals.Ebc2Asc
                     OpenAFP.Records.AFP OpenAFP.Records.PTX OpenAFP.Records.T OpenAFP.Records.MCF
                     OpenAFP.Types.Chunk OpenAFP.Types.Buffer OpenAFP.Types.View
                     OpenAFP.Types.Record OpenAFP.Internals OpenAFP.Records OpenAFP.Types OpenAFP 
+                    OpenAFP.Prelude.InstanceAFP.B
+                    OpenAFP.Prelude.InstanceAFP.C
+                    OpenAFP.Prelude.InstanceAFP.D
+                    OpenAFP.Prelude.InstanceAFP.E
+                    OpenAFP.Prelude.InstanceAFP.F
+                    OpenAFP.Prelude.InstanceAFP.G
+                    OpenAFP.Prelude.InstanceAFP.I
+                    OpenAFP.Prelude.InstanceAFP.L
+                    OpenAFP.Prelude.InstanceAFP.M
 category:           Data
 includes:           unicode/ucnv.h
 extensions:         CPP, ForeignFunctionInterface
@@ -88,5 +97,5 @@ build-depends:      base, mtl, haskell98, regex-compat, directory, process, arra
 include-dirs:       /usr/include /usr/local/include /opt/local/include
 extra-lib-dirs:     /usr/lib /usr/local/lib /opt/local/lib
 ld-options:         -licuuc
-ghc-options:        -fglasgow-exts -funbox-strict-fields -fno-warn-missing-signatures
+ghc-options:        -fglasgow-exts -funbox-strict-fields -fno-warn-missing-signatures -O2
 hs-source-dirs:     src
