@@ -6,6 +6,7 @@ import System.Mem
 import System.Directory
 import Control.Concurrent
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Unsafe as B
 
 isUDC :: N1 -> Bool
 isUDC hi = hi >= 0x92 && hi <= 0xFE
@@ -76,7 +77,7 @@ ptxGroupScan (!scfl:cs) = seq (length cs) $ do
             (`mapM_` trns) $ \trn -> scanTRN (decodeChunk trn)
 
 scanTRN :: PTX_TRN -> IO ()
-scanTRN trn = B.useAsCStringLen (packBuf $ ptx_trn trn) $ \(cstr, len) -> do
+scanTRN trn = B.unsafeUseAsCStringLen (packBuf $ ptx_trn trn) $ \(cstr, len) -> do
     forM_ [0, 2..len-1] $ \off -> do
         hi <- peekByteOff cstr off
         when (isUDC hi) $ do
