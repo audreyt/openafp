@@ -28,22 +28,14 @@ class (Show a, Typeable a) => Rec a where
     recPut x = error ("recPut not defined: " ++ show x)
     recSizeOf :: a -> Int
     recSizeOf x = error ("recSizeOf not defined: " ++ show x)
-    recView :: a -> IO ViewRecord
+    recView :: a -> ViewRecord
     recView x = error ("recView not defined: " ++ show x)
     recType :: a -> Int
     recType x = error ("recType not defined: " ++ show x)
 
--- (forall a. (Rec a) => (a -> m b))
-instance (Rec a) => Storable (Record a) where
+instance Rec a => Storable (Record a) where
     alignment (Record r) = 8
     sizeOf (Record r) = recSizeOf r
-    -- sizeOf (Record r) = sum $ recApply func r
-
-{-
-func :: (Storable x) => String -> x -> Int
-func x y = sizeOf y
--}
-func x y = 0
 
 instance Rec a => Rec (Record a) where
     recGet               = liftM Record recGet
@@ -52,7 +44,7 @@ instance Rec a => Rec (Record a) where
     recSizeOf (Record a) = recSizeOf a
     recType (Record a)   = recType a
 
-instance (Rec a) => Binary (Record a) where
+instance Rec a => Binary (Record a) where
     get = fmap Record recGet
     put (Record a) = recPut a
 

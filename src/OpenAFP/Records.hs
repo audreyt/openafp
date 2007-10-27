@@ -34,6 +34,7 @@ import OpenAFP.Records.MCF
 import OpenAFP.Records.T
 
 import Data.Binary.Get
+import qualified Data.ByteString as S
 import qualified Data.ByteString.Lazy as L
 
 ---[ Unknown ]--------------------------------------------------

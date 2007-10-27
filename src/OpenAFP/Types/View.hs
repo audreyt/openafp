@@ -17,6 +17,7 @@
 module OpenAFP.Types.View where
 import OpenAFP.Types.Buffer
 import OpenAFP.Internals
+import Data.ByteString
 
 type ChunksType = TypeRep
 type RecordType = TypeRep
@@ -24,16 +25,25 @@ type NumberType = TypeRep
 type NStrType   = TypeRep
 type StringType = TypeRep
 type DataType   = TypeRep
-type FieldLabel = String
+type FieldLabel = ByteString
 
--- newtype ViewChunks = ViewChunks (ChunksType, [ViewRecord])
-newtype ViewRecord = ViewRecord (RecordType, [ViewField]) deriving (Show, Typeable)
-newtype ViewField  = ViewField  (FieldLabel, ViewContent) deriving (Show, Typeable)
+data ViewRecord = ViewRecord
+    { vr_type   :: !RecordType
+    , vr_field  :: ![ViewField]
+    }
+    deriving (Show, Typeable)
+
+data ViewField = ViewField
+    { vf_label   :: !FieldLabel
+    , vf_content :: !ViewContent
+    }
+    deriving (Show, Typeable)
+
 data ViewContent
-    = ViewNumber (NumberType, Int)
-    | ViewString (StringType, String)
-    | ViewNStr   (NStrType,   [N1])
-    | ViewChunks (ChunksType, [ViewRecord])
-    | ViewData   (DataType,   [ViewRecord])
+    = ViewNumber { vc_type :: !NumberType, vc_number :: !Int }
+    | ViewString { vc_type :: !StringType, vc_string :: !ByteString }
+    | ViewNStr   { vc_type :: !NStrType,   vc_nstr   :: !ByteString }
+    | ViewChunks { vc_type :: !ChunksType, vc_chunks :: ![ViewRecord] }
+    | ViewData   { vc_type :: !DataType,   vc_data   :: ![ViewRecord] }
     deriving (Show, Typeable)
 
