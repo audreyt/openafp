@@ -4,7 +4,9 @@ module Main where
 import OpenAFP
 import CP835
 import qualified Data.IntMap as IM
-import qualified Data.ByteString as B
+import qualified Data.ByteString as S
+import qualified Data.ByteString.Unsafe as S
+import qualified Data.ByteString.Internal as S
 import qualified Data.ByteString.Char8 as C
 
 main :: IO ()
@@ -29,13 +31,13 @@ dumpPageContent = do
         writeIORef _CurrentColumn 0
         forM_ (IM.toAscList line) $ \(col, str) -> do
             cur <- readIORef _CurrentColumn
-            B.putStr (B.take (col - cur) _Spaces)
-            B.putStr str
-            writeIORef _CurrentColumn (col + B.length str)
-        B.putStr _NewLine
-    unless (IM.null pg) $ B.putStr _NewPage
+            S.putStr (S.take (col - cur) _Spaces)
+            S.putStr str
+            writeIORef _CurrentColumn (col + S.length str)
+        S.putStr _NewLine
+    unless (IM.null pg) $ S.putStr _NewPage
 
-_Spaces  = B.replicate 65536 0x20
+_Spaces  = S.replicate 65536 0x20
 _NewLine = C.pack "\r\n"
 _NewPage = C.pack "\r\n\x0C\r\n"
 
@@ -107,9 +109,9 @@ ptxDump ptx = mapM_ ptxGroupDump .
 
 -- A Page is a IntMap from line-number to a map from column-number to bytestring.
 type Page = IM.IntMap Line
-type Line = IM.IntMap B.ByteString
+type Line = IM.IntMap S.ByteString
 
-insertText :: B.ByteString -> IO ()
+insertText :: S.ByteString -> IO ()
 insertText str = do
     ln  <- readIORef _CurrentLine
     col <- readIORef _CurrentColumn
@@ -126,12 +128,12 @@ ptxGroupDump (scfl:cs) = do
         Just curEncoding -> do
             cs ..> 
                 [ _PTX_TRN ... \trn -> case curEncoding of
-                    CP37    -> packAStr (ptx_trn trn) >>= \bstr -> do
+                    CP37    -> let bstr = packAStr' (ptx_trn trn) in do
                         insertText bstr
-                        modifyIORef _CurrentColumn (+ B.length bstr)
+                        modifyIORef _CurrentColumn (+ S.length bstr)
                     CP835   -> pack835 (ptx_trn trn) >>= \bstr -> do
                         insertText bstr
-                        modifyIORef _CurrentColumn (+ B.length bstr)
+                        modifyIORef _CurrentColumn (+ S.length bstr)
                 , _PTX_BLN ... \_ -> do
                     writeIORef _CurrentColumn 0
                     modifyIORef _CurrentLine (+1)
@@ -145,20 +147,20 @@ ptxGroupDump (scfl:cs) = do
                     writeIORef _CurrentColumn pos'
                 ]
 
-packAStr :: AStr -> IO B.ByteString
-packAStr astr = return $ B.map (ebc2ascWord !) (packBuf astr)
+packAStr' :: AStr -> S.ByteString
+packAStr' astr = S.map (ebc2ascWord !) (packBuf astr)
 
-pack835 :: NStr -> IO B.ByteString
-pack835 nstr = B.useAsCStringLen (packBuf nstr) $ \(cstr', len) -> do
-    let cstr = castPtr cstr'
+pack835 :: NStr -> IO S.ByteString
+pack835 nstr = S.unsafeUseAsCStringLen (packBuf nstr) $ \(src, len) -> S.create len $ \target -> do
+    let s = castPtr src
+    let t = castPtr target
     forM_ [0..(len `div` 2)-1] $ \i -> do
-        hi  <- peekElemOff cstr (i*2)       :: IO Word8
-        lo  <- peekElemOff cstr (i*2+1)     :: IO Word8
+        hi  <- peekByteOff s (i*2)       :: IO Word8
+        lo  <- peekByteOff s (i*2+1)     :: IO Word8
         let cp950       = convert835to950 (fromEnum hi * 256 + fromEnum lo)
             (hi', lo')  = cp950 `divMod` 256
-        pokeElemOff cstr (i*2)   (toEnum hi' :: Word8)
-        pokeElemOff cstr (i*2+1) (toEnum lo' :: Word8)
-    B.packCStringLen (castPtr cstr, len)
+        pokeByteOff t (i*2)   (toEnum hi' :: Word8)
+        pokeByteOff t (i*2+1) (toEnum lo' :: Word8)
 
 ebc2ascWord :: UArray Word8 Word8
 ebc2ascWord = listArray (0x00, 0xff) [
