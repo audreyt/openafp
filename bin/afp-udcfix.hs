@@ -3,9 +3,11 @@
 module Main where
 import OpenAFP
 import qualified Data.Map as Map
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Unsafe as B
+import qualified Data.ByteString as S
+import qualified Data.ByteString.Unsafe as S
+import qualified Data.ByteString.Char8 as C
 import qualified Data.ByteString.Lazy as L
+import Data.Int
 
 -- | Flags.
 type VarsIO a = StateIO Vars a
@@ -18,12 +20,21 @@ dbcsFirst = (0x4C, 0x41)
 isUDC :: N1 -> Bool
 isUDC  hi = hi >= 0x92 && hi <= 0xFE
 
+{-# NOINLINE _Vars #-}
+_Vars :: IORef Vars
+_Vars = unsafePerformIO $ newIORef undefined
+
 -- | The main program: initialize global variables, split the input
 -- AFP file into "pages", then dispatch each page to pageHandler.
 main :: IO ()
-main = runReaderT stateMain =<< initVars
+main = do
+    writeIORef _Vars =<< initVars
+    stateMain
 
-stateMain :: ReaderT Vars IO ()
+instance MonadReader Vars IO where
+    ask = readIORef _Vars
+    local = undefined
+
 stateMain = do
     chunks  <- liftOpt readInputAFP
     fh      <- liftOpt openOutputAFP
@@ -53,13 +64,13 @@ mcfHandler r = do
             let cs = readChunks mcf
             ids   <- sequence [ t_rli `applyToChunk` c | c <- cs, c ~~ _T_RLI ]
             fonts <- sequence [ t_fqn `applyToChunk` c | c <- cs, c ~~ _T_FQN ]
-            _IdToFont %%= (ids `zip` map fromAStr fonts)
+            _IdToFont %%= (ids `zip` map packAStr fonts)
         ]
 
 -- | Record font Id to Name mappings in MCF1's Data chunks.
 mcf1Handler r = do
     _IdToFont %%=
-        [ (mcf1_CodedFontLocalId mcf1, fromA8 $ mcf1_CodedFontName mcf1)
+        [ (mcf1_CodedFontLocalId mcf1, packA8 $ mcf1_CodedFontName mcf1)
             | Record mcf1 <- readData r
         ]
 
@@ -83,7 +94,7 @@ ptxGroupCheckUDC (scfl:trnList) = seq (length trnList) $ do
 -- | Look inside TRN buffers for UDC characters.  If we find one,
 -- raise an IO exception so the page handler can switch to UDC mode.
 trnCheckUDC :: NStr -> IO ()
-trnCheckUDC nstr = B.unsafeUseAsCStringLen (packBuf nstr) $ \(cstr, len) -> do
+trnCheckUDC nstr = S.unsafeUseAsCStringLen (packBuf nstr) $ \(cstr, len) -> do
     forM_ [0, 2..len-1] $ \off -> do
         hi <- peekByteOff cstr off
         when (isUDC hi) $ do
@@ -123,32 +134,36 @@ udcPageHandler page = do
 
 trnHandler r = do
     font    <- currentFont
-    let trn = fromNStr $ ptx_trn r
+    let trn = packNStr $ ptx_trn r
     isDBCS  <- fontIsDBCS &: font
     case isDBCS of
         True -> do
             -- If font is double byte, transform the TRN with dbcsHandler.
-            vars    <- ask
             db      <- dbcsHandler font trn -- XXX
-            push r { ptx_trn = toNStr db }
+            push r{ ptx_trn = mkBuf db }
         False -> do
             -- If font is single byte, simply add each byte's increments.
             -- without parsing UDC.
-            incrs   <- forM trn $ \ch -> do
-                incrementOf font (0x00, if ch == 0x00 then 0x40 else ch)
-            (_X += sum) incrs
+            let f tot ch = do
+                    inc <- incrementOf font (0x00, if ch == 0x00 then 0x40 else N1 ch)
+                    return (tot + inc)
+            inc <- foldM f 0 (S.unpack trn)
+            (_X += id) inc
             push r
 
-dbcsHandler :: FontField -> [N1] -> VarsIO [N1]
-dbcsHandler _ []    = return []
-dbcsHandler _ [x]   = do
+dbcsHandler :: FontField -> ByteString -> VarsIO ByteString
+dbcsHandler font bs = liftM (S.pack . map fromN1) (dbcsHandler' font (map N1 (S.unpack bs)))
+
+dbcsHandler' :: FontField -> [N1] -> VarsIO [N1]
+dbcsHandler' _ []    = return []
+dbcsHandler' _ [x]   = do
     warn $ "invalid DBCS sequence: " ++ show x
     return []
-dbcsHandler font (hi:lo:xs) = do
+dbcsHandler' font (hi:lo:xs) = do
     (incChar, (hi', lo'))   <- dbcsCharHandler font (hi, lo)
     incr                    <- incrementOf font incChar
     (_X += id) incr
-    rest                    <- dbcsHandler font xs
+    rest                    <- dbcsHandler' font xs
     return (hi':lo':rest)
 
 dbcsCharHandler font char@(hi, _)
@@ -226,7 +241,7 @@ incrementOf x y = do
             udcRef <- asks _UDC
             io $ do
                 -- Remove this from the list of UDCs to gen image for
-                putStrLn $ "Skipping unknown UDC: " ++ show char ++ ", font: " ++ show (drop 2 f)
+                putStrLn $ "Skipping unknown UDC: " ++ show char ++ ", font: " ++ show (ck_font f)
                 modifyIORef udcRef (filter ((/= char) . udcChar))
             return 0
 
@@ -243,27 +258,24 @@ fontInfoOf x y = do
             _ -> return Nothing
 
 cachedLibReader :: (MonadIO m, MonadReader Vars m, MonadPlus m, MonadError e m, Show e, Typeable e) =>
-                     (Vars -> HashTable String a)
-                       -> (String -> NChar -> String -> m (Maybe a) -> m a)
+                     (Vars -> HashTable CacheKey a)
+                       -> (ByteString -> NChar -> CacheKey -> m (Maybe a) -> m a)
                          -> a -> FontField -> NChar -> m a
 cachedLibReader cache filler fallback font char = do
     vars <- ask
     let val = io $ hashLookup (cache vars) key
-        fillCache = filler fontstr char key val
+        fillCache = filler font char key val
     val >>= maybe (fillCache `catchError` hdl) return
     where
-    key = cacheKey fontstr char
-    font' = font
-    fontstr | ('X':_:xs) <- font'  = trim ('X':'0':xs)
-            | otherwise            = trim font'
-    hdl err | Just e <- cast err, isUserError e = do
-        let keySeen = cacheKey fontstr (0x00, 0x00)
+    key = cacheKey font char
+    hdl err | Just e <- cast err, isUserError e = {-# SCC "hdl" #-} do
+        let keySeen = cacheKey font (0x00, 0x00)
         seen <- cache %? keySeen
         when (isNothing seen) $ do
-            warn $ "font library does not exist: " ++ fontstr
+            warn $ "font library does not exist: " ++ C.unpack font
         cache %= (key, fallback)
         cache %= (keySeen, fallback)
-        -- sequence_ [ cache %= (cacheKey fontstr (fst char, lo), fallback) | <- [0x00 .. 0xFF] ]
+        -- sequence_ [ cache %= (cacheKey font (fst char, lo), fallback) | <- [0x00 .. 0xFF] ]
         return fallback
             | otherwise = throwError err
 
@@ -359,7 +371,7 @@ _FontInfo = FontInfo 0 0 0 0 0 0 0 _NStr 0 0 0
 
 -- | Simple test case.
 run :: IO ()
-run = withArgs (split " " "-a -d NS -i tmp -o x") main
+run = withArgs (split " " "-a -d NS.. -i tmp -o x -f /StreamEDP/fontlib") main
 
 data Vars = Vars
     { _XPageSize      :: !(IORef N2)
@@ -372,16 +384,23 @@ data Vars = Vars
     , _FontId         :: !(IORef N1)
     , _UDC            :: !(IORef [CharUDC])
     , _IdToFont       :: !(IOArray N1 FontField)
-    , _InfoCache      :: !(HashTable String (Maybe FontInfo))
-    , _IncrCache      :: !(HashTable String N2)
+    , _InfoCache      :: !(HashTable CacheKey (Maybe FontInfo))
+    , _IncrCache      :: !(HashTable CacheKey N2)
     , _Opts           :: !Opts
     }
 
 type Config = Int
 
-cacheKey :: String -> NChar -> String
-cacheKey font (hi, lo) = (chr' hi : chr' lo : font)
-    where chr' = chr . fromEnum
+data CacheKey = MkCacheKey
+    { ck_hash   :: !Int32
+    , ck_font   :: !ByteString
+    }
+    deriving Eq
+
+cacheKey :: ByteString -> NChar -> CacheKey
+cacheKey font (hi, lo) = MkCacheKey 
+    (hashString (chr (fromEnum hi) : chr (fromEnum lo) : C.unpack font))
+    font
 
 initVars :: IO Vars
 initVars = do
@@ -394,9 +413,9 @@ initVars = do
     bi  <- newIORef 0
     fid <- newIORef 0
     udc <- newIORef []
-    idf <- newIOArray (0x00, 0xFF) []
-    ifc <- hashNew (==) hashString
-    inc <- hashNew (==) hashString
+    idf <- newIOArray (0x00, 0xFF) C.empty
+    ifc <- hashNew (==) ck_hash
+    inc <- hashNew (==) ck_hash
     opt <- getOpts
     return $ Vars xp x y xo yo im bi fid udc idf ifc inc opt
 
@@ -413,28 +432,33 @@ getOpts = do
     when (null paths) $ do
         die $ "cannot find a valid font library path"
     fontIsDBCS opts `seq` forM_ errs warn
-    return opts { readFontlibAFP = reader paths (fontlibSuffix opts) }
+    return opts{ readFontlibAFP = reader paths (fontlibSuffix opts) }
     where
     checkPath path = do
-        exists <- doesDirectoryExist path
+        exists <- doesDirectoryExist (C.unpack path)
         unless (exists) $ do
-            warn $ "directory does not exist: `" ++ path ++ "'"
+            warn $ "directory does not exist: `" ++ C.unpack path ++ "'"
         return exists
     reader paths suffix name = do
         -- Here we memoize by name.
-        let key = concat (suffix:name:paths)
+        let key = C.concat (suffix:name:paths)
         rv <- hashLookup _ReaderCache key
         case rv of
             Just chunks -> return chunks
             _           -> do
-                (afp:_) <- filterM doesFileExist $ map (++ "/" ++ name ++ suffix) paths
+                (afp:_) <- filterM doesFileExist
+                    [ C.unpack f ++ "/" ++ fileName ++ C.unpack suffix | f <- paths ]
                 chunks  <- readAFP afp
                 hashInsert _ReaderCache key (seq (length chunks) chunks)
                 return chunks
+        where
+        fileName = case C.unpack name of
+            ('X':_:xs)  -> trim ('X':'0':xs)
+            xs          -> trim xs
 
 {-# NOINLINE _ReaderCache #-}
-_ReaderCache :: HashTable String [AFP_]
-_ReaderCache = unsafePerformIO (hashNew (==) hashString)
+_ReaderCache :: HashTable ByteString [AFP_]
+_ReaderCache = unsafePerformIO (hashNew (==) hashByteString)
 
 infixl 4 &:
 l &: v = do
@@ -458,31 +482,17 @@ defaultOpts = Opts
     , readInputAFP      = fail $ requiredOpt usage "input"
     , openOutputAFP     = fail $ requiredOpt usage "output"
     , readFontlibAFP    = const $ error "fontlib" -- calculated with the two fields below
-    , fontlibPaths      = ["fontlib"]
-    , fontlibSuffix     = ""
+    , fontlibPaths      = [C.pack "fontlib"]
+    , fontlibSuffix     = C.empty
     , cstrlenCheckUDC   = checkUDC
     , trnToSegments     = dbcsHandler
     , verbose           = False
     , showHelp          = return ()
     }
     where
-    -- isDBCS hi = hi >= 0x40 && hi <= 0x91
     checkUDC (cstr, len) = forM_ [0, 2..len-1] $ \off -> do
         hi <- peekByteOff cstr off
         when (isUDC hi) $ fail "UDC"
-{-
-    segment buf = do
-        let (pstr, len) = bufToPStrLen buf
-        withForeignPtr (castForeignPtr pstr) $ \cstr ->
-            return . snd =<< foldM (\off -> do
-                hi <- peekByteOff cstr off
-                if (isUDC hi) then do
-                        lo <- peekByteOff cstr $ off+1
-                        return $ SegmentUDC (hi, lo) (0x40, 0x40)
-                      else
-                        return $ SegmentDBCS (0x4C, 0x41))
-                [] [0, 2..len-1]
--}
 
 usage :: String -> IO a
 usage = showUsage options showInfo
@@ -498,29 +508,30 @@ options =
     , reqArg "c" ["codepage"]       "835|947"       "UDC codepage (default: 835)"
         setCodepage
     , reqArg "d" ["dbcs-pattern"]   "REGEXP"        "DBCS font name pattern"
-        (\s o -> o { fontIsDBCS     = setMatchDBCS s
-                   , dbcsPattern    = Just s })
+        (\s o -> o { fontIsDBCS     = setMatchDBCS (C.pack s)
+                   , dbcsPattern    = Just (C.pack s) })
     , reqArg "f" ["fontlib-path"]   "PATH,PATH..."  "Paths to font libraries"
-        (\s o -> o { fontlibPaths   = split "," s })
+        (\s o -> o { fontlibPaths   = C.split ',' (C.pack s) })
     , reqArg "i" ["input"]          "FILE"          "Input AFP file"
         (\s o -> o { readInputAFP   = readAFP s })
     , reqArg "o" ["output"]         "FILE"          "Output AFP file"
         (\s o -> o { openOutputAFP  = openBinaryFile s WriteMode })
     , reqArg "s" ["fontlib-suffix"] ".SUFFIX"       "Font library file suffix"
-        (\s o -> o { fontlibSuffix  = s })
+        (\s o -> o { fontlibSuffix  = C.pack s })
     , noArg  "v" ["verbose"]                        "Print progress information"
         (\o   -> o { verbose        = True })
     , noArg  "h" ["help"]                           "Show help"
         (\o   -> o { showHelp       = usage "" })
     ]
     where
-    setMatchDBCS "M..T" (_:_:'M':_:_:'T':_) = True
-    setMatchDBCS "M..T" _                   = False
-    setMatchDBCS "NS.." (_:_:'N':'S':_:_:_) = True
-    setMatchDBCS "NS.." _                   = False
-    setMatchDBCS "NS"   (_:_:'N':'S':_)     = True
-    setMatchDBCS "NS"   _                   = False
-    setMatchDBCS s a   = (a =~ s)
+    _M__T = C.pack "M..T"
+    _NS__ = C.pack "NS.."
+    _NS   = C.pack "NS"
+    setMatchDBCS s a
+        | s == _M__T = (C.length a >= 6) && ((C.index a 2 == 'M') || (C.index a 5 == 'T'))
+        | s == _NS__ = (C.length a >= 6) && ((C.index a 2 == 'N') || (C.index a 3 == 'S'))
+        | s == _NS   = (C.length a >= 4) && ((C.index a 2 == 'N') || (C.index a 3 == 'S'))
+        | otherwise  = (C.unpack a =~ C.unpack s)
     setCodepage "835"  = id
     setCodepage "947"  = \o -> o
         { cstrlenCheckUDC   = checkUDC
@@ -539,8 +550,8 @@ options =
     segment = error "segment"
 
 type NChar = (N1, N1)
-type FontField = String
-fromFontField = fromA8
+type FontField = ByteString
+fromFontField = packA8
 
 data Segment
     = SegmentUDC
@@ -558,15 +569,15 @@ data Segment
 
 data Opts = Opts
     { fontIsDBCS        :: !(FontField -> Bool)
-    , dbcsPattern       :: !(Maybe String)
+    , dbcsPattern       :: !(Maybe ByteString)
     , adjustY           :: !(I2 -> I2)
     , readInputAFP      :: !(IO [AFP_])
     , openOutputAFP     :: !(IO Handle)
-    , readFontlibAFP    :: !(String -> IO [AFP_])
-    , fontlibPaths      :: !([FilePath])
-    , fontlibSuffix     :: !(String)
+    , readFontlibAFP    :: !(ByteString -> IO [AFP_])
+    , fontlibPaths      :: !([ByteString])
+    , fontlibSuffix     :: !(ByteString)
     , cstrlenCheckUDC   :: !(CStringLen -> IO ())
-    , trnToSegments     :: FontField -> [N1] -> VarsIO [N1]
+    , trnToSegments     :: FontField -> ByteString -> VarsIO ByteString
     , verbose           :: !(Bool)
     , showHelp          :: !(IO ())
     } deriving (Typeable)
