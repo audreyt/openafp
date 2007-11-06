@@ -12,56 +12,38 @@ import qualified Data.ByteString.Char8 as C
 main :: IO ()
 main = do
     hSetBinaryMode stdout True
-    (getArgs >>=) . mapM_ $ \f -> do
+    args    <- getArgs
+    when (null args) $ do
+        putStrLn "Usage: afp2line input.afp ... > output.txt"
+    forM_ args $ \f -> do
         cs  <- readAFP f
         forM_ (splitRecords _PGD cs) $ \page -> do
             page ..>
-                [ _MCF  ... mcfHandler
+                [ _PTX  ... ptxDump
+                , _MCF  ... mcfHandler
                 , _MCF1 ... mcf1Handler
-                , _PTX  ... ptxDump
                 ]
             dumpPageContent
-
 
 dumpPageContent :: IO ()
 dumpPageContent = do
     pg  <- readIORef _CurrentPage
     writeIORef _CurrentPage IM.empty
-    forM_ (IM.elems pg) $ \line -> do
-        writeIORef _CurrentColumn 0
-        forM_ (IM.toAscList line) $ \(col, str) -> do
-            cur <- readIORef _CurrentColumn
-            S.putStr (S.take (col - cur) _Spaces)
-            S.putStr str
-            writeIORef _CurrentColumn (col + S.length str)
-        S.putStr _NewLine
-    unless (IM.null pg) $ S.putStr _NewPage
+    if IM.null pg then return () else do
+        forM_ (IM.elems pg) $ \line -> do
+            writeIORef _CurrentColumn 0
+            forM_ (IM.toAscList line) $ \(col, str) -> do
+                cur <- readIORef _CurrentColumn
+                S.putStr $ S.take (col - cur) _Spaces
+                S.putStr str
+                writeIORef _CurrentColumn (col + S.length str)
+            S.putStr _NewLine
+        S.putStr _NewPage
 
-_Spaces  = S.replicate 65536 0x20
+_Spaces, _NewLine, _NewPage :: ByteString
+_Spaces  = S.replicate 4096 0x20
 _NewLine = C.pack "\r\n"
 _NewPage = C.pack "\r\n\x0C\r\n"
-
-data Encoding = CP37 | CP835
-    deriving Show
-
-type Size = Int
-
-fontInfoOf :: String -> (Encoding, Size)
-fontInfoOf f
-    | ('T':_) <- dropWhile isSpace (reverse f)
-    = (CP835, sz `div` 2)
-    | otherwise
-    = (CP37, sz)
-    where
-    sz = read . reverse . takeWhile isDigit . dropWhile (not . isDigit) . reverse $ f
-
-{-# NOINLINE _FontToEncoding #-}
-_FontToEncoding :: HashTable N1 Encoding
-_FontToEncoding = unsafePerformIO $ hashNew (==) fromIntegral
-
-{-# NOINLINE _MinFontSize #-}
-_MinFontSize :: IORef Int
-_MinFontSize = unsafePerformIO $ newIORef 0
 
 {-# NOINLINE _CurrentPage #-}
 _CurrentPage :: IORef Page
@@ -75,19 +57,14 @@ _CurrentLine = unsafePerformIO $ newIORef 0
 _CurrentColumn :: IORef Int
 _CurrentColumn = unsafePerformIO $ newIORef 0
 
--- | Record font Id to Name mappings in MCF's RLI and FQN chunks.
-mcfHandler :: MCF -> IO ()
-mcfHandler r = do
-    readChunks r ..>
-        [ _MCF_T ... \mcf -> do
-            let cs  = readChunks mcf
-            ids   <- sequence [ t_rli `applyToChunk` c | c <- cs, c ~~ _T_RLI ]
-            fonts <- sequence [ t_fqn `applyToChunk` c | c <- cs, c ~~ _T_FQN ]
-            insertFonts (ids `zip` map fromAStr fonts)
-        ]
+{-# NOINLINE _MinFontSize #-}
+_MinFontSize :: IORef Size
+_MinFontSize = unsafePerformIO $ newIORef 0
 
+lookupFontEncoding :: N1 -> IO (Maybe Encoding)
+lookupFontEncoding = hashLookup _FontToEncoding
 
-insertFonts :: [(N1, String)] -> IO ()
+insertFonts :: [(N1, ByteString)] -> IO ()
 insertFonts = mapM_ $ \(i, f) -> do
     let (enc, sz) = fontInfoOf f
     modifyIORef _MinFontSize $ \szMin -> case szMin of
@@ -95,17 +72,32 @@ insertFonts = mapM_ $ \(i, f) -> do
         _   -> min szMin sz
     hashInsert _FontToEncoding i enc
 
+{-# NOINLINE _FontToEncoding #-}
+_FontToEncoding :: HashTable N1 Encoding
+_FontToEncoding = unsafePerformIO $ hashNew (==) fromIntegral
+
+
+-- | Record font Id to Name mappings in MCF's RLI and FQN chunks.
+mcfHandler :: MCF -> IO ()
+mcfHandler r = do
+    readChunks r ..>
+        [ _MCF_T ... \mcf -> do
+            let cs    = readChunks mcf
+                ids   = [ t_rli (decodeChunk c) | c <- cs, c ~~ _T_RLI ]
+                fonts = [ t_fqn (decodeChunk c) | c <- cs, c ~~ _T_FQN ]
+            insertFonts (ids `zip` map packAStr fonts)
+        ]
+
 -- | Record font Id to Name mappings in MCF1's Data chunks.
 mcf1Handler :: MCF1 -> IO ()
 mcf1Handler r = do
     insertFonts
-        [ (mcf1_CodedFontLocalId mcf1, fromA8 $ mcf1_CodedFontName mcf1)
+        [ (mcf1_CodedFontLocalId mcf1, packA8 $ mcf1_CodedFontName mcf1)
             | Record mcf1 <- readData r
         ]
 
 ptxDump :: PTX -> IO ()
-ptxDump ptx = mapM_ ptxGroupDump .
-    splitRecords _PTX_SCFL $ readChunks ptx
+ptxDump ptx = mapM_ ptxGroupDump . splitRecords _PTX_SCFL $ readChunks ptx
 
 -- A Page is a IntMap from line-number to a map from column-number to bytestring.
 type Page = IM.IntMap Line
@@ -121,31 +113,30 @@ insertText str = do
 
 ptxGroupDump :: [PTX_] -> IO ()
 ptxGroupDump (scfl:cs) = do
-    scflId  <- ptx_scfl `applyToChunk` scfl
-    rv      <- hashLookup _FontToEncoding scflId
+    let scflId = ptx_scfl (decodeChunk scfl)
+    rv <- lookupFontEncoding scflId
     case rv of
         Nothing          -> return ()
-        Just curEncoding -> do
-            cs ..> 
-                [ _PTX_TRN ... \trn -> case curEncoding of
-                    CP37    -> let bstr = packAStr' (ptx_trn trn) in do
-                        insertText bstr
-                        modifyIORef _CurrentColumn (+ S.length bstr)
-                    CP835   -> pack835 (ptx_trn trn) >>= \bstr -> do
-                        insertText bstr
-                        modifyIORef _CurrentColumn (+ S.length bstr)
-                , _PTX_BLN ... \_ -> do
-                    writeIORef _CurrentColumn 0
-                    modifyIORef _CurrentLine (+1)
-                , _PTX_AMB ... \x -> do
-                    minSize <- readIORef _MinFontSize
-                    writeIORef _CurrentLine (fromEnum (ptx_amb x) `div` minSize)
-                , _PTX_AMI ... \x -> do
-                    minSize <- readIORef _MinFontSize
-                    let offset  = (fromEnum $ ptx_ami x)
-                        pos'    = offset `div` minSize
-                    writeIORef _CurrentColumn pos'
-                ]
+        Just curEncoding -> cs ..>
+            [ _PTX_TRN ... \trn -> case curEncoding of
+                CP37    -> let bstr = packAStr' (ptx_trn trn) in do
+                    insertText bstr
+                    modifyIORef _CurrentColumn (+ S.length bstr)
+                CP835   -> pack835 (ptx_trn trn) >>= \bstr -> do
+                    insertText bstr
+                    modifyIORef _CurrentColumn (+ S.length bstr)
+            , _PTX_BLN ... \_ -> do
+                writeIORef _CurrentColumn 0
+                modifyIORef _CurrentLine (+1)
+            , _PTX_AMB ... \x -> do
+                minSize <- readIORef _MinFontSize
+                writeIORef _CurrentLine (fromEnum (ptx_amb x) `div` minSize)
+            , _PTX_AMI ... \x -> do
+                minSize <- readIORef _MinFontSize
+                let offset = fromEnum $ ptx_ami x
+                    pos    = offset `div` minSize
+                writeIORef _CurrentColumn pos
+            ]
 
 packAStr' :: AStr -> S.ByteString
 packAStr' astr = S.map (ebc2ascWord !) (packBuf astr)
@@ -163,7 +154,7 @@ pack835 nstr = S.unsafeUseAsCStringLen (packBuf nstr) $ \(src, len) -> S.create 
         pokeByteOff t (i*2+1) (toEnum lo' :: Word8)
 
 ebc2ascWord :: UArray Word8 Word8
-ebc2ascWord = listArray (0x00, 0xff) [
+ebc2ascWord = listArray (0x00, 0xFF) [
         0x20, 0x20, 0x20, 0x20, 0x20, 0x09, 0x20, 0x20,
         0x20, 0x20, 0x20, 0x20, 0x20, 0x0D, 0x20, 0x20,
         0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,

@@ -1,6 +1,7 @@
 {-# OPTIONS -O -fglasgow-exts -funbox-strict-fields -fimplicit-params #-}
 
 module Main where
+import CP835
 import Text.XHtml
 import OpenAFP hiding ((!))
 import qualified Data.Set as Set
@@ -127,6 +128,10 @@ recHtml (ViewRecord t fs)
 {-# NOINLINE _TypeHtmlCache #-}
 _TypeHtmlCache :: H.HashTable RecordType Html 
 _TypeHtmlCache = unsafePerformIO $ H.new (==) (hashInt . typeInt)
+
+{-# NOINLINE _FontToEncoding #-}
+_FontToEncoding :: HashTable N1 Encoding
+_FontToEncoding = unsafePerformIO $ hashNew (==) fromIntegral
 
 typeHtml :: RecordType -> Html
 typeHtml t = unsafePerformIO $ do

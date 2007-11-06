@@ -1,17 +1,37 @@
-module CP835 (convert835to950) where
+module CP835 (convert835to950, Encoding(..), Size, fontInfoOf) where
 
+import OpenAFP
 import Data.Char
-import Data.IntMap as IM
+import qualified Data.IntMap as IM
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as C
+
+type Size = Int
+
+fontInfoOf :: ByteString -> (Encoding, Size)
+fontInfoOf f
+    | (not (C.null font) && C.last font == 'T')
+      || (not (C.null namePart) && C.last namePart == 'S')
+    = (CP835, sz `div` 2) -- M40T, NS32
+    | otherwise
+    = (CP37, sz)
+    where
+    (font, _)            = C.spanEnd isSpace f
+    (namePart, sizePart) = C.spanEnd isDigit . fst $ C.breakEnd isDigit font
+    sz                   = case C.readInt sizePart of
+        Just (0, _) -> 10
+        Just (x, _) -> x
+        _           -> error $ "Cannot parse font for size: " ++ show f
+
+data Encoding = CP37 | CP835 deriving (Show)
 
 convert835to950 :: Int -> Int
 convert835to950 i = case IM.lookup i _map of
     Just rv -> rv
     _       -> _default
 
-_map :: IntMap Int
-_map = fromList _map2
+_map :: IM.IntMap Int
+_map = IM.fromDistinctAscList _map2
 
 _default :: Int
 _default = 0x20 * 256 + 0x20
