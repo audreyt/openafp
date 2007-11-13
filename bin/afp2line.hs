@@ -1,16 +1,26 @@
-{-# OPTIONS -O2 -fglasgow-exts #-}
+{-# OPTIONS_GHC -O2 -fglasgow-exts #-}
 
 module Main where
 import OpenAFP
 import CP835
+import System.Posix.Resource
 import qualified Data.IntMap as IM
 import qualified Data.ByteString as S
 import qualified Data.ByteString.Unsafe as S
 import qualified Data.ByteString.Internal as S
 import qualified Data.ByteString.Char8 as C
 
+__1GB__ :: Integer
+__1GB__ = 1024 * 1024 * 1024
+
+mkLimit :: Integer -> ResourceLimits
+mkLimit x = ResourceLimits (ResourceLimit x) (ResourceLimit x)
+
 main :: IO ()
 main = do
+    setResourceLimit ResourceTotalMemory (mkLimit __1GB__)
+    setResourceLimit ResourceCoreFileSize (mkLimit 0)
+
     hSetBinaryMode stdout True
     args    <- getArgs
     when (null args) $ do
