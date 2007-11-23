@@ -10,6 +10,8 @@ type Size = Int
 
 fontInfoOf :: ByteString -> (Encoding, Size)
 fontInfoOf f
+    | (C.length font == 8) && (C.head font == 'X')
+    = (CP950, 10) -- X08PD0SB etc. (TBB)
     | (not (C.null font) && C.last font == 'T')
       || (not (C.null namePart) && C.last namePart == 'S')
     = (CP835, sz `div` 2) -- M40T, NS32
@@ -23,7 +25,7 @@ fontInfoOf f
         Just (x, _) -> x
         _           -> error $ "Cannot parse font for size: " ++ show f
 
-data Encoding = CP37 | CP835 deriving (Show)
+data Encoding = CP37 | CP835 | CP950 deriving (Show)
 
 convert835to950 :: Int -> Int
 convert835to950 i = case IM.lookup i _map of
