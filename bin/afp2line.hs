@@ -124,29 +124,38 @@ insertText str = do
 ptxGroupDump :: [PTX_] -> IO ()
 ptxGroupDump (scfl:cs) = do
     let scflId = ptx_scfl (decodeChunk scfl)
-    rv <- lookupFontEncoding scflId
-    case rv of
-        Nothing          -> return ()
-        Just curEncoding -> cs ..>
-            [ _PTX_TRN ... \trn -> case curEncoding of
-                CP37    -> let bstr = packAStr' (ptx_trn trn) in do
-                    insertText bstr
-                    modifyIORef _CurrentColumn (+ S.length bstr)
-                CP835   -> pack835 (ptx_trn trn) >>= \bstr -> do
-                    insertText bstr
-                    modifyIORef _CurrentColumn (+ S.length bstr)
-            , _PTX_BLN ... \_ -> do
-                writeIORef _CurrentColumn 0
-                modifyIORef _CurrentLine (+1)
-            , _PTX_AMB ... \x -> do
-                minSize <- readIORef _MinFontSize
-                writeIORef _CurrentLine (fromEnum (ptx_amb x) `div` minSize)
-            , _PTX_AMI ... \x -> do
-                minSize <- readIORef _MinFontSize
-                let offset = fromEnum $ ptx_ami x
-                    pos    = offset `div` minSize
-                writeIORef _CurrentColumn pos
-            ]
+    curEncoding <- lookupFontEncoding scflId
+    cs ..>
+        [ _PTX_TRN ... \trn -> case curEncoding of
+            Just CP37    -> let bstr = packAStr' (ptx_trn trn) in do
+                insertText bstr
+                modifyIORef _CurrentColumn (+ S.length bstr)
+            Just CP835   -> pack835 (ptx_trn trn) >>= \bstr -> do
+                insertText bstr
+                modifyIORef _CurrentColumn (+ S.length bstr)
+            Just CP950   -> let bstr = packBuf (ptx_trn trn) in do
+                insertText bstr
+                modifyIORef _CurrentColumn (+ S.length bstr)
+            _            -> fail "TRN without SCFL?"
+        , _PTX_BLN ... \_ -> do
+            writeIORef _CurrentColumn 0
+            modifyIORef _CurrentLine (+1)
+        , _PTX_AMB ... movePosition Absolute _CurrentLine   . ptx_amb
+        , _PTX_RMB ... movePosition Relative _CurrentLine   . ptx_rmb
+        , _PTX_AMI ... movePosition Absolute _CurrentColumn . ptx_ami
+        , _PTX_RMI ... movePosition Relative _CurrentColumn . ptx_rmi
+        ]
+
+data Position = Absolute | Relative 
+
+movePosition :: Position -> IORef Int -> N2 -> IO ()
+movePosition p ref n = do
+    minSize <- readIORef _MinFontSize
+    let offset = fromEnum n `div` minSize
+    case p of
+        Absolute -> writeIORef ref offset
+        Relative -> modifyIORef ref (+ offset)
+
 
 packAStr' :: AStr -> S.ByteString
 packAStr' astr = S.map (ebc2ascWord !) (packBuf astr)
