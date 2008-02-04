@@ -3,6 +3,7 @@
 module Main where
 import OpenAFP
 import System.Exit
+import System.FilePath
 import qualified Data.ByteString.Char8 as C
 import qualified Data.ByteString.Lazy as L
 
@@ -38,8 +39,15 @@ finalizeFh chunks ref = do
 main :: IO ()
 main = do
     args    <- getArgs
-    if null args then error "Usage: tcb-split file.afp" else do
-    let inFile = head args
+
+    let (inFile, maxSmallPages) = case args of
+            []      -> error "Usage: tcb-split file.afp [max-small-pages (defaults to 3)]"
+            [x]     -> (x, 3)
+            (x:y:_) -> (x, read y)
+        (dir, fn) = splitFileName inFile
+
+    let ?maxSmallPages  = maxSmallPages
+
     cs      <- readAFP inFile
 
     let (preamble, rest) = break (~~ _BPG) cs
@@ -54,15 +62,15 @@ main = do
 
     forM_ ([0..] `zip` splitPages rest) $ \(i, page) -> do
         fh  <- initFh preamble $ case pageSizeOf page of
-                PSmall  -> (smallOpened, "small_" ++ inFile)
-                _       -> (largeOpened, "large_" ++ inFile)
+                PSmall  -> (smallOpened, dir `combine` "small_" ++ fn)
+                _       -> (largeOpened, dir `combine` "large_" ++ fn)
         L.hPut fh $ encodeList page
 
     finalizeFh postamble smallOpened
     finalizeFh postamble largeOpened
 
 -- Find the non-zero AMB with lowest number
-pageSizeOf :: [AFP_] -> PageSize
+pageSizeOf :: (?maxSmallPages :: Int) => [AFP_] -> PageSize
 pageSizeOf [] = PSmall
 pageSizeOf cs = case sortBy compareAMB rows of
     []      -> PSmall -- A page with no text?
@@ -72,8 +80,8 @@ pageSizeOf cs = case sortBy compareAMB rows of
             []      -> PSmall -- An empty TRN?
             toks    -> case C.readInt (last toks) of
                 Nothing -> PSmall   -- A non-numeric token?
-                Just (i, _) | i <= 3    -> PSmall   -- Three pages or less are small
-                            | otherwise -> PLarge   -- Four pages or more are large
+                Just (i, _) | i <= ?maxSmallPages -> trace (show col ++ ": Small") PSmall
+                            | otherwise           -> trace (show col ++ ": Large") PLarge
     where
     rows = tail . splitRecords _PTX_AMB $ concat [ptx_Chunks $ decodeChunk c | c <- cs, c ~~ _PTX ]
     compareTRN x y = compare (C.length y) (C.length x)
