@@ -43,12 +43,12 @@ import qualified Data.ByteString as S
 import GHC.Word (Word32(..),Word16(..),Word64(..))
 import qualified Data.ByteString.Lazy as L
 
-newtype A1 = A1 Word8 deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable, Storable)
-newtype A2 = A2 Word16 deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable, Storable)
+newtype A1 = A1 Word8 deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable, Storable, Bounded)
+newtype A2 = A2 Word16 deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable, Storable, Bounded)
 newtype A3 = A3 Word32 deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable)
-newtype A4 = A4 Word32 deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable, Storable)
+newtype A4 = A4 Word32 deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable, Storable, Bounded)
 newtype A6 = A6 Word64 deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable)
-newtype A8 = A8 Word64 deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable, Storable)
+newtype A8 = A8 Word64 deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable, Storable, Bounded)
 newtype A12 = A12 Integer deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable)
 
 newtype I1 = I1 Int8 deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable, Storable, Ix, IArray UArray, Show)
@@ -56,12 +56,28 @@ newtype I2 = I2 Int16 deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeab
 newtype I4 = I4 Int32 deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable, Storable, Ix, IArray UArray, Show)
 newtype I8 = I8 Int64 deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable, Storable, Ix, IArray UArray, Show)
 
-newtype N1 = N1 { fromN1 :: Word8 } deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable, Storable, Binary, Ix, IArray UArray)
-newtype N2 = N2 { fromN2 :: Word16 } deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable, Storable, Binary)
+newtype N1 = N1 { fromN1 :: Word8 } deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable, Storable, Binary, Ix, IArray UArray, Bounded)
+newtype N2 = N2 { fromN2 :: Word16 } deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable, Storable, Binary, Bounded)
 newtype N3 = N3 { fromN3 :: Word32 } deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable)
-newtype N4 = N4 { fromN4 :: Word32 } deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable, Storable, Binary)
+newtype N4 = N4 { fromN4 :: Word32 } deriving (Ord, Enum, Real, Integral, Eq, Num, Bits, Typeable, Storable, Binary, Bounded)
 
-data N0 = N0 deriving (Show, Ord, Enum, Eq, Typeable, Ix)
+data N0 = N0 deriving (Show, Ord, Enum, Eq, Typeable, Ix, Bounded)
+
+instance Bounded A3 where
+    minBound = A3 0
+    maxBound = A3 (2 ^ (8 * 3))
+
+instance Bounded A6 where
+    minBound = A6 0
+    maxBound = A6 (2 ^ (8 * 6))
+
+instance Bounded A12 where
+    minBound = A12 0
+    maxBound = A12 (2 ^ (8 * 12))
+
+instance Bounded N3 where
+    minBound = N3 0
+    maxBound = N3 (2 ^ (8 * 3))
 
 instance Binary N0 where
     get = return N0
