@@ -19,7 +19,26 @@ import OpenAFP.Types
 import OpenAFP.Records
 import OpenAFP.Internals
 import qualified Data.ByteString as S
+import qualified Data.ByteString.Unsafe as S
+import qualified Data.ByteString.Internal as S
 import qualified Data.ByteString.Lazy as L
+
+import Data.Int
+import GHC.Base (build, unsafeChr, realWorld#)
+import GHC.IOBase (IO(..))
+
+hashByteString (S.PS x s l) = inlinePerformIO $ withForeignPtr x $ \p ->
+     go (0 :: Int32) (p `plusPtr` s) l
+     where
+     go :: Int32 -> Ptr Word8 -> Int -> IO Int32
+     go a b c | a `seq` b `seq` c `seq` False = undefined
+     go h _ 0 = return h
+     go h p n = do w <- peek p
+                   go (fromIntegral w + rotateL h 8) (p `plusPtr` 1) (n-1)
+
+{-# INLINE inlinePerformIO #-}
+inlinePerformIO :: IO a -> a
+inlinePerformIO (IO m) = case m realWorld# of (# _, r #) -> r
 
 infixl 5 $$
 infixl 5 $=
@@ -147,6 +166,17 @@ toA8 s = sum
     where
     [n1, n2, n3, n4, n5, n6, n7, n8] = map (fromIntegral . (asc2ebc !) . ord) padded
     padded = take 8 (s ++ repeat ' ')
+
+packA8 :: A8 -> S.ByteString
+packA8 w = S.unsafeCreate 8 $ \ptr -> do
+    pokeByteOff ptr 0 (ebc2ascW8 ! fromIntegral (w `shiftR` 56))
+    pokeByteOff ptr 1 (ebc2ascW8 ! fromIntegral ((w `shiftR` 48) .&. 0xff))
+    pokeByteOff ptr 2 (ebc2ascW8 ! fromIntegral ((w `shiftR` 40) .&. 0xff))
+    pokeByteOff ptr 3 (ebc2ascW8 ! fromIntegral ((w `shiftR` 32) .&. 0xff))
+    pokeByteOff ptr 4 (ebc2ascW8 ! fromIntegral ((w `shiftR` 24) .&. 0xff))
+    pokeByteOff ptr 5 (ebc2ascW8 ! fromIntegral ((w `shiftR` 16) .&. 0xff))
+    pokeByteOff ptr 6 (ebc2ascW8 ! fromIntegral ((w `shiftR` 8)  .&. 0xff))
+    pokeByteOff ptr 7 (ebc2ascW8 ! fromIntegral (w .&. 0xff))
 
 fromA8 :: A8 -> String
 fromA8 w = [

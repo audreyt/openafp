@@ -50,14 +50,20 @@ nullForeignPtr = unsafePerformIO (newForeignPtr_ nullPtr)
 _NStr :: NStr
 _NStr = mkBuf S.empty
 
+packAStr :: AStr -> S.ByteString
+packAStr = S.map (ebc2ascW8 !) . packBuf
+
 fromAStr :: AStr -> String
-fromAStr = C.unpack . S.map (ebc2ascW8 !) . packBuf
+fromAStr = C.unpack . packAStr
 
 toAStr :: String -> AStr
 toAStr = mkBuf . S.pack . map (asc2ebcW8 !)
 
+packNStr :: NStr -> S.ByteString
+packNStr = packBuf
+
 fromNStr :: NStr -> [N1]
-fromNStr = map N1 . S.unpack . packBuf
+fromNStr = map N1 . S.unpack . packNStr
 
 toNStr :: [N1] -> NStr
 toNStr = mkBuf . S.pack . map fromN1
