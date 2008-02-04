@@ -5,6 +5,7 @@ import OpenAFP
 import System.Mem
 import System.Directory
 import Control.Concurrent
+import qualified Control.Exception as E (try, catch, throwIO)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Unsafe as B
 
@@ -49,20 +50,19 @@ main = do
 
 scanUDC :: FilePath -> IO Bool
 scanUDC file = do
-    cs      <- readAFP file
-    (`catchError` hdl) $ do
-        let ptxs = length cs `seq` filter (~~ _PTX) cs
-        mapM_ (scanPTX . decodeChunk) ptxs
-        return False
+    rv <- E.try $ readAFP file
+    case rv of
+        Right cs    -> (`E.catch` hdl) $ do
+            let ptxs = length cs `seq` filter (~~ _PTX) cs
+            mapM_ (scanPTX . decodeChunk) ptxs
+            return False
+        _           -> return False -- skip non-afp files
     where
-    tryOpen = openBinaryFile file ReadMode `catchError` tryErr
-    tryErr e
-        | isFullError e = do
-            threadDelay 200
-            tryOpen
-        | otherwise = throwError e
-    hdl err | Just e <- cast err, isUserError e = return True
-            | otherwise = return False
+    tryOpen = openBinaryFile file ReadMode `E.catch` tryErr
+    tryErr (IOException ioe) | isFullError ioe = threadDelay 200 >> tryOpen
+    tryErr e = E.throwIO e
+    hdl (IOException ioe) | Just e <- cast ioe, isUserError e = return True
+    hdl _ = return False
 
 scanPTX :: PTX -> IO ()
 scanPTX ptx = mapM_ ptxGroupScan . splitRecords _PTX_SCFL $ readChunks ptx

@@ -7,7 +7,7 @@ import System.Exit
 main :: IO ()
 main = do
     args    <- getArgs
-    if null args then error "Usage: validate file.afp" else do
+    if null args then error "Usage: afp-validate file.afp" else do
     oks <- (`mapM` args) $ \file -> do
         putStr $ file ++ ": "
         cs <- readAFP file

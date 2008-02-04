@@ -187,44 +187,44 @@ endPageHandler r = do
         xo  <- readVar _XOrientation
         yo  <- readVar _YOrientation
         forM_ (reverse udcList) $ \udc -> do
-            push _BII
-            push _IOC
-                { ioc_XMap            = 0x03E8
-                , ioc_XOrientation    = xo
-                , ioc_YMap            = 0x03E8
-                , ioc_YOrientation    = yo
-                }
-            udcCharHandler xp yo udc
-            push _EII
+            infoMaybe <- fontInfoOf (udcFont udc) (udcChar udc)
+            case infoMaybe of
+                Just info | S.length (fromBuf0 $ fontBitmap info) > 0 -> do
+                    push _BII
+                    push _IOC
+                        { ioc_XMap            = 0x03E8
+                        , ioc_XOrientation    = xo
+                        , ioc_YMap            = 0x03E8
+                        , ioc_YOrientation    = yo
+                        }
+                    udcCharHandler xp yo udc info
+                    push _EII
+                _ -> return ()
     push r
 
-udcCharHandler xp yo char = do
-    infoMaybe <- fontInfoOf (udcFont char) (udcChar char)
-    case infoMaybe of
-        Nothing -> return ()
-        Just info -> do
-            base <- adjustY &: fontBaseOffset info
-            let (x, y) = orientate x' y'
-                x' = udcX char + (fromIntegral $ fontASpace info)
-                y' = udcY char - (fromIntegral $ base)
-            push _IID
-                { iid_Color           = 0x0008
-                , iid_ConstantData1   = 0x000009600960000000000000
-                , iid_ConstantData2   = 0x000000002D00
-                , iid_XUnits          = fontResolution info
-                , iid_YUnits          = fontResolution info
-                }
-            push _ICP
-                { icp_XCellOffset = x
-                , icp_XCellSize   = fontWidth info
-                , icp_XFillSize   = fontWidth info
-                , icp_YCellOffset = y
-                , icp_YCellSize   = fontHeight info
-                , icp_YFillSize   = fontHeight info
-                }
-            push _IRD {
-                ird_ImageData = fontBitmap info
-            }
+udcCharHandler xp yo char info = do
+    base <- adjustY &: fontBaseOffset info
+    let (x, y) = orientate x' y'
+        x' = udcX char + (fromIntegral $ fontASpace info)
+        y' = udcY char - (fromIntegral $ base)
+    push _IID
+        { iid_Color           = 0x0008
+        , iid_ConstantData1   = 0x000009600960000000000000
+        , iid_ConstantData2   = 0x000000002D00
+        , iid_XUnits          = fontResolution info
+        , iid_YUnits          = fontResolution info
+        }
+    push _ICP
+        { icp_XCellOffset = x
+        , icp_XCellSize   = fontWidth info
+        , icp_XFillSize   = fontWidth info
+        , icp_YCellOffset = y
+        , icp_YCellSize   = fontHeight info
+        , icp_YFillSize   = fontHeight info
+        }
+    push _IRD {
+        ird_ImageData = fontBitmap info
+    }
     where
     orientate x y
         | (yo == 0x5a00)    = (xp - y, x)
