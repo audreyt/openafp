@@ -26,7 +26,7 @@ instance Rec T_AV where
     recGet = do a01 <- get; a02 <- get; return $ T_AV a01 a02
     recPut r = do put $ t_av_Type r; put $ t_av r; return ()
     recSizeOf r = sum [ sizeOf $ t_av_Type r, sizeOf $ t_av r ]
-    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ t_av_Type r), viewField "" (viewNStr $ t_av r) ]
+    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ t_av_Type r), viewField "" (viewAStr $ t_av r) ]
     recType = fromEnum . t_av_Type
 
 instance Rec T_C where
