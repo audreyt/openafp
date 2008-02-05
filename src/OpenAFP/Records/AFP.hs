@@ -288,7 +288,7 @@ _BFN  = BFN  0xD3A889 0 _NStr
 _BGR  :: BGR
 _BGR  = BGR  0xD3A8BB 0 _NStr
 _BII  :: BII
-_BII  = BII  0xD3A87B 0 0
+_BII  = BII  0xD3A87B 0 _NStr
 _BIM  :: BIM
 _BIM  = BIM  0xD3A8FB 0 _NStr
 _BMM  :: BMM
@@ -366,7 +366,7 @@ _EFN  = EFN  0xD3A989 0 _NStr
 _EGR  :: EGR
 _EGR  = EGR  0xD3A9BB 0 _NStr
 _EII  :: EII
-_EII  = EII  0xD3A97B 0 0
+_EII  = EII  0xD3A97B 0 _NStr
 _EIM  :: EIM
 _EIM  = EIM  0xD3A9FB 0 _NStr
 _EMM  :: EMM

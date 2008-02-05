@@ -7,6 +7,6 @@ import OpenAFP.Internals
 data BII = BII {
     bii_Type                         :: !N3
     ,bii_                            :: !N3
-    ,bii_ImageObjectName             :: !A8
+    ,bii_ImageObjectName             :: !AStr
 } deriving (Show, Typeable)
 

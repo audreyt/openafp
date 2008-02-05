@@ -7,6 +7,6 @@ import OpenAFP.Internals
 data EII = EII {
     eii_Type                         :: !N3
     ,eii_                            :: !N3
-    ,eii_ImageObjectName             :: !A8
+    ,eii_ImageObjectName             :: !AStr
 } deriving (Show, Typeable)
 

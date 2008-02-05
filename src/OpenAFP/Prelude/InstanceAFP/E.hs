@@ -107,7 +107,7 @@ instance Rec EII where
     recGet = do a01 <- get; a02 <- get; a03 <- get; return $ EII a01 a02 a03
     recPut r = do put $ eii_Type r; put $ eii_ r; put $ eii_ImageObjectName r; return ()
     recSizeOf r = sum [ sizeOf $ eii_Type r, sizeOf $ eii_ r, sizeOf $ eii_ImageObjectName r ]
-    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ eii_Type r), viewField "_" (viewNumber $ eii_ r), viewField "ImageObjectName" (viewString $ eii_ImageObjectName r) ]
+    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ eii_Type r), viewField "_" (viewNumber $ eii_ r), viewField "ImageObjectName" (viewAStr $ eii_ImageObjectName r) ]
     recType = fromEnum . eii_Type
 
 instance Rec EIM where

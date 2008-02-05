@@ -121,7 +121,7 @@ instance Rec BII where
     recGet = do a01 <- get; a02 <- get; a03 <- get; return $ BII a01 a02 a03
     recPut r = do put $ bii_Type r; put $ bii_ r; put $ bii_ImageObjectName r; return ()
     recSizeOf r = sum [ sizeOf $ bii_Type r, sizeOf $ bii_ r, sizeOf $ bii_ImageObjectName r ]
-    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ bii_Type r), viewField "_" (viewNumber $ bii_ r), viewField "ImageObjectName" (viewString $ bii_ImageObjectName r) ]
+    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ bii_Type r), viewField "_" (viewNumber $ bii_ r), viewField "ImageObjectName" (viewAStr $ bii_ImageObjectName r) ]
     recType = fromEnum . bii_Type
 
 instance Rec BIM where
