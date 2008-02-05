@@ -4,6 +4,7 @@ module Main where
 import OpenAFP
 import System.Exit
 import System.FilePath
+import qualified Data.ByteString as S
 import qualified Data.ByteString.Char8 as C
 import qualified Data.ByteString.Lazy as L
 
@@ -50,40 +51,41 @@ main = do
 
     cs      <- readAFP inFile
 
-    let (preamble, rest) = break (~~ _BPG) cs
-        _epg      = encodeChunk $ Record _EPG
-        _eng      = encodeChunk $ Record _ENG
-        _edt      = encodeChunk $ Record _EDT
-        postamble | any (~~ _BNG) preamble  = [_epg, _eng, _edt]
-                  | otherwise               = [_epg, _edt]
+    let (preamble:rest) = splitPages cs
+        _edt            = encodeChunk $ Record _EDT
 
     smallOpened <- newIORef Nothing
     largeOpened <- newIORef Nothing
 
-    forM_ ([0..] `zip` splitPages rest) $ \(i, page) -> do
+    forM_ rest $ \page -> do
         fh  <- initFh preamble $ case pageSizeOf page of
                 PSmall  -> (smallOpened, dir `combine` "small_" ++ fn)
                 _       -> (largeOpened, dir `combine` "large_" ++ fn)
         L.hPut fh $ encodeList page
 
-    finalizeFh postamble smallOpened
-    finalizeFh postamble largeOpened
+    finalizeFh [_edt] smallOpened
+    finalizeFh [_edt] largeOpened
+
+isBeginPage :: AFP_ -> Bool
+isBeginPage t = (t ~~ _BPG) || (t ~~ _BNG)
 
 -- Find the non-zero AMB with lowest number
 pageSizeOf :: (?maxSmallPages :: Int) => [AFP_] -> PageSize
 pageSizeOf [] = PSmall
 pageSizeOf cs = case sortBy compareAMB rows of
     []      -> PSmall -- A page with no text?
-    (row:_) -> case sortBy compareTRN [packAStr $ ptx_trn (decodeChunk c) | c <- row, c ~~ _PTX_TRN] of
+    (row:_) -> case sortBy compareTRN [packNStr $ ptx_trn (decodeChunk c) | c <- row, c ~~ _PTX_TRN] of
         []      -> PSmall -- A column with no TRN?
-        (col:_) -> case C.words col of
-            []      -> PSmall -- An empty TRN?
-            toks    -> case C.readInt (last toks) of
-                Nothing -> PSmall   -- A non-numeric token?
-                Just (i, _) | i <= ?maxSmallPages -> trace (show col ++ ": Small") PSmall
-                            | otherwise           -> trace (show col ++ ": Large") PLarge
+        (col:_) -> case [ S.map fromDigitLike x | x <- S.splitWith (not . isDigitLike) col, not (S.null x) ] of
+            []  -> PSmall -- No digits :-/
+            xs  -> case C.readInt (last xs) of
+                Nothing -> trace (shows xs ": Non-parsable") PSmall   -- A non-numeric token?
+                Just (i, _) | i <= ?maxSmallPages -> trace (shows xs ": Small") PSmall
+                            | otherwise           -> trace (shows xs ": Large") PLarge
     where
-    rows = tail . splitRecords _PTX_AMB $ concat [ptx_Chunks $ decodeChunk c | c <- cs, c ~~ _PTX ]
+    rows = case splitRecords _PTX_AMB $ concat [ptx_Chunks $ decodeChunk c | c <- cs, c ~~ _PTX ] of
+        []      -> []
+        (_:xs)  -> xs
     compareTRN x y = compare (C.length y) (C.length x)
     compareAMB (x:_) (y:_) = compare (ambOf x) (ambOf y)
     compareAMB _ _ = EQ
@@ -91,9 +93,34 @@ pageSizeOf cs = case sortBy compareAMB rows of
         0   -> maxBound -- We don't really care about rows with AMB 0.
         x   -> x
 
+fromDigitLike :: Word8 -> Word8
+fromDigitLike n
+    | n >= 0xF0 = n - 0xC0
+    | otherwise = n
+
+isDigitLike :: Word8 -> Bool
+isDigitLike n = (n >= 0x30 && n <= 0x39) || (n >= 0xF0 && n <= 0xF9)
+
+-- | Selects words corresponding to white-space characters in the Latin-1 range
+-- ordered by frequency. 
+isSpaceWord8' :: Word8 -> Bool
+isSpaceWord8' w =
+    w == 0x20 ||
+    w == 0x00 || -- This Case Is Specific To Us
+    w == 0x0A || -- LF, \n
+    w == 0x09 || -- HT, \t      
+    w == 0x0C || -- FF, \f      
+    w == 0x0D || -- CR, \r      
+    w == 0x0B || -- VT, \v      
+    w == 0xA0    -- spotted by QC..
+{-# INLINE isSpaceWord8' #-}
+
+
 splitPages :: [AFP_] -> [[AFP_]]
-splitPages cs = case rest of
-    []      -> []
-    (_:xs)  -> (this:splitPages xs)
+splitPages cs = if null rest then [this] else case splitPages rest' of
+    []      -> [this, rest]
+    (y:ys)  -> (this:(begins ++ y):ys)
     where
-    (this, rest) = break (~~ _EPG) cs
+    (this, rest)    = break isBeginPage cs
+    (begins, rest') = span isBeginPage rest
+
