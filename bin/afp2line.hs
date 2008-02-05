@@ -136,6 +136,7 @@ ptxGroupDump (scfl:cs) = do
             Just CP950   -> let bstr = packBuf (ptx_trn trn) in do
                 insertText bstr
                 modifyIORef _CurrentColumn (+ S.length bstr)
+            Just CP932   -> fail "Found 932!"
             _            -> fail "TRN without SCFL?"
         , _PTX_BLN ... \_ -> do
             writeIORef _CurrentColumn 0
