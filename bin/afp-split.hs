@@ -16,19 +16,20 @@ main = do
     if null args then error "Usage: afp-split file.afp" else do
     let inFile = head args
     cs      <- readAFP inFile
-    let (preamble, rest) = break (~~ _BPG) cs
-        _epg      = encodeChunk $ Record _EPG
-        _eng      = encodeChunk $ Record _ENG
+    let (preamble:rest) = splitPages cs
         _edt      = encodeChunk $ Record _EDT
-        postamble = [_epg, _eng, _edt]
-    forM_ ([0..] `zip` splitPages rest) $ \(i, page) -> do
+    forM_ ([0..] `zip` rest) $ \(i, page) -> do
         let outFile = inFile ++ ('.':show i)
         putStrLn outFile
-        writeAFP outFile $ preamble ++ page ++ postamble
+        writeAFP outFile $ preamble ++ page ++ [_edt]
 
 splitPages :: [AFP_] -> [[AFP_]]
-splitPages cs = case rest of
-    []      -> []
-    (_:xs)  -> (this:splitPages xs)
+splitPages cs = if null rest then [this] else case splitPages rest' of
+    []      -> [this, rest]
+    (y:ys)  -> (this:(begins ++ y):ys)
     where
-    (this, rest) = break (~~ _EPG) cs
+    (this, rest)    = break isBeginPage cs
+    (begins, rest') = span isBeginPage rest
+
+isBeginPage :: AFP_ -> Bool
+isBeginPage t = (t ~~ _BPG) || (t ~~ _BNG)
