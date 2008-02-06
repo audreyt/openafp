@@ -133,10 +133,12 @@ ptxGroupDump (scfl:cs) = do
             Just CP835   -> pack835 (ptx_trn trn) >>= \bstr -> do
                 insertText bstr
                 modifyIORef _CurrentColumn (+ S.length bstr)
+            Just CP939   -> pack939 (ptx_trn trn) >>= \bstr -> do
+                insertText bstr
+                modifyIORef _CurrentColumn (+ S.length bstr)
             Just CP950   -> let bstr = packBuf (ptx_trn trn) in do
                 insertText bstr
                 modifyIORef _CurrentColumn (+ S.length bstr)
-            Just CP932   -> fail "Found 932!"
             _            -> fail "TRN without SCFL?"
         , _PTX_BLN ... \_ -> do
             writeIORef _CurrentColumn 0
@@ -161,15 +163,22 @@ movePosition p ref n = do
 packAStr' :: AStr -> S.ByteString
 packAStr' astr = S.map (ebc2ascWord !) (packBuf astr)
 
-pack835 :: NStr -> IO S.ByteString
-pack835 nstr = S.unsafeUseAsCStringLen (packBuf nstr) $ \(src, len) -> S.create len $ \target -> do
+{-# INLINE pack835 #-}
+{-# INLINE pack939 #-}
+pack835, pack939 :: NStr -> IO S.ByteString
+pack835 = packWith convert835to950
+pack939 = packWith convert939to932
+
+{-# INLINE packWith #-}
+packWith :: (Int -> Int) -> NStr -> IO S.ByteString
+packWith f nstr = S.unsafeUseAsCStringLen (packBuf nstr) $ \(src, len) -> S.create len $ \target -> do
     let s = castPtr src
     let t = castPtr target
     forM_ [0..(len `div` 2)-1] $ \i -> do
         hi  <- peekByteOff s (i*2)       :: IO Word8
         lo  <- peekByteOff s (i*2+1)     :: IO Word8
-        let cp950       = convert835to950 (fromEnum hi * 256 + fromEnum lo)
-            (hi', lo')  = cp950 `divMod` 256
+        let ch         = f (fromEnum hi * 256 + fromEnum lo)
+            (hi', lo') = ch `divMod` 256
         pokeByteOff t (i*2)   (toEnum hi' :: Word8)
         pokeByteOff t (i*2+1) (toEnum lo' :: Word8)
 
