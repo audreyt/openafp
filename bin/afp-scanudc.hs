@@ -81,4 +81,6 @@ scanTRN trn = B.unsafeUseAsCStringLen (packBuf $ ptx_trn trn) $ \(cstr, len) -> 
     forM_ [0, 2..len-1] $ \off -> do
         hi <- peekByteOff cstr off
         when (isUDC hi) $ do
+            -- lo <- peekByteOff cstr (off+1)
+            -- print [hi, lo]
             throwError (strMsg "Found UDC")

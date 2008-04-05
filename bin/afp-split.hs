@@ -13,15 +13,22 @@ import qualified Data.ByteString.Char8 as C
 main :: IO ()
 main = do
     args    <- getArgs
-    if null args then error "Usage: afp-split file.afp" else do
+    if null args then error "Usage: afp-split file.afp [pages]" else do
     let inFile = head args
     cs      <- readAFP inFile
     let (preamble:rest) = splitPages cs
+        _eng      = encodeChunk $ Record _ENG
         _edt      = encodeChunk $ Record _EDT
-    forM_ ([0..] `zip` rest) $ \(i, page) -> do
-        let outFile = inFile ++ ('.':show i)
-        putStrLn outFile
-        writeAFP outFile $ preamble ++ page ++ [_edt]
+        pagePairs = map show [1..] `zip` rest
+    if null args
+        then forM_ pagePairs $ \(i, page) -> do
+            let outFile = inFile ++ ('.':i)
+            putStrLn outFile
+            writeAFP outFile $ preamble ++ page ++ [_eng, _edt]
+        else do
+            let outFile = inFile ++ ".part"
+            writeAFP outFile $ preamble ++ concat [ page | (i, page) <- pagePairs, i `elem` args ] ++ [_eng, _edt]
+            putStrLn outFile
 
 splitPages :: [AFP_] -> [[AFP_]]
 splitPages cs = if null rest then [this] else case splitPages rest' of
@@ -32,4 +39,4 @@ splitPages cs = if null rest then [this] else case splitPages rest' of
     (begins, rest') = span isBeginPage rest
 
 isBeginPage :: AFP_ -> Bool
-isBeginPage t = (t ~~ _BPG) || (t ~~ _BNG)
+isBeginPage t = (t ~~ _BPG)

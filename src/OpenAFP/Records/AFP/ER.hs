@@ -7,6 +7,6 @@ import OpenAFP.Internals
 data ER = ER {
     er_Type                          :: !N3
     ,er_                             :: !N3
-    ,er                              :: !NStr
+    ,er                              :: !AStr
 } deriving (Show, Typeable)
 

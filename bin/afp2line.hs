@@ -26,14 +26,45 @@ main = do
     when (null args) $ do
         putStrLn "Usage: afp2line input.afp ... > output.txt"
     forM_ args $ \f -> do
-        cs  <- readAFP f
-        forM_ (splitRecords _PGD cs) $ \page -> do
-            page ..>
-                [ _PTX  ... ptxDump
-                , _MCF  ... mcfHandler
-                , _MCF1 ... mcf1Handler
-                ]
-            dumpPageContent
+        ft <- guessFileType f
+        processFile ft f
+
+data FileType = F_ASCII | F_EBCDIC | F_AFP | F_PDF | F_Unknown deriving Show
+
+guessFileType :: FilePath -> IO FileType
+guessFileType fn = do
+    fh <- openBinaryFile fn ReadMode
+    bs <- S.hGet fh 1
+    hClose fh
+    return $ if S.null bs then F_Unknown else case C.head bs of
+        'Z'     -> F_AFP
+        '%'     -> F_PDF
+        '1'     -> F_ASCII
+        '0'     -> F_ASCII
+        ' '     -> F_ASCII
+        '\xF0'  -> F_EBCDIC
+        '\xF1'  -> F_EBCDIC
+        '@'     -> F_EBCDIC
+        _       -> F_Unknown
+
+processFile :: FileType -> FilePath -> IO ()
+processFile F_ASCII f = do
+    -- ...Look at each line's first byte to determine what to output...
+processFile F_AFP f = do
+    -- Read the first byte to determine its file type:
+    -- '1'    indicates ASCII Plain Text line data
+    -- '\xF1' indicates EBCDIC line data
+    -- 'Z'    indicates AFP file
+    -- '%'    indicates PDF file
+    cs  <- readAFP f
+    forM_ (splitRecords _PGD cs) $ \page -> do
+        page ..>
+            [ _PTX  ... ptxDump
+            , _MCF  ... mcfHandler
+            , _MCF1 ... mcf1Handler
+            ]
+        dumpPageContent
+processFile t f = warn $ "Unknown file type: " ++ show t ++ " (" ++ f ++ ")"
 
 dumpPageContent :: IO ()
 dumpPageContent = do

@@ -184,7 +184,7 @@ instance Rec ER where
     recGet = do a01 <- get; a02 <- get; a03 <- get; return $ ER a01 a02 a03
     recPut r = do put $ er_Type r; put $ er_ r; put $ er r; return ()
     recSizeOf r = sum [ sizeOf $ er_Type r, sizeOf $ er_ r, sizeOf $ er r ]
-    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ er_Type r), viewField "_" (viewNumber $ er_ r), viewField "" (viewNStr $ er r) ]
+    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ er_Type r), viewField "_" (viewNumber $ er_ r), viewField "" (viewAStr $ er r) ]
     recType = fromEnum . er_Type
 
 instance Rec ERG where
