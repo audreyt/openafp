@@ -1,5 +1,5 @@
 name:               OpenAFP
-version:            1.0
+version:            1.1
 license:            BSD3
 License-file:       LICENSE
 author:             Audrey Tang
@@ -7,10 +7,9 @@ maintainer:         audreyt@audreyt.org
 synopsis:           IBM AFP document format parser and generator
 description:        IBM AFP document format parser and generator
 exposed-modules:    OpenAFP.Internals.Binary OpenAFP.Internals.Ebc2Asc
-                    OpenAFP.Internals.UConv
                     OpenAFP.Prelude.Utils OpenAFP.Prelude.Instances OpenAFP.Prelude.InstanceT
                     OpenAFP.Prelude.Lookups
-                    OpenAFP.Prelude.InstanceAFP OpenAFP.Prelude.InstancePTX OpenAFP.Prelude.Exts
+                    OpenAFP.Prelude.InstanceAFP OpenAFP.Prelude.InstancePTX
                     OpenAFP.Records.T.LDOPM OpenAFP.Records.T.OSFO OpenAFP.Records.T.FRMT
                     OpenAFP.Records.T.OCH OpenAFP.Records.T.MO OpenAFP.Records.T.T2FRMT
                     OpenAFP.Records.T.FDS OpenAFP.Records.T.OCL OpenAFP.Records.T.OO
@@ -91,11 +90,11 @@ exposed-modules:    OpenAFP.Internals.Binary OpenAFP.Internals.Ebc2Asc
                     OpenAFP.Prelude.InstanceAFP.L
                     OpenAFP.Prelude.InstanceAFP.M
 category:           Data
-includes:           unicode/ucnv.h
-extensions:         CPP, ForeignFunctionInterface
-build-depends:      base, mtl, haskell98, regex-compat, directory, process, array, containers, binary, bytestring
-include-dirs:       /usr/include /usr/local/include /opt/local/include
-extra-lib-dirs:     /usr/lib /usr/local/lib /opt/local/lib
-ld-options:         -licuuc
-ghc-options:        -fglasgow-exts -funbox-strict-fields -fno-warn-missing-signatures -O2
+extensions:         MagicHash, DeriveDataTypeable, GeneralizedNewtypeDeriving,
+                    RankNTypes, TypeFamilies, FlexibleContexts, TypeSynonymInstances,
+                    ScopedTypeVariables, MultiParamTypeClasses
+build-type:         Simple
+build-depends:      base, mtl, haskell98, regex-compat, directory, process,
+                    array, containers, binary, bytestring
+ghc-options:        -funbox-strict-fields -fno-warn-missing-signatures -O
 hs-source-dirs:     src

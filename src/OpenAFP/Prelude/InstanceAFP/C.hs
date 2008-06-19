@@ -39,8 +39,8 @@ instance Rec CFI_Data where
     recView r = viewRecord (typeOf r) [ viewField "FontCharacterSetName" (viewString $ cfi_FontCharacterSetName r), viewField "CodePageName" (viewString $ cfi_CodePageName r), viewField "CodedFontName" (viewString $ cfi_CodedFontName r), viewField "Section" (viewNumber $ cfi_Section r) ]
     recType r = 0
 
-type instance RecOf CFI_Data = CFI
-instance RecData CFI where
+instance RecData CFI CFI_Data where
+    type RecOf CFI_Data = CFI
     type DataOf CFI = CFI_Data
     readData = cfi_Data
     writeData r cs = r { cfi_Data = cs }
@@ -73,8 +73,8 @@ instance Rec CPI_Data where
     recView r = viewRecord (typeOf r) [ viewField "GCGID" (viewString $ cpi_GCGID r), viewField "Section" (viewNumber $ cpi_Section r), viewField "CodePoint" (viewNumber $ cpi_CodePoint r) ]
     recType r = 0
 
-type instance RecOf CPI_Data = CPI
-instance RecData CPI where
+instance RecData CPI CPI_Data where
+    type RecOf CPI_Data = CPI
     type DataOf CPI = CPI_Data
     readData = cpi_Data
     writeData r cs = r { cpi_Data = cs }

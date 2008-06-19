@@ -186,8 +186,8 @@ instance Rec MCF1_Data where
     recView r = viewRecord (typeOf r) [ viewField "CodedFontLocalId" (viewNumber $ mcf1_CodedFontLocalId r), viewField "Reserved1" (viewString $ mcf1_Reserved1 r), viewField "CodedFontResourceSectionId" (viewNumber $ mcf1_CodedFontResourceSectionId r), viewField "Reserved2" (viewString $ mcf1_Reserved2 r), viewField "CodedFontName" (viewString $ mcf1_CodedFontName r), viewField "CodePageName" (viewString $ mcf1_CodePageName r), viewField "FontCharacterSetName" (viewString $ mcf1_FontCharacterSetName r), viewField "CharacterRotation" (viewNumber $ mcf1_CharacterRotation r) ]
     recType r = 0
 
-type instance RecOf MCF1_Data = MCF1
-instance RecData MCF1 where
+instance RecData MCF1 MCF1_Data where
+    type RecOf MCF1_Data = MCF1
     type DataOf MCF1 = MCF1_Data
     readData r = mcf1_Data r
     writeData r cs = r { mcf1_Data = cs }

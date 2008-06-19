@@ -104,10 +104,10 @@ fromJust' Nothing = error "fromJust1 - fail"
 fromJust'' (Just x) = x
 fromJust'' Nothing = error "fromJust2 - fail"
 
-matchRecord :: (RecData a, Eq b) => b -> (DataOf a -> b) -> a -> DataOf a
+matchRecord :: (RecData a b, Eq c) => c -> (b -> c) -> a -> b
 matchRecord n f = findRecord ((n ==) . f) . readData
 
-matchRecordMaybe :: (RecData a, Eq b) => b -> (DataOf a -> b) -> a -> Maybe (DataOf a)
+matchRecordMaybe :: (RecData a b, Eq c) => c -> (b -> c) -> a -> Maybe b
 matchRecordMaybe n f = findRecordMaybe ((n ==) . f) . readData
 
 findRecordMaybe :: (a -> Bool) -> [Record a] -> Maybe a

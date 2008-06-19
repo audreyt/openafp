@@ -46,8 +46,8 @@ instance Rec FNI_Data where
     recView r = viewRecord (typeOf r) [ viewField "GCGID" (viewString $ fni_GCGID r), viewField "CharacterIncrement" (viewNumber $ fni_CharacterIncrement r), viewField "AscendHeight" (viewNumber $ fni_AscendHeight r), viewField "DescendDepth" (viewNumber $ fni_DescendDepth r), viewField "Reserved1" (viewNumber $ fni_Reserved1 r), viewField "FNMCount" (viewNumber $ fni_FNMCount r), viewField "ASpace" (viewNumber $ fni_ASpace r), viewField "BSpace" (viewNumber $ fni_BSpace r), viewField "CSpace" (viewNumber $ fni_CSpace r), viewField "Reserved2" (viewNumber $ fni_Reserved2 r), viewField "BaseOffset" (viewNumber $ fni_BaseOffset r) ]
     recType r = 0
 
-type instance RecOf FNI_Data = FNI
-instance RecData FNI where
+instance RecData FNI FNI_Data where
+    type RecOf FNI_Data = FNI
     type DataOf FNI = FNI_Data
     readData = fni_Data
     writeData r cs = r { fni_Data = cs }
@@ -67,8 +67,8 @@ instance Rec FNM_Data where
     recView r = viewRecord (typeOf r) [ viewField "Width" (viewNumber $ fnm_Width r), viewField "Height" (viewNumber $ fnm_Height r), viewField "Offset" (viewNumber $ fnm_Offset r) ]
     recType r = 0
 
-type instance RecOf FNM_Data = FNM
-instance RecData FNM where
+instance RecData FNM FNM_Data where
+    type RecOf FNM_Data = FNM
     type DataOf FNM = FNM_Data
     readData = fnm_Data
     writeData r cs = r { fnm_Data = cs }
