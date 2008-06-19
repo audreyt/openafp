@@ -1,5 +1,3 @@
-{-# OPTIONS -fglasgow-exts -O -funbox-strict-fields #-}
-
 module OpenAFP.Internals.Binary (
     N0(..),
 

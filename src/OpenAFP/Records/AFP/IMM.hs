@@ -1,4 +1,3 @@
-{-# OPTIONS -fglasgow-exts -funbox-strict-fields #-}
 
 module OpenAFP.Records.AFP.IMM where
 import OpenAFP.Types

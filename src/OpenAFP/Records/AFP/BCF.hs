@@ -1,4 +1,3 @@
-{-# OPTIONS -fglasgow-exts -funbox-strict-fields #-}
 
 module OpenAFP.Records.AFP.BCF where
 import OpenAFP.Types

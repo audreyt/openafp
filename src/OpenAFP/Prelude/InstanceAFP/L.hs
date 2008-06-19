@@ -1,4 +1,3 @@
-{-# OPTIONS -fglasgow-exts #-}
 
 module OpenAFP.Prelude.InstanceAFP.L () where
 import OpenAFP.Types

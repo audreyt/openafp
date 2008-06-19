@@ -1,4 +1,3 @@
-{-# OPTIONS -fglasgow-exts #-}
 
 module OpenAFP.Prelude.InstanceAFP.B () where
 import OpenAFP.Types
@@ -128,7 +127,7 @@ instance Rec BIM where
     recGet = do a01 <- get; a02 <- get; a03 <- get; return $ BIM a01 a02 a03
     recPut r = do put $ bim_Type r; put $ bim_ r; put $ bim r; return ()
     recSizeOf r = sum [ sizeOf $ bim_Type r, sizeOf $ bim_ r, sizeOf $ bim r ]
-    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ bim_Type r), viewField "_" (viewNumber $ bim_ r), viewField "" (viewNStr $ bim r) ]
+    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ bim_Type r), viewField "_" (viewNumber $ bim_ r), viewField "" (viewAStr $ bim r) ]
     recType = fromEnum . bim_Type
 
 instance Rec BMM where
@@ -184,21 +183,21 @@ instance Rec BPS where
     recGet = do a01 <- get; a02 <- get; a03 <- get; return $ BPS a01 a02 a03
     recPut r = do put $ bps_Type r; put $ bps_ r; put $ bps r; return ()
     recSizeOf r = sum [ sizeOf $ bps_Type r, sizeOf $ bps_ r, sizeOf $ bps r ]
-    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ bps_Type r), viewField "_" (viewNumber $ bps_ r), viewField "" (viewNStr $ bps r) ]
+    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ bps_Type r), viewField "_" (viewNumber $ bps_ r), viewField "" (viewAStr $ bps r) ]
     recType = fromEnum . bps_Type
 
 instance Rec BPT where
     recGet = do a01 <- get; a02 <- get; a03 <- get; return $ BPT a01 a02 a03
     recPut r = do put $ bpt_Type r; put $ bpt_ r; put $ bpt r; return ()
     recSizeOf r = sum [ sizeOf $ bpt_Type r, sizeOf $ bpt_ r, sizeOf $ bpt r ]
-    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ bpt_Type r), viewField "_" (viewNumber $ bpt_ r), viewField "" (viewNStr $ bpt r) ]
+    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ bpt_Type r), viewField "_" (viewNumber $ bpt_ r), viewField "" (viewAStr $ bpt r) ]
     recType = fromEnum . bpt_Type
 
 instance Rec BR where
     recGet = do a01 <- get; a02 <- get; a03 <- get; return $ BR a01 a02 a03
     recPut r = do put $ br_Type r; put $ br_ r; put $ br r; return ()
     recSizeOf r = sum [ sizeOf $ br_Type r, sizeOf $ br_ r, sizeOf $ br r ]
-    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ br_Type r), viewField "_" (viewNumber $ br_ r), viewField "" (viewNStr $ br r) ]
+    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ br_Type r), viewField "_" (viewNumber $ br_ r), viewField "" (viewAStr $ br r) ]
     recType = fromEnum . br_Type
 
 instance Rec BRG where

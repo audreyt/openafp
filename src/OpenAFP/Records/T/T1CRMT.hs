@@ -1,4 +1,3 @@
-{-# OPTIONS -fglasgow-exts -funbox-strict-fields #-}
 module OpenAFP.Records.T.T1CRMT where
 import OpenAFP.Types
 import OpenAFP.Internals

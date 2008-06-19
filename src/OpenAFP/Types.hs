@@ -1,4 +1,3 @@
-{-# OPTIONS -fglasgow-exts -funbox-strict-fields #-}
 
 -----------------------------------------------------------------------------
 -- |
@@ -11,7 +10,7 @@
 -- Portability :  non-portable (GHC-only)
 --
 -- This module imports and re-exports the fundamental types in the OpenAFP
--- framework: Buffer, ChunkBuf and Record.
+-- framework: Buffer, Chunk and Record.
 --
 -----------------------------------------------------------------------------
 
@@ -37,7 +36,7 @@ viewChunks cs = ViewChunks (typeOf cs) (map viewChunk cs)
 
 viewChunk c = withChunk c recView
 
-withChunk :: (ChunkBuf a n b) => a -> (forall r. (Rec r) => r -> x) -> x
+withChunk :: Chunk a => a -> (forall r. (Rec r) => r -> x) -> x
 withChunk c = chunkApply (fst . chunkDecon $ c) c
 
 viewData ds = ViewData (typeOf ds) (map recView ds)

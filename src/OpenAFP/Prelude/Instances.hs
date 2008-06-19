@@ -1,4 +1,3 @@
-{-# OPTIONS -fglasgow-exts #-}
 
 module OpenAFP.Prelude.Instances where
 import OpenAFP.Types
@@ -12,13 +11,15 @@ import qualified Data.ByteString as S
 instance Rec T_ where
     recSizeOf c = 1 + (S.length $ packChunk c)
 
-instance ChunkBuf AFP_ N3 Buffer2 where
+instance Chunk AFP_ where
+    type N AFP_ = N3
+    type BufOf AFP_ = Buffer2
     mkChunk = AFP_
     chunkDecon (AFP_ x y) = (x, y)
     chunkTypeLookup = lookupAFP
     chunkApply = applyAFP
 
-apply :: (ChunkBuf c n b, Rec r) => c -> (r -> t) -> t
+apply :: (Chunk c, Rec r) => c -> (r -> t) -> t
 apply c f = f (decodeChunk c)
 
 applyAFP :: forall x. N3 -> AFP_ -> (forall a. (Rec a) => (a -> x)) -> x
@@ -149,7 +150,9 @@ applyAFP x rec f = case x of
     0xD3EEFB -> apply rec (f :: IPD -> x)
     _        -> apply rec (f :: Unknown -> x)
 
-instance ChunkBuf MCF_ N0 Buffer2 where
+instance Chunk MCF_ where
+    type N MCF_ = N0
+    type BufOf MCF_ = Buffer2
     mkChunk = MCF_
     chunkDecon (MCF_ x y) = (x, y)
     chunkTypeLookup = lookupMCF
@@ -159,7 +162,8 @@ applyMCF :: forall x. N0 -> MCF_ -> (forall a. (Rec a) => (a -> x)) -> x
 applyMCF x rec f = case x of
     _        -> apply rec (f :: MCF_T -> x)
 
-instance RecChunk MCF MCF_ N0 Buffer2 where
+instance RecChunk MCF where
+    type ChunkOf MCF = MCF_
     readChunks r = mcf_Chunks r
     writeChunks r io = do
         cs <- io
@@ -182,7 +186,9 @@ instance Rec MCF1_Data where
     recView r = viewRecord (typeOf r) [ viewField "CodedFontLocalId" (viewNumber $ mcf1_CodedFontLocalId r), viewField "Reserved1" (viewString $ mcf1_Reserved1 r), viewField "CodedFontResourceSectionId" (viewNumber $ mcf1_CodedFontResourceSectionId r), viewField "Reserved2" (viewString $ mcf1_Reserved2 r), viewField "CodedFontName" (viewString $ mcf1_CodedFontName r), viewField "CodePageName" (viewString $ mcf1_CodePageName r), viewField "FontCharacterSetName" (viewString $ mcf1_FontCharacterSetName r), viewField "CharacterRotation" (viewNumber $ mcf1_CharacterRotation r) ]
     recType r = 0
 
-instance RecData MCF1 MCF1_Data where
+type instance RecOf MCF1_Data = MCF1
+instance RecData MCF1 where
+    type DataOf MCF1 = MCF1_Data
     readData r = mcf1_Data r
     writeData r cs = r { mcf1_Data = cs }
 
@@ -354,7 +360,8 @@ instance Rec PTD1 where
     recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ ptd1_Type r), viewField "_" (viewNumber $ ptd1_ r), viewField "" (viewNStr $ ptd1 r) ]
     recType = fromEnum . ptd1_Type
 
-instance RecChunk TLE T_ N1 Buffer1 where
+instance RecChunk TLE where
+    type ChunkOf TLE = T_
     readChunks r = tle_Chunks r
     writeChunks r io = do
         cs <- io
@@ -367,7 +374,8 @@ instance Rec TLE where
     recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ tle_Type r), viewField "_" (viewNumber $ tle_ r), viewField "Chunks" (viewChunks $ tle_Chunks r) ]
     recType = fromEnum . tle_Type
 
-instance RecChunk MCF_T T_ N1 Buffer1 where
+instance RecChunk MCF_T where
+    type ChunkOf MCF_T = T_
     readChunks r = mcf_t_Chunks r
     writeChunks r io = do
         cs <- io

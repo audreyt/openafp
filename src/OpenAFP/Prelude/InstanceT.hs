@@ -1,11 +1,9 @@
-{-# OPTIONS -fglasgow-exts #-}
-
 module OpenAFP.Prelude.InstanceT () where
 import OpenAFP.Types
 import OpenAFP.Records
 import OpenAFP.Internals
 
-apply :: (ChunkBuf c n b, Rec r) => c -> (r -> t) -> t
+apply :: (Chunk c, Rec r) => c -> (r -> t) -> t
 apply c f = f (decodeChunk c)
 
 instance Rec T_AD where
@@ -407,7 +405,9 @@ instance Rec T_UDTS where
     recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ t_udts_Type r), viewField "" (viewNStr $ t_udts r) ]
     recType = fromEnum . t_udts_Type
 
-instance ChunkBuf T_ N1 Buffer1 where
+instance Chunk T_ where
+    type N T_ = N1
+    type BufOf T_ = Buffer1
     mkChunk = T_
     chunkDecon (T_ x y) = (x, y)
     chunkTypeLookup = lookupT

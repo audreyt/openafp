@@ -1,4 +1,3 @@
-{-# OPTIONS -fglasgow-exts #-}
 
 module OpenAFP.Prelude.InstancePTX () where
 import OpenAFP.Types
@@ -6,7 +5,7 @@ import OpenAFP.Records
 import OpenAFP.Internals
 import qualified Data.ByteString as S
 
-apply :: (ChunkBuf c n b, Rec r) => c -> (r -> t) -> t
+apply :: (Chunk c, Rec r) => c -> (r -> t) -> t
 apply c f = f (decodeChunk c)
 
 instance Rec PTX_AMB where
@@ -142,7 +141,9 @@ instance Rec PTX_TRN where
     recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ ptx_trn_Type r), viewField "" (viewNStr $ ptx_trn r) ]
     recType = fromEnum . ptx_trn_Type
 
-instance ChunkBuf PTX_ N1 Buffer1 where
+instance Chunk PTX_ where
+    type N PTX_ = N1
+    type BufOf PTX_ = Buffer1
     mkChunk = PTX_
     chunkDecon (PTX_ x y) = (x, y)
     chunkTypeLookup = lookupPTX
@@ -190,7 +191,8 @@ applyPTX x rec f = case x of
     0xF9 -> apply rec (f :: PTX_NOP -> x)
     _    -> apply rec (f :: Unknown -> x)
 
-instance RecChunk PTX PTX_ N1 Buffer1 where
+instance RecChunk PTX where
+    type ChunkOf PTX = PTX_
     readChunks r = ptx_Chunks r
     writeChunks r io = do
         cs <- io

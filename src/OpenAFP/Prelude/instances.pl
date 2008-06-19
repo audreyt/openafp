@@ -6,7 +6,6 @@ open LOOKUP, '>Lookups.hs';
 select(LOOKUP);
 
 print << '.';
-{-# OPTIONS -fglasgow-exts #-}
 
 module OpenAFP.Prelude.Lookups where
 import OpenAFP.Types

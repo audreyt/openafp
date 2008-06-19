@@ -1,4 +1,3 @@
-{-# OPTIONS -fglasgow-exts #-}
 
 -----------------------------------------------------------------------------
 -- |
@@ -39,7 +38,7 @@ type NStr = Buffer0
 type AStr = NStr
 
 type ChunkWriter c = WriterT (ChunkQueue c)
-type WriterStateIO v a = (ChunkBuf c n b, MonadReader v m) => ChunkWriter c m a
+type WriterStateIO v a = (Chunk c, MonadReader v m) => ChunkWriter c m a
 
 instance Storable NStr where
     alignment _ = 8
@@ -77,18 +76,20 @@ typeInt x = unsafePerformIO (typeRepKey x)
 chunkTypeOf :: Typeable a => a -> ChunkType
 chunkTypeOf = MkChunkType . typeInt . typeOf
 
--- | The ChunkBuf class represents non-parsed chunks, constructed from a
+-- | The Chunk class represents non-parsed chunks, constructed from a
 --   (ChunkType, Buffer) tuple.
-class (Show c, Typeable c, Buf b, Num n, Enum n) => ChunkBuf c n b | c -> n, c -> b where
-    chunkApply :: n -> c -> (forall a. (Rec a) => (a -> x)) -> x
-    mkChunk :: n -> b -> c
+class (Show c, Typeable c, Buf (BufOf c), Enum (N c), Num (N c)) => Chunk c where
+    type N c
+    type BufOf c
+    chunkApply :: N c -> c -> (forall a. (Rec a) => (a -> x)) -> x
+    mkChunk :: N c -> BufOf c -> c
     mkChunk = curry chunkCon
-    chunkCon :: (n, b) -> c
+    chunkCon :: (N c, BufOf c) -> c
     chunkCon = uncurry mkChunk
-    chunkDecon :: c -> (n, b)
+    chunkDecon :: c -> (N c, BufOf c)
     chunkType :: c -> ChunkType
     chunkType c = chunkTypeLookup c . fst $ chunkDecon c
-    chunkTypeLookup :: c -> n -> ChunkType
+    chunkTypeLookup :: c -> N c -> ChunkType
     packChunk :: c -> PStringLen
     chunkMapFiltersM_ :: (Monad m) => c -> [(ChunkType, c -> m [c])] -> m ()
     chunkMapFiltersM_ c possibleFilters = mapM_ (\(_, f) -> f c) filters
@@ -113,15 +114,20 @@ class (Show c, Typeable c, Buf b, Num n, Enum n) => ChunkBuf c n b | c -> n, c -
 
 -- | The RecChunk class unifies a Rec (parent) with its contained
 --   chunk types (children).
-class (Rec r, ChunkBuf c n b) => RecChunk r c n b | r -> c where
-    readChunks :: r -> [c]
+class (Rec r, Chunk (ChunkOf r)) => RecChunk r where
+    type ChunkOf r
+    readChunks :: r -> [ChunkOf r]
     readChunks = error "readChunks not defined"
-    writeChunks :: (Monad m) => r -> m [c] -> m r
+    writeChunks :: Monad m => r -> m [ChunkOf r] -> m r
     writeChunks = error "writeChunks not defined"
+
+-- Mutual dependency of Rec/Data pair.
 
 -- | The RecData class unifies a Rec (parent) with its contained
 --   Rec data type (children).
-class (Rec a, Rec b) => RecData a b | a -> b, b -> a where
+class (Rec a, Rec b, DataOf a ~ b, RecOf b ~ a) => RecData a b where
+    type DataOf a
+    type RecOf b
     readData :: a -> [Record b]
     readData = error "readData not defined"
     writeData :: a -> [Record b] -> a
@@ -131,34 +137,34 @@ instance (Rec a, Binary a) => Storable [a] where
     alignment = undefined
     sizeOf r = recSizeOf r
     
-(~~) :: (ChunkBuf c n b, Typeable t) => c -> t -> Bool
+(~~) :: (Chunk c, Typeable t) => c -> t -> Bool
 c ~~ t = (chunkTypeOf t == chunkType c)
 
-(<~~) :: (Monad m, ChunkBuf c n b, Typeable t, Rec r) => t -> [c] -> m r
+(<~~) :: (Monad m, Chunk c, Typeable t, Rec r) => t -> [c] -> m r
 t <~~ cs = case find (~~ t) cs of
     Just c  -> return (decodeChunk c)
     _       -> fail $ "Cannot find locate chunk: " ++ show (typeOf t, cs)
 
-(~~>) :: (Monad m, ChunkBuf c n b, Typeable t, Rec r) => [c] -> t -> m r
+(~~>) :: (Monad m, Chunk c, Typeable t, Rec r) => [c] -> t -> m r
 (~~>) = flip (<~~)
 
-(==>) :: (ChunkBuf c n b, Monad m) => [c] -> [(ChunkType, c -> m [c])] -> m [c]
+(==>) :: (Chunk c, Monad m) => [c] -> [(ChunkType, c -> m [c])] -> m [c]
 cs ==> fs = length cs `seq` chunksMapFiltersM cs fs
 
-(<==) :: (ChunkBuf c n b, Monad m) => [(ChunkType, c -> m [c])] -> [c] -> m [c]
+(<==) :: (Chunk c, Monad m) => [(ChunkType, c -> m [c])] -> [c] -> m [c]
 (<==) = flip (==>)
 
-(..>) :: (ChunkBuf c n b, Monad m) => [c] -> [(ChunkType, c -> m [c])] -> m ()
+(..>) :: (Chunk c, Monad m) => [c] -> [(ChunkType, c -> m [c])] -> m ()
 cs ..> fs = length cs `seq` chunksMapFiltersM_ cs fs
 
-(<..) :: (ChunkBuf c n b, Monad m) => [(ChunkType, c -> m [c])] -> [c] -> m ()
+(<..) :: (Chunk c, Monad m) => [(ChunkType, c -> m [c])] -> [c] -> m ()
 (<..) = flip (..>)
 
 t === f = (chunkTypeOf t, processChunk t f)
 -- t ==== f = (chunkTypeOf t, processChunk t (lift . f))
 -- t ===== f = (chunkTypeOf t, processChunk t (lift . lift . f))
 
-processChunk :: (Monad m, Rec r, ChunkBuf c n b) =>
+processChunk :: (Monad m, Rec r, Chunk c) =>
     r -> (r -> ChunkWriter c m a) -> (c -> m [c])
 processChunk _ f c = do
     -- pass it to the filter along with the push function
@@ -170,14 +176,14 @@ t ... f = (chunkTypeOf t, inspectChunk t f)
 t .... f = (chunkTypeOf t, inspectChunk t (lift . f))
 t ..... f = (chunkTypeOf t, inspectChunk t (lift . lift . f))
 
-inspectChunk :: (Monad m, Rec a, ChunkBuf c n b) => a -> (a -> m t) -> (c -> m [c])
+inspectChunk :: (Monad m, Rec a, Chunk c) => a -> (a -> m t) -> (c -> m [c])
 inspectChunk _ f c = f (decodeChunk c) >> return [c]
 
-push :: (ChunkBuf c n b, Monad m, Rec a) => a -> ChunkWriter c m ()
+push :: (Chunk c, Monad m, Rec a) => a -> ChunkWriter c m ()
 push = tell . ChunkItem . encodeChunk . Record
 
-filterChunks :: (Monad m, RecChunk r c n b, ChunkBuf c' n' b') =>
-    r -> [(ChunkType, c -> ChunkWriter c' m [c])] -> ChunkWriter c' m ()
+filterChunks :: (Monad m, RecChunk r, Chunk c) =>
+    r -> [(ChunkType, ChunkOf r -> ChunkWriter c m [ChunkOf r])] -> ChunkWriter c m ()
 filterChunks r list = do
     push =<< (writeChunks r $ list <== readChunks r)
 

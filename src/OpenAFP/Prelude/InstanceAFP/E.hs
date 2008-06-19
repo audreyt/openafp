@@ -1,4 +1,3 @@
-{-# OPTIONS -fglasgow-exts #-}
 
 module OpenAFP.Prelude.InstanceAFP.E () where
 import OpenAFP.Types
@@ -114,7 +113,7 @@ instance Rec EIM where
     recGet = do a01 <- get; a02 <- get; a03 <- get; return $ EIM a01 a02 a03
     recPut r = do put $ eim_Type r; put $ eim_ r; put $ eim r; return ()
     recSizeOf r = sum [ sizeOf $ eim_Type r, sizeOf $ eim_ r, sizeOf $ eim r ]
-    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ eim_Type r), viewField "_" (viewNumber $ eim_ r), viewField "" (viewNStr $ eim r) ]
+    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ eim_Type r), viewField "_" (viewNumber $ eim_ r), viewField "" (viewAStr $ eim r) ]
     recType = fromEnum . eim_Type
 
 instance Rec EMM where
@@ -135,7 +134,7 @@ instance Rec ENG where
     recGet = do a01 <- get; a02 <- get; a03 <- get; return $ ENG a01 a02 a03
     recPut r = do put $ eng_Type r; put $ eng_ r; put $ eng r; return ()
     recSizeOf r = sum [ sizeOf $ eng_Type r, sizeOf $ eng_ r, sizeOf $ eng r ]
-    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ eng_Type r), viewField "_" (viewNumber $ eng_ r), viewField "" (viewNStr $ eng r) ]
+    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ eng_Type r), viewField "_" (viewNumber $ eng_ r), viewField "" (viewAStr $ eng r) ]
     recType = fromEnum . eng_Type
 
 instance Rec EOC where
@@ -149,14 +148,14 @@ instance Rec EOG where
     recGet = do a01 <- get; a02 <- get; a03 <- get; return $ EOG a01 a02 a03
     recPut r = do put $ eog_Type r; put $ eog_ r; put $ eog r; return ()
     recSizeOf r = sum [ sizeOf $ eog_Type r, sizeOf $ eog_ r, sizeOf $ eog r ]
-    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ eog_Type r), viewField "_" (viewNumber $ eog_ r), viewField "" (viewNStr $ eog r) ]
+    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ eog_Type r), viewField "_" (viewNumber $ eog_ r), viewField "" (viewAStr $ eog r) ]
     recType = fromEnum . eog_Type
 
 instance Rec EPG where
     recGet = do a01 <- get; a02 <- get; a03 <- get; return $ EPG a01 a02 a03
     recPut r = do put $ epg_Type r; put $ epg_ r; put $ epg r; return ()
     recSizeOf r = sum [ sizeOf $ epg_Type r, sizeOf $ epg_ r, sizeOf $ epg r ]
-    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ epg_Type r), viewField "_" (viewNumber $ epg_ r), viewField "" (viewNStr $ epg r) ]
+    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ epg_Type r), viewField "_" (viewNumber $ epg_ r), viewField "" (viewAStr $ epg r) ]
     recType = fromEnum . epg_Type
 
 instance Rec EPM where
@@ -170,7 +169,7 @@ instance Rec EPS where
     recGet = do a01 <- get; a02 <- get; a03 <- get; return $ EPS a01 a02 a03
     recPut r = do put $ eps_Type r; put $ eps_ r; put $ eps r; return ()
     recSizeOf r = sum [ sizeOf $ eps_Type r, sizeOf $ eps_ r, sizeOf $ eps r ]
-    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ eps_Type r), viewField "_" (viewNumber $ eps_ r), viewField "" (viewNStr $ eps r) ]
+    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ eps_Type r), viewField "_" (viewNumber $ eps_ r), viewField "" (viewAStr $ eps r) ]
     recType = fromEnum . eps_Type
 
 instance Rec EPT where

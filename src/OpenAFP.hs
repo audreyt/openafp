@@ -1,5 +1,3 @@
-{-# OPTIONS -fglasgow-exts -funbox-strict-fields #-}
-
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  OpenAFP
@@ -19,23 +17,19 @@ module OpenAFP (
     module OpenAFP.Types,
     module OpenAFP.Records,
     module OpenAFP.Internals,
-    module OpenAFP.Prelude.Exts,
     module OpenAFP.Prelude.Utils,
     module OpenAFP.Prelude.Lookups,
     module OpenAFP.Prelude.Instances,
-    module OpenAFP.Internals.UConv,
 
-    readAFP, writeAFP, -- filterAFP,
-    readArgs, afp_Chunks,
+    readAFP, writeAFP,
+    readArgs, afp_Chunks
 ) where
 import OpenAFP.Types
 import OpenAFP.Records
 import OpenAFP.Internals
-import OpenAFP.Internals.UConv
 import OpenAFP.Prelude.Utils
 import OpenAFP.Prelude.Lookups
 import OpenAFP.Prelude.Instances
-import OpenAFP.Prelude.Exts
 import qualified Data.ByteString.Lazy as L
 
 afp_Chunks :: FilePath -> [AFP_]
@@ -75,7 +69,8 @@ filterChunk c possibleFilters bh
 	filters = filter (\(t, _) -> (t == chunkType c)) possibleFilters
 
 -}
-instance RecChunk FilePath AFP_ N3 Buffer2 where
+instance RecChunk FilePath where
+    type ChunkOf FilePath = AFP_
     readChunks = afp_Chunks
 
 instance Rec Char

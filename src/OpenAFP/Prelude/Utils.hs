@@ -1,5 +1,3 @@
-{-# OPTIONS -fglasgow-exts -funbox-strict-fields #-}
-
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  OpenAFP.Prelude.Utils
@@ -24,8 +22,7 @@ import qualified Data.ByteString.Internal as S
 import qualified Data.ByteString.Lazy as L
 
 import Data.Int
-import GHC.Base (build, unsafeChr, realWorld#)
-import GHC.IOBase (IO(..))
+import GHC.Base (build, unsafeChr)
 
 hashByteString (S.PS x s l) = inlinePerformIO $ withForeignPtr x $ \p ->
      go (0 :: Int32) (p `plusPtr` s) l
@@ -38,7 +35,7 @@ hashByteString (S.PS x s l) = inlinePerformIO $ withForeignPtr x $ \p ->
 
 {-# INLINE inlinePerformIO #-}
 inlinePerformIO :: IO a -> a
-inlinePerformIO (IO m) = case m realWorld# of (# _, r #) -> r
+inlinePerformIO = S.inlinePerformIO
 
 infixl 5 $$
 infixl 5 $=
@@ -89,13 +86,13 @@ l %%= kvList = do
     vars    <- ask
     liftIO $ mapM_ (\(k, v) -> writeIOArray (l vars) k v) kvList
 
-applyToChunk :: (Monad m, Rec a, ChunkBuf c n b) => (a -> x) -> c -> m x
+applyToChunk :: (Monad m, Rec a, Chunk c) => (a -> x) -> c -> m x
 applyToChunk f = return . f . decodeChunk
 
-withChunk :: (ChunkBuf a n b) => a -> (forall r. (Rec r) => r -> x) -> x
+withChunk :: (Chunk a) => a -> (forall r. (Rec r) => r -> x) -> x
 withChunk c = chunkApply (fst . chunkDecon $ c) c
 
-splitRecords :: (ChunkBuf c n b, Typeable t) => t -> [c] -> [[c]]
+splitRecords :: (Chunk c, Typeable t) => t -> [c] -> [[c]]
 splitRecords t = groupBy (const $ not . (~~ t))
 
 findRecord :: (a -> Bool) -> [Record a] -> a
@@ -107,10 +104,10 @@ fromJust' Nothing = error "fromJust1 - fail"
 fromJust'' (Just x) = x
 fromJust'' Nothing = error "fromJust2 - fail"
 
-matchRecord :: (RecData a b, Eq c) => c -> (b -> c) -> a -> b
+matchRecord :: (RecData a, Eq b) => b -> (DataOf a -> b) -> a -> DataOf a
 matchRecord n f = findRecord ((n ==) . f) . readData
 
-matchRecordMaybe :: (RecData a b, Eq c) => c -> (b -> c) -> a -> Maybe b
+matchRecordMaybe :: (RecData a, Eq b) => b -> (DataOf a -> b) -> a -> Maybe (DataOf a)
 matchRecordMaybe n f = findRecordMaybe ((n ==) . f) . readData
 
 findRecordMaybe :: (a -> Bool) -> [Record a] -> Maybe a

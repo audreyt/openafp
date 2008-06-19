@@ -1,4 +1,3 @@
-{-# OPTIONS -fglasgow-exts #-}
 
 module OpenAFP.Prelude.InstanceAFP.I () where
 import OpenAFP.Types
@@ -79,7 +78,7 @@ instance Rec IPS where
     recGet = do a01 <- get; a02 <- get; a03 <- get; return $ IPS a01 a02 a03
     recPut r = do put $ ips_Type r; put $ ips_ r; put $ ips r; return ()
     recSizeOf r = sum [ sizeOf $ ips_Type r, sizeOf $ ips_ r, sizeOf $ ips r ]
-    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ ips_Type r), viewField "_" (viewNumber $ ips_ r), viewField "" (viewNStr $ ips r) ]
+    recView r = viewRecord (typeOf r) [ viewField "Type" (viewNumber $ ips_Type r), viewField "_" (viewNumber $ ips_ r), viewField "" (viewAStr $ ips r) ]
     recType = fromEnum . ips_Type
 
 instance Rec IRD where
