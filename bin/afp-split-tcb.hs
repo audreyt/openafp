@@ -42,7 +42,7 @@ main = do
     args    <- getArgs
 
     let (inFile, maxSmallPages) = case args of
-            []      -> error "Usage: tcb-split file.afp [max-small-pages (defaults to 3)]"
+            []      -> error "Usage: afp-split-tcb file.afp [max-small-pages (defaults to 3)]"
             [x]     -> (x, 3)
             (x:y:_) -> (x, read y)
         (dir, fn) = splitFileName inFile
