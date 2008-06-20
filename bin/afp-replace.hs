@@ -1,12 +1,10 @@
-{-# OPTIONS -O -fglasgow-exts #-}
-
+{-# LANGUAGE DeriveDataTypeable, FlexibleContexts, PatternGuards #-}
 module Main where
 import OpenAFP
+import qualified Data.ByteString.Lazy as L
 
 type Map = [([N1], [N1])]
 type Maps = IORef [Map]
-type OptsIO a = StateIO Opts a
-type WriterOptsIO a = WriterStateIO Opts a
 
 main :: IO ()
 main = do
@@ -14,25 +12,27 @@ main = do
     fms     <- readMaps opts
     cs      <- readInputAFP opts
     fh      <- openOutputAFP opts
-    bh      <- openBinIO_ fh
-    mapref	<- newIORef []
+    mapref  <- newIORef []
     scflref <- newIORef []
     sidref  <- newIORef 1
-    runReaderT (stateMain bh cs) opts
+    runReaderT (stateMain fh cs) opts
         { currentMap = mapref
         , scflStack = scflref
         , scflID = sidref } { maps = fms }
     hClose fh
 
-stateMain :: BinHandle -> [AFP_] -> ReaderT Opts IO ()
-stateMain bh = do
-    mapM_ ((liftIO . put bh =<<) . pageHandler)
-        . splitRecords _PGD
+stateMain :: (Binary c, MonadReader Opts m, MonadIO m, Chunk c)
+    => Handle -> [c] -> m ()
+stateMain fh chunks = forM_ (splitRecords _PGD chunks) $ \cs -> do
+    cs' <- pageHandler cs
+    io $ L.hPutStr fh (encodeList cs')
 
+pageHandler :: (Chunk t, MonadReader Opts m, MonadIO m)
+    => [t] -> m [t]
 pageHandler page = do
     ptxList <- sequence [ ptx_Chunks `applyToChunk` c | c <- page, c ~~ _PTX ]
     trnList <- sequence [ ptx_trn `applyToChunk` c | c <- concat ptxList, c ~~ _PTX_TRN ]
-    strList <- mapM fromNStr trnList
+    let strList = map fromNStr trnList
     -- check each strList against each map element
     -- if one matches the length, return the munged page, and nix the map from mapList
     fms     <- readVar maps
@@ -50,13 +50,12 @@ mungeMap = concatMap mungePair
 mungePair :: ([N1], [N1]) -> Map
 mungePair (key, val) = splitChunks key `zip` (val:repeat [])
 
-pretty :: [[N1]] -> [String]
-pretty = map foo
-    where
-    foo = map (chr . fromEnum)
+_pretty :: [[N1]] -> [String]
+_pretty = map $ map (chr . fromEnum)
+
 matchMap :: [[N1]] -> Map -> Bool
 matchMap strList fm
-    -- | trace (unlines $ pretty matched) True
+    -- | trace (unlines $ _pretty matched) True
     -- | trace (show (length matched, length keys)) True
     = (length matched >= length keys)
     where
@@ -75,6 +74,7 @@ matchMap strList fm
 --        , trace (map (chr . fromEnum) str) True
         = False
 
+splitChunks :: [N1] -> [[N1]]
 splitChunks = foldr joinChunks [] . strChunks
 
 joinChunks :: [N1] -> [[N1]] -> [[N1]]
@@ -88,7 +88,8 @@ strChunks [] = []
 strChunks (hi:lo:xs) | hi >= 0x80 = ([hi, lo] : strChunks xs)
 strChunks (x:xs) = [x] : strChunks xs
 
-mungePage :: [AFP_] -> OptsIO [AFP_]
+mungePage :: (Chunk c, MonadReader Opts t, MonadIO t)
+    => [c] -> t [c]
 mungePage page = do
     page ==>
         [ _MCF ... mcfHandler
@@ -99,7 +100,8 @@ mungePage page = do
         ]
 
 -- | Record font Id to Name mappings in MCF's RLI and FQN chunks.
-mcfHandler :: MCF -> OptsIO ()
+mcfHandler :: (RecChunk r, MonadIO m, MonadReader Opts m)
+    => r -> m ()
 mcfHandler r = do
     readChunks r ..>
         [ _MCF_T ... \mcf -> do
@@ -107,7 +109,7 @@ mcfHandler r = do
             let cs = readChunks mcf
             ids   <- sequence [ t_rli `applyToChunk` c | c <- cs, c ~~ _T_RLI ]
             fonts <- sequence [ t_fqn `applyToChunk` c | c <- cs, c ~~ _T_FQN ]
-            let alist = map fromA8 fonts `zip` ids
+            let alist = map fromAStr fonts `zip` ids
             case lookup fnt alist of
                 Just sid -> do
                     verbose $$ ("Found font ID for " ++ fnt ++ ": " ++ (show sid))
@@ -116,15 +118,17 @@ mcfHandler r = do
                 Nothing -> return ()
         ]
 
-scflHandler :: PTX_SCFL -> WriterOptsIO ()
+scflHandler :: (MonadReader Opts m, MonadIO m)
+    => PTX_SCFL -> m ()
 scflHandler r = do
     scfls <- readVar scflStack
     scflStack $= id $ (r:scfls)
 
-trnHandler :: PTX_TRN -> WriterOptsIO ()
+trnHandler :: (Chunk c, MonadIO m, MonadReader Opts m)
+    => PTX_TRN -> WriterT (ChunkQueue c) m ()
 trnHandler r = do
-    trnOld  <- fromNStr $ ptx_trn r
-    fm		<- readVar currentMap
+    let trnOld = fromNStr $ ptx_trn r
+    fm      <- readVar currentMap
     scfls   <- readVar scflStack
     sid     <- readVar scflID
     case fm of
@@ -139,7 +143,7 @@ trnHandler r = do
                     push _PTX_SCFL{ ptx_scfl = sid, ptx_scfl_Type = typ + (1-rst) }
                 (s:ss)  -> mapM_ push $ reverse (s{ ptx_scfl = 1 }:ss)
             unless (null rv) $ do
-                trn' <- toNStr rv
+                let trn' = toNStr rv
                 verbose $$ ("From:[" ++ map (chr . fromEnum) trnOld ++ "]")
                 verbose $$ ("To:  [" ++ map (chr . fromEnum) rv ++ "]")
                 push r { ptx_trn = trn' }
@@ -148,8 +152,6 @@ trnHandler r = do
             mapM_ push $ reverse scfls
             push r
     scflStack $= id $ []
-
-foo nstr = snd $ bufToPStrLen nstr
 
 usage :: String -> IO a
 usage = showUsage options showInfo
@@ -160,7 +162,7 @@ usage = showUsage options showInfo
 data Opts = Opts
     { readMaps          :: IO Maps
     , maps              :: Maps
-    , currentMap		:: IORef Map
+    , currentMap                :: IORef Map
     , readInputAFP      :: IO [AFP_]
     , openOutputAFP     :: IO Handle
     , font              :: String
@@ -170,9 +172,10 @@ data Opts = Opts
     , scflID            :: IORef N1
     } deriving (Typeable)
 
+defaultOpts :: Opts
 defaultOpts = Opts
     { readMaps          = requiredOpt usage "map"
-   	, currentMap		= undefined
+        , currentMap            = undefined
     , maps              = requiredOpt usage "map"
     , readInputAFP      = requiredOpt usage "input"
     , openOutputAFP     = requiredOpt usage "output"
@@ -203,7 +206,8 @@ run :: IO ()
 -- run = withArgs (split " " "-v -m SC27.add -i SC27.AFP -o output.afp") main
 run = runWith "-v -m 1-map.txt -i 1-in.afp -o 1-out.afp -f X0FDB000"
 
-runWith str = withArgs (split " " str) main
+runWith :: String -> IO ()
+runWith str = withArgs (words str) main
 
 makeMaps :: String -> [Map]
 makeMaps str = entries
@@ -221,13 +225,40 @@ makeMaps str = entries
     checkDBCS (x:y:xs) | x > 0x7F = (x:y:checkDBCS xs)
     checkDBCS x = error $ "Not DBCS: " ++ ordList x
 
-gun = run
-
 getOpts :: IO Opts
 getOpts = do
     args <- getArgs
-    (optsIO, rest, errs) <- return . getOpt Permute options $ procArgs args
+    (optsIO, _rest, _errs) <- return . getOpt Permute options $ procArgs args
     return $ foldl (flip ($)) defaultOpts optsIO
     where
     procArgs []     = ["-h"]
     procArgs xs     = xs
+
+-- | Split a list into pieces that were held together by glue.  Example:
+--
+-- > split ", " "one, two, three" ===> ["one","two","three"]
+
+split :: Eq a => [a] -- ^ Glue that holds pieces together
+      -> [a]         -- ^ List to break into pieces
+      -> [[a]]       -- ^ Result: list of pieces
+
+split glue xs = split' xs
+    where
+    split' []  = []
+    split' xs' = piece : split' (dropGlue rest)
+        where (piece, rest) = breakOnGlue glue xs'
+    dropGlue   = drop (length glue)
+
+-- | Break off the first piece of a list held together by glue,
+--   leaving the glue attached to the remainder of the list.  Example:
+--
+-- > breakOnGlue ", " "one, two, three" ===> ("one", ", two, three")
+
+breakOnGlue :: (Eq a) => [a] -- ^ Glue that holds pieces together
+            -> [a]           -- ^ List from which to break off a piece
+            -> ([a],[a])     -- ^ Result: (first piece, glue ++ rest of list)
+
+breakOnGlue _ [] = ([],[])
+breakOnGlue glue rest@(x:xs)
+    | glue `isPrefixOf` rest = ([], rest)
+    | otherwise = (x:piece, rest') where (piece, rest') = breakOnGlue glue xs

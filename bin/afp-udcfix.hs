@@ -8,6 +8,8 @@ import qualified Data.ByteString.Unsafe as S
 import qualified Data.ByteString.Char8 as C
 import qualified Data.ByteString.Lazy as L
 import Data.Int
+import Text.Regex.Posix
+import Text.Regex.Base.RegexLike
 
 -- | Flags.
 type VarsIO a = StateIO Vars a
@@ -187,7 +189,7 @@ endPageHandler r = do
         xo  <- readVar _XOrientation
         yo  <- readVar _YOrientation
         forM_ (reverse udcList) $ \udc -> do
-            infoMaybe <- fontInfoOf (udcFont udc) (udcChar udc)
+            infoMaybe <- getFontInfo (udcFont udc) (udcChar udc)
             case infoMaybe of
                 Just info | S.length (fromBuf0 $ fontBitmap info) > 0 -> do
                     push _BII
@@ -245,7 +247,7 @@ incrementOf x y = do
                 modifyIORef udcRef (filter ((/= char) . udcChar))
             return 0
 
-fontInfoOf x y = do
+getFontInfo x y = do
     cachedLibReader _InfoCache fillInfo (Just _FontInfo) x y
     where
     fillInfo font char key _ = do
@@ -371,7 +373,7 @@ _FontInfo = FontInfo 0 0 0 0 0 0 0 _NStr 0 0 0
 
 -- | Simple test case.
 run :: IO ()
-run = withArgs (split " " "-a -d NS.. -i tmp -o x -f /StreamEDP/fontlib") main
+run = withArgs (words "-a -d NS.. -i tmp -o x -f /StreamEDP/fontlib") main
 
 data Vars = Vars
     { _XPageSize      :: !(IORef N2)
@@ -427,7 +429,7 @@ getOpts = do
         suffix  = fontlibSuffix opts
     showHelp opts
     unless (null rest) $ do
-        warn $ "unrecognized arguments: `" ++ joinList " " rest ++ "'\n"
+        warn $ "unrecognized arguments: `" ++ concat (intersperse " " rest) ++ "'\n"
     paths <- filterM checkPath $ fontlibPaths opts
     when (null paths) $ do
         die $ "cannot find a valid font library path"

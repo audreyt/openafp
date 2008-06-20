@@ -14,20 +14,20 @@ main :: IO ()
 main = do
     args    <- getArgs
     if null args then error "Usage: afp-split file.afp [pages]" else do
-    let inFile = head args
+    let (inFile:outPages) = args
     cs      <- readAFP inFile
     let (preamble:rest) = splitPages cs
         _eng      = encodeChunk $ Record _ENG
         _edt      = encodeChunk $ Record _EDT
         pagePairs = map show [1..] `zip` rest
-    if null args
+    if null outPages
         then forM_ pagePairs $ \(i, page) -> do
             let outFile = inFile ++ ('.':i)
             putStrLn outFile
             writeAFP outFile $ preamble ++ page ++ [_eng, _edt]
         else do
             let outFile = inFile ++ ".part"
-            writeAFP outFile $ preamble ++ concat [ page | (i, page) <- pagePairs, i `elem` args ] ++ [_eng, _edt]
+            writeAFP outFile $ preamble ++ concat [ page | (i, page) <- pagePairs, i `elem` outPages ] ++ [_eng, _edt]
             putStrLn outFile
 
 splitPages :: [AFP_] -> [[AFP_]]

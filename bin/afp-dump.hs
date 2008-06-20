@@ -1,8 +1,8 @@
 {-# OPTIONS -O -fglasgow-exts -funbox-strict-fields -fimplicit-params #-}
 
 module Main where
-import CP835
 import Text.XHtml
+import Codec.Text.UConv
 import OpenAFP hiding ((!))
 import qualified Data.Set as Set
 import qualified Data.ByteString as S
@@ -41,7 +41,7 @@ usage = showUsage options showInfo
 options :: [OptDescr (Opts -> Opts)]
 options =
     [ reqArg "e" ["encodings"]      "ENC,ENC..."    "Text encodings (default: 937,500)"
-        (\s o -> o { encodings          = split "," s })
+        (\s o -> o { encodings          = splitComma s })
     , reqArg "i" ["input"]          "FILE"          "Input AFP file"
         (\s o -> o { inputFile          = s })
     , reqArg "o" ["output"]         "FILE"          "Output HTML file"
@@ -49,6 +49,15 @@ options =
     , noArg  "h" ["help"]                           "Show help"
         (\o   -> o { showHelp           = usage "" })
     ]
+
+splitComma :: String -> [String]
+splitComma "" =  []
+splitComma s = l : case s' of
+    []      -> []
+    (_:s'') -> splitComma s''
+    where
+    (l, s') = break (== ',') s
+
 
 getOpts :: IO Opts
 getOpts = do
@@ -62,7 +71,7 @@ getOpts = do
 	| otherwise	    = init xs ++ ["-i", last xs]
 
 run :: IO ()
-run = withArgs (split " " "-e 937,500 -i ln-1.afp -o x.html") main
+run = withArgs (words "-e 937,500 -i ln-1.afp -o x.html") main
 
 main :: IO ()
 main = do
@@ -105,7 +114,7 @@ htmlPage title = showHtmlFragment
     ]
 
 styles :: String
-styles = joinList "\n" [
+styles = unlines [
     "body { background: #e0e0e0; font-family: times new roman, times; margin-left: 20px }",
     "h1 { font-family: times new roman, times }",
     "span { font-family: andale mono, courier }",
@@ -146,7 +155,7 @@ typeHtml t = unsafePerformIO $ do
 typeHtml' :: RecordType -> Html
 typeHtml' t = thediv << (typeStr +++ primHtml " &mdash; " +++ typeDesc)
     where
-    typeStr = bold << last (split "." typeRepr)
+    typeStr = bold << reverse (takeWhile (/= '.') (reverse typeRepr))
     typeDesc = stringToHtml $ descLookup (MkChunkType $ typeInt t)
     typeRepr = show t
 
@@ -160,9 +169,9 @@ ptxHtml nstr = [table << textHtml]
 texts nstr = maybeToList $ msum [ maybe Nothing (Just . ((,) cp)) $ conv (codeName cp) | cp <- encs ]
     where
     conv c@"ibm-937"
-        | (even $ length nstr)  = uconv c "utf8" (0x0E : nstr)
+        | (even $ length nstr)  = convert c "utf8" (packNStr $ toNStr (0x0E : nstr))
         | otherwise             = Nothing
-    conv c = uconv c "utf8" nstr
+    conv c = convert c "utf8" (packNStr $ toNStr nstr)
     codeName c
         | isJust $ find (not . isDigit) c   = c
         | otherwise                         = "ibm-" ++ c
