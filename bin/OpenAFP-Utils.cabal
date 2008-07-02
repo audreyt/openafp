@@ -1,0 +1,64 @@
+Name:               OpenAFP-Utils
+Version:            1.2
+License:            BSD3
+License-file:       LICENSE
+Author:             Audrey Tang
+Maintainer:         audreyt@audreyt.org
+Synopsis:           Assorted utilities to work with AFP data streams
+Description:        Assorted utilities to work with AFP data streams
+Category:           Data
+Build-type:         Simple
+
+Executable:         afp-olndump
+Main-is:            afp-olndump.hs
+Build-depends:      OpenAFP, haskell98, base, bytestring, containers, binary
+
+Executable:         afp-dump
+Main-is:            afp-dump.hs
+Build-depends:      OpenAFP, haskell98, base, bytestring, containers, uconv, xhtml
+Extensions:         DeriveDataTypeable, PatternGuards
+
+Executable:         afp-page
+Main-is:            afp-page.hs
+Build-depends:      OpenAFP, haskell98, base
+
+Executable:         afp-replace
+Main-is:            afp-replace.hs
+Build-depends:      OpenAFP, haskell98, base
+Extensions:         DeriveDataTypeable, FlexibleContexts, PatternGuards
+
+Executable:         afp-scanudc
+Main-is:            afp-scanudc.hs
+Build-depends:      OpenAFP, haskell98, base, directory
+Extensions:         BangPatterns
+
+Executable:         afp-split
+Main-is:            afp-split.hs
+Build-depends:      OpenAFP, haskell98, base
+
+Executable:         afp-split-scb
+Main-is:            afp-split-scb.hs
+Build-depends:      OpenAFP, haskell98, base
+
+Executable:         afp-split-tcb
+Main-is:            afp-split-tcb.hs
+Build-depends:      OpenAFP, haskell98, base, filepath
+Extensions:         ImplicitParams
+
+Executable:         afp-type
+Main-is:            afp-type.hs
+Build-depends:      OpenAFP, haskell98, base
+
+Executable:         afp-udcfix
+Main-is:            afp-udcfix.hs
+Build-depends:      OpenAFP, haskell98, base, regex-base, regex-posix
+Extensions:         DeriveDataTypeable, MultiParamTypeClasses, FlexibleContexts
+
+Executable:         afp-validate
+Main-is:            afp-validate.hs
+Build-depends:      OpenAFP, haskell98, base
+
+Executable:         afp2line
+Main-is:            afp2line.hs
+Build-depends:      OpenAFP, haskell98, base
+Extensions:         GeneralizedNewtypeDeriving 
