@@ -4,6 +4,7 @@ license:            BSD3
 License-file:       LICENSE
 author:             Audrey Tang
 maintainer:         audreyt@audreyt.org
+homepage:           http://github.com/audreyt/openafp/
 synopsis:           IBM AFP document format parser and generator
 description:        IBM AFP document format parser and generator
 exposed-modules:    OpenAFP.Internals.Binary OpenAFP.Internals.Ebc2Asc

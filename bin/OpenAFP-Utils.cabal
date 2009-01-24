@@ -2,6 +2,7 @@ Name:               OpenAFP-Utils
 Version:            1.2
 License:            BSD3
 License-file:       LICENSE
+Homepage:           http://github.com/audreyt/openafp/
 Author:             Audrey Tang
 Maintainer:         audreyt@audreyt.org
 Synopsis:           Assorted utilities to work with AFP data streams
