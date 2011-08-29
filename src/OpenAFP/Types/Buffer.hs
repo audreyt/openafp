@@ -23,13 +23,7 @@ import qualified Data.ByteString.Lazy as L
 -- | The Buf class represents buffers, with the leading bytes
 --   representing its length.
 class (Show a, Typeable a) => Buf a where
-    {-# SPECIALIZE mkBuf :: BS -> Buffer0 #-}
-    {-# SPECIALIZE mkBuf :: BS -> Buffer1 #-}
-    {-# SPECIALIZE mkBuf :: BS -> Buffer2 #-}
     mkBuf :: BS -> a
-    {-# SPECIALIZE packBuf :: Buffer0 -> BS #-}
-    {-# SPECIALIZE packBuf :: Buffer1 -> BS #-}
-    {-# SPECIALIZE packBuf :: Buffer2 -> BS #-}
     packBuf :: a -> BS
 
 -- | Buffer0, being a simple BS, is of unlimited length.

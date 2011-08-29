@@ -1,4 +1,4 @@
-
+{-# LANGUAGE CPP #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  OpenAFP.Types.Chunk
@@ -67,14 +67,23 @@ fromNStr = map N1 . S.unpack . packNStr
 toNStr :: [N1] -> NStr
 toNStr = mkBuf . S.pack . map fromN1
 
+#if (__GLASGOW_HASKELL__ >= 700)
+newtype ChunkType = MkChunkType TypeRep
+    deriving (Show, Eq, Typeable, Ord)
+
+chunkTypeOf :: Typeable a => a -> ChunkType
+chunkTypeOf = MkChunkType . typeOf
+
+#else
 newtype ChunkType = MkChunkType Int
     deriving (Show, Eq, Typeable, Ord)
 
-typeInt :: TypeRep -> Int
-typeInt x = unsafePerformIO (typeRepKey x)
-
 chunkTypeOf :: Typeable a => a -> ChunkType
 chunkTypeOf = MkChunkType . typeInt . typeOf
+    where
+    typeInt :: TypeRep -> Int
+    typeInt x = unsafePerformIO (typeRepKey x)
+#endif
 
 -- | The Chunk class represents non-parsed chunks, constructed from a
 --   (ChunkType, Buffer) tuple.
