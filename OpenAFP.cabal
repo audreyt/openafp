@@ -1,19 +1,19 @@
 name:               OpenAFP
-version:            1.1.1
+version:            1.3
 license:            PublicDomain
 License-file:       LICENSE
 cabal-version:      >= 1.6
 author:             Audrey Tang
-Tested-With:        GHC==7.2.0
+Tested-With:        GHC==6.10.1, GHC==6.12.1, GHC==7.0.1, GHC==7.2.1
 maintainer:         audreyt@audreyt.org
 homepage:           https://github.com/audreyt/openafp/
 synopsis:           IBM AFP document format parser and generator
 description:        IBM AFP document format parser and generator
 category:           Data
 build-type:         Simple
-build-depends:      base, mtl, regex-compat, directory, process,
-                    array, containers, binary, bytestring
 library
+    build-depends:      base, mtl, regex-compat, directory, process,
+                        array, containers, binary, bytestring
     hs-source-dirs:     src
     ghc-options:        -funbox-strict-fields -fno-warn-missing-signatures
     extensions:         MagicHash, DeriveDataTypeable, GeneralizedNewtypeDeriving,

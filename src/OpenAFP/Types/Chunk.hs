@@ -21,6 +21,9 @@ import System.IO.Unsafe (unsafePerformIO)
 import qualified Data.ByteString as S
 import qualified Data.ByteString.Lazy as L
 import qualified Data.ByteString.Char8 as C
+#if (__GLASGOW_HASKELL__ >= 700)
+import Unsafe.Coerce (unsafeCoerce)
+#endif
 
 infixl 4 ~~
 infixl 4 <~~
@@ -71,19 +74,26 @@ toNStr = mkBuf . S.pack . map fromN1
 newtype ChunkType = MkChunkType TypeRep
     deriving (Show, Eq, Typeable, Ord)
 
-chunkTypeOf :: Typeable a => a -> ChunkType
-chunkTypeOf = MkChunkType . typeOf
+mkChunkType :: TypeRep -> ChunkType
+mkChunkType = MkChunkType
+
+typeInt :: TypeRep -> Int
+typeInt x = unsafeCoerce (unsafePerformIO (typeRepKey x))
 
 #else
 newtype ChunkType = MkChunkType Int
     deriving (Show, Eq, Typeable, Ord)
 
-chunkTypeOf :: Typeable a => a -> ChunkType
-chunkTypeOf = MkChunkType . typeInt . typeOf
-    where
-    typeInt :: TypeRep -> Int
-    typeInt x = unsafePerformIO (typeRepKey x)
+mkChunkType :: TypeRep -> ChunkType
+mkChunkType = MkChunkType . typeInt
+
+typeInt :: TypeRep -> Int
+typeInt x = unsafePerformIO (typeRepKey x)
+
 #endif
+
+chunkTypeOf :: Typeable a => a -> ChunkType
+chunkTypeOf = mkChunkType . typeOf
 
 -- | The Chunk class represents non-parsed chunks, constructed from a
 --   (ChunkType, Buffer) tuple.
@@ -134,12 +144,12 @@ class (Rec r, Chunk (ChunkOf r)) => RecChunk r where
 
 -- | The RecData class unifies a Rec (parent) with its contained
 --   Rec data type (children).
-class (Rec a, Rec b, DataOf a ~ b, RecOf b ~ a) => RecData a b where
+class (Rec a, Rec b) => RecData a b where
     type DataOf a
     type RecOf b
-    readData :: a -> [Record b]
+    readData :: (DataOf a ~ b, RecOf b ~ a) => a -> [Record b]
     readData = error "readData not defined"
-    writeData :: a -> [Record b] -> a
+    writeData :: (DataOf a ~ b, RecOf b ~ a) => a -> [Record b] -> a
     writeData = error "writeData not defined"
 
 instance (Rec a, Binary a) => Storable [a] where
