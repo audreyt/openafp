@@ -4,7 +4,7 @@
 -- |
 -- Module      :  OpenAFP.Internals.UConv
 -- Copyright   :  Audrey Tang
--- License     :  BSD-style
+-- License     :  PublicDomain
 --
 -- Maintainer  :  audreyt@audreyt.org
 -- Stability   :  experimental

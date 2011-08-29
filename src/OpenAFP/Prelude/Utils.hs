@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  OpenAFP.Prelude.Utils
--- Copyright   :  (c) Audrey Tang 2004, 2006
--- License     :  BSD-style
+-- Copyright   :  (c) Audrey Tang 2004-2011
+-- License     :  PublicDomain
 -- 
 -- Maintainer  :  audreyt@audreyt.org
 -- Stability   :  experimental
