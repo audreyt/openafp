@@ -102,7 +102,7 @@ instance Show A8 where show = zeropad 8
 instance Show A12 where show = zeropad 12
 
 {-# INLINE zeropad #-}
-zeropad :: (Integral a) => Int -> a -> String
+zeropad :: (Show a, Integral a) => Int -> a -> String
 zeropad len str = replicate len' '0' ++ str'
     where str' = map toUpper $ showHex str ""
           len' = 2*len - length str'
