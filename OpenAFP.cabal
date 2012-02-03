@@ -12,7 +12,7 @@ description:        IBM AFP document format parser and generator
 category:           Data
 build-type:         Simple
 library
-    build-depends:      base, mtl, regex-compat, directory, process,
+    build-depends:      base >= 2 && < 5, mtl, regex-compat, directory, process,
                         array, containers, binary, bytestring
     hs-source-dirs:     src
     ghc-options:        -funbox-strict-fields -fno-warn-missing-signatures
