@@ -196,6 +196,8 @@ fontInfoOf f
     = (CP950, 10) -- X08PD0SB etc. (TBB)
     | C.pack "T0XXXX" `C.isPrefixOf` font
     = (CP939, 10) -- T0XXXX means Japanese. (CHB)
+    | C.pack "T1R" `C.isPrefixOf` font
+    = (CP939, sz `div` 2) -- T1R___ means Japanese. (CHB)
     | (not (C.null font) && C.last font == 'T')
       || (not (C.null namePart) && C.last namePart == 'S')
     = (CP835, sz `div` 2) -- M40T, NS32
