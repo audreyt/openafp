@@ -192,6 +192,10 @@ type Size = Int
 
 fontInfoOf :: ByteString -> (Encoding, Size)
 fontInfoOf f
+    | C.pack "X1M" `C.isPrefixOf` font
+    = (CP835, 24) -- X1MB, X1MN, etc. (FEIB)
+    | C.pack "X1TRN" `C.isPrefixOf` font
+    = (CP37, 24) -- (FEIB)
     | (C.length font == 8) && (C.head font == 'X')
     = (CP950, 10) -- X08PD0SB etc. (TBB)
     | C.pack "T0XXXX" `C.isPrefixOf` font
