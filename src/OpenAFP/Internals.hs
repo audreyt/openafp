@@ -19,7 +19,7 @@ module OpenAFP.Internals (
     IOm, StateIO, BS,
 
     HashTable,
-    hashNew, hashLookup, hashInsert, hashDelete,
+    hashCreate, hashNew, hashLookup, hashInsert, hashDelete,
     stateGet, statePut
 ) where
 import OpenAFP.Internals.Binary  as X 
