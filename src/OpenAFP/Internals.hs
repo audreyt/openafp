@@ -18,6 +18,7 @@ module OpenAFP.Internals (
 
     IOm, StateIO, BS,
 
+    HashTable,
     hashNew, hashLookup, hashInsert, hashDelete,
     stateGet, statePut
 ) where
@@ -35,7 +36,6 @@ import Data.Array.Unboxed        as X
 import Data.Bits                 as X 
 import Data.Char                 as X 
 import Data.List                 as X 
-import Data.HashTable            as X hiding (lookup, insert, delete, new)
 import Data.Word                 as X 
 import Data.Typeable             as X 
 import Data.IORef                as X 
@@ -61,17 +61,27 @@ import System.IO.Unsafe          as X
 import System.IO.Error           as X 
 import System.Directory          as X 
 import Text.Regex                as X 
-import GHC.IOBase                as X (IOArray, newIOArray, readIOArray, writeIOArray)
+import GHC.IOArray               as X (IOArray, newIOArray, readIOArray, writeIOArray)
+import Data.Hashable (Hashable)
 import qualified Control.Monad.RWS (get, put)
 import qualified Control.Monad.State (MonadState)
-import qualified Data.HashTable (lookup, insert, delete, new)
+import qualified Data.HashTable.IO
+import qualified Data.HashTable.Class as H
 import qualified Data.ByteString as S
 import qualified Data.ByteString.Lazy as L
 
-hashNew     = Data.HashTable.new
-hashLookup  = Data.HashTable.lookup
-hashInsert  = Data.HashTable.insert
-hashDelete  = Data.HashTable.delete
+type HashTable k v = Data.HashTable.IO.CuckooHashTable k v
+
+hashNew :: a -> b -> IO (HashTable k v)
+hashNew _ _ = Data.HashTable.IO.new
+hashCreate :: IO (HashTable k v)
+hashCreate = Data.HashTable.IO.new
+hashLookup :: (Eq k, Hashable k) => HashTable k v -> k -> IO (Maybe v)
+hashLookup  = Data.HashTable.IO.lookup
+hashInsert :: (Eq k, Hashable k) => HashTable k v -> k -> v -> IO ()
+hashInsert  = Data.HashTable.IO.insert
+hashDelete :: (Eq k, Hashable k) => HashTable k v -> k -> IO ()
+hashDelete  = Data.HashTable.IO.delete
 
 type BS = S.ByteString
 type BL = L.ByteString

@@ -78,8 +78,7 @@ mkChunkType :: TypeRep -> ChunkType
 mkChunkType = MkChunkType
 
 typeInt :: TypeRep -> Int
-typeInt x = unsafeCoerce (unsafePerformIO (typeRepKey x))
-
+typeInt x = error "No longer needed for Hashable, as TypeRep becomes part of Ord"
 #else
 newtype ChunkType = MkChunkType Int
     deriving (Show, Eq, Typeable, Ord)
