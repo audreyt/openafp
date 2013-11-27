@@ -1,0 +1,4 @@
+# 1.4.0
+
+* Switch to hashtables & hashable packages for GHC 7.8.1 compatibility.
+* New hashCreate API that simply returns a hash table, with Eq and Hash inferred from typeclasses.

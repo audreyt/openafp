@@ -11,6 +11,8 @@ synopsis:           IBM AFP document format parser and generator
 description:        IBM AFP document format parser and generator
 category:           Data
 build-type:         Simple
+extra-source-files: ChangeLog
+
 library
     build-depends:      base >= 2 && < 5, mtl, regex-compat, directory, process,
                         array, containers, binary, bytestring, hashtables, hashable
