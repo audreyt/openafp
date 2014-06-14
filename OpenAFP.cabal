@@ -1,5 +1,5 @@
 name:               OpenAFP
-version:            1.4.1
+version:            1.4.2
 license:            PublicDomain
 License-file:       LICENSE
 cabal-version:      >= 1.6
