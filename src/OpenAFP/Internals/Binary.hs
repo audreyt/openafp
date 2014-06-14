@@ -86,6 +86,7 @@ instance Num N0 where
     x * _           = x
     abs x           = x
     signum x        = x
+    negate x        = x
     fromInteger _   = N0
 
 instance Show N1 where show = zeropad 1
@@ -223,7 +224,7 @@ shiftr_w32 :: Word32 -> Int -> Word32
 shiftr_w32 (W32# w) (I# i) = W32# (w `uncheckedShiftRL#`   i)
 
 readN :: Int -> (S.ByteString -> a) -> Get a
-readN n f = fmap f $ getBytes n
+readN n f = fmap f $ getByteString n
 {-# INLINE readN #-}
 -- ^ important
 

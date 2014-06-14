@@ -51,7 +51,7 @@ import Foreign.Ptr               as X
 import Foreign.ForeignPtr        as X 
 import Foreign.Storable          as X 
 import Numeric                   as X 
-import System.Cmd                as X 
+import System.Process            as X 
 import System.Console.GetOpt     as X 
 import System.IO                 as X 
 import System.Environment        as X 
