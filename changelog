@@ -1,3 +1,7 @@
+# 1.4.1
+
+* No functional changes, just cleaned up deprecation warnings and built on GHC 7.8.2.
+
 # 1.4.0
 
 * Switch to hashtables & hashable packages for GHC 7.8.1 compatibility.
