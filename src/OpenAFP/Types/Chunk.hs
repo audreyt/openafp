@@ -41,7 +41,7 @@ type NStr = Buffer0
 type AStr = NStr
 
 type ChunkWriter c = WriterT (ChunkQueue c)
-type WriterStateIO v a = (Chunk c, MonadReader v m) => ChunkWriter c m a
+type WriterStateIO v a = forall c m. (Chunk c, MonadReader v m) => ChunkWriter c m a
 
 instance Storable NStr where
     alignment _ = 8

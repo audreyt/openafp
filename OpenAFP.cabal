@@ -1,10 +1,10 @@
 name:               OpenAFP
-version:            1.4.2
+version:            1.4.3
 license:            PublicDomain
 License-file:       LICENSE
 cabal-version:      >= 1.6
 author:             Audrey Tang
-Tested-With:        GHC==6.10.1, GHC==6.12.1, GHC==7.0.1, GHC==7.2.1, GHC==7.4.1, GHC==7.8.2
+Tested-With:        GHC==6.10.1, GHC==6.12.1, GHC==7.0.1, GHC==7.2.1, GHC==7.4.1, GHC==7.8.2, GHC==8.0.2
 maintainer:         audreyt@audreyt.org
 homepage:           https://github.com/audreyt/openafp/
 synopsis:           IBM AFP document format parser and generator

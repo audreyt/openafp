@@ -55,7 +55,7 @@ import System.Process            as X
 import System.Console.GetOpt     as X 
 import System.IO                 as X 
 import System.Environment        as X 
-import System.Exit               as X 
+import System.Exit               as X hiding (die)
 import System.Mem.Weak           as X 
 import System.IO.Unsafe          as X 
 import System.IO.Error           as X 
@@ -91,5 +91,5 @@ stateGet = Control.Monad.RWS.get
 statePut :: (Control.Monad.State.MonadState s m) => s -> m ()
 statePut = Control.Monad.RWS.put
 
-type IOm a = (MonadPlus m, MonadIO m, MonadError e m, Show e, Typeable e) => m a
-type StateIO v a = (MonadPlus m, MonadIO m, MonadReader v m, MonadError e m, Show e, Typeable e) => m a
+type IOm a = forall m e. (MonadPlus m, MonadIO m, MonadError e m, Show e, Typeable e) => m a
+type StateIO v a = forall m e. (MonadPlus m, MonadIO m, MonadReader v m, MonadError e m, Show e, Typeable e) => m a
